@@ -32,7 +32,7 @@ for (const [en, zh] of pairs) {
     process.exit(1);
   }
 }
-console.log('4 bilingual pairs OK');
+console.log('7 bilingual pairs OK');
 "
 
 echo "=== [pre-commit] BOM 防线 / BOM guard ==="

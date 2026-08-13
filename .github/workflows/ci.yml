@@ -61,7 +61,7 @@ jobs:
               nz = sum(1 for _ in io.open(zh, encoding='utf-8'))
               if abs(ne - nz) > 10:
                   raise SystemExit('bilingual asymmetry: %s %d vs %s %d' % (en, ne, zh, nz))
-          print('4 bilingual pairs OK')
+          print('7 bilingual pairs OK')
           EOF
 
       - name: 'BOM 防线 / BOM guard'
