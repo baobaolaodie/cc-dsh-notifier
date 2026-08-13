@@ -15,7 +15,9 @@ export const TYPE_LABELS = {
 
 export function normalizeCwd(cwd) {
   if (!cwd) return '';
-  const c = String(cwd).replace(/[\\/]+$/, '');
+  // 分隔符统一为 \ (反斜杠),否则 D:\foo 与 D:/foo 比较不相等
+  // (2026-08-14 修复:目录匹配绑定发现 hook JSON cwd 为正斜杠、进程命令行路径为反斜杠)
+  const c = String(cwd).replace(/[\\/]+$/, '').replace(/\//g, '\\');
   return process.platform === 'win32' ? c.toLowerCase() : c;
 }
 

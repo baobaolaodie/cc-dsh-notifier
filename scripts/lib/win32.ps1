@@ -1,5 +1,7 @@
 ﻿# scripts/lib/win32.ps1 — user32 P/Invoke 封装:枚举可见顶层窗口 / 取前台窗口
 # 注意:本文件须以 UTF-8 BOM 保存,否则 PowerShell 5.1 按 ANSI 解码中文注释会破坏语法
+# 每个窗口附加 commandLine(进程启动命令行,仅白名单进程按 pid 查询),供 SessionStart
+# 目录匹配绑定(Claude Code 动态终端标题不含项目名,2026-08-14 调研结论)
 param(
   [ValidateSet('enumerate', 'foreground')]
   [string]$Action = 'enumerate'
@@ -51,4 +53,21 @@ public static class Win32Bridge {
 '@
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 if ($Action -eq 'enumerate') { $rows = @([Win32Bridge]::Windows()) } else { $rows = @([Win32Bridge]::Foreground()) }
+
+# 只对白名单进程按 pid 查询命令行(WindowsTerminal/Code/cmd/pwsh/powershell/conhost)
+# Get-CimInstance 按 pid 单条查询(实测 <50ms);避免全量 913ms 开销
+$WANT = @('WindowsTerminal', 'Code', 'cmd', 'pwsh', 'powershell', 'conhost')
+$wantedPids = @($rows | Where-Object { $_.pid -gt 0 -and $WANT -contains $_.processName } | Select-Object -ExpandProperty pid -Unique)
+$cmdMap = @{}
+if ($wantedPids.Count -gt 0) {
+  try {
+    $procs = Get-CimInstance Win32_Process -Filter ("ProcessId=" + ($wantedPids -join ' OR ProcessId=')) -ErrorAction SilentlyContinue
+    foreach ($p in $procs) { $cmdMap[[int]$p.ProcessId] = [string]$p.CommandLine }
+  } catch { /* 查询失败则 commandLine 为空 */ }
+}
+foreach ($r in $rows) {
+  $cl = ''
+  if ($cmdMap.ContainsKey([int]$r.pid)) { $cl = $cmdMap[[int]$r.pid] }
+  $r | Add-Member -NotePropertyName commandLine -NotePropertyValue $cl -Force
+}
 $rows | ConvertTo-Json -Compress -Depth 4

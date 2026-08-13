@@ -11,6 +11,7 @@ import { readState, writeState, clearState, isPidAlive } from './lib/state.mjs';
 import { log } from './lib/logger.mjs';
 import { runWin32 } from './lib/win32.mjs';
 import { buildWindowMap, isWhitelistedProcess } from './lib/window-map.mjs';
+import { commandLineMatchesCwd } from './lib/proc-dir.mjs';
 import { decideFocus } from './lib/focus.mjs';
 
 const TOAST = fileURLToPath(new URL('./toast-agent.py', import.meta.url));
@@ -98,26 +99,43 @@ async function handleEvent(event) {
   if (event.type === 'session-start') {
     if (!event.sessionId) { log('daemon', 'session-start 缺 session_id,忽略'); return; } // 防 null 键锁死空闲退出
     // 会话启动时绑定窗口句柄(多会话各自绑定):
-    // 1) 优先:枚举可见窗口,标题含 cwd 目录名(或 'Claude Code')的窗口 → 最可靠
-    // 2) 兜底:前台窗口且标题/进程匹配(标题含目录名/'Claude Code'/终端宿主进程)
+    // 1) 优先:进程目录匹配(Claude Code 动态终端标题不含项目名,2026-08-14 调研;
+    //    WindowsTerminal 启动参数 -d "<cwd>" 是可靠信号,见 proc-dir.mjs)
+    // 2) 次之:标题含 cwd 目录名(WindowsTerminal 默认标题含路径、VS Code 含文件夹名;
+    //    进程白名单过滤,排除 explorer 误绑)
+    // 3) 兜底:前台窗口同样规则
     let fgHwnd = 0;
     try {
-      // 最强信号:窗口标题含 cwd 目录名(WindowsTerminal 默认标题含路径、VS Code 含文件夹名)
-      // 进程白名单过滤:只绑终端宿主(WindowsTerminal/Code/cmd/pwsh/powershell/conhost),
-      // 排除 explorer 等窗口(标题可能含项目名,如「cc-notifier 和 1 个其他选项卡」,
-      // 2026-08-14 实测误绑 explorer 导致点击跳转跳到资源管理器)
-      const base = projectName(event.cwd || '').toLowerCase();
-      const matches = (w) => base && isWhitelistedProcess(w.processName)
+      const eventCwd = event.cwd || '';
+      const base = projectName(eventCwd).toLowerCase();
+      const titleMatches = (w) => base && isWhitelistedProcess(w.processName)
         && String(w.title || '').toLowerCase().includes(base);
-      // 1) 枚举匹配
+      const dirMatches = (w) => isWhitelistedProcess(w.processName)
+        && commandLineMatchesCwd(w.commandLine, eventCwd);
+      // 1) 枚举匹配:
+      //    a) 目录信号限定进程(WindowsTerminal 多标签:进程级 -d 参数命中 cwd)
+      //    b) 进程内优先选 '? ' 前缀标签(Claude Code 动态标题特征,2026-08-14 实测),
+      //       避免误绑同进程的其他标签(cmd/其他 shell)
+      //    c) 无 ? 标签时回退标题含项目名匹配
       const all = await runWin32('enumerate');
-      for (const w of all) {
-        if (matches(w)) { fgHwnd = w.hwnd; break; }
+      const dirMatched = all.filter((w) => dirMatches(w));
+      const ccTag = dirMatched.find((w) => /^\?\s/.test(w.title || ''));
+      if (ccTag) {
+        fgHwnd = ccTag.hwnd;
+      } else if (dirMatched.length > 0) {
+        fgHwnd = dirMatched[0].hwnd;
       }
-      // 2) 前台兜底(同样按目录名+白名单;标题自定义的窗口无法绑定 → hwnd=0,回退标题映射)
+      if (!fgHwnd) {
+        for (const w of all) {
+          if (titleMatches(w)) { fgHwnd = w.hwnd; break; }
+        }
+      }
+      // 2) 前台兜底(同样双信号;前台窗口若是 Claude Code 标签直接采用)
       if (!fgHwnd) {
         const fg = await runWin32('foreground');
-        if (fg && fg[0] && matches(fg[0])) fgHwnd = fg[0].hwnd;
+        if (fg && fg[0] && (dirMatches(fg[0]) || titleMatches(fg[0]) || /^\?\s/.test(fg[0].title || ''))) {
+          fgHwnd = fg[0].hwnd;
+        }
       }
     } catch { /* 桥接失败则 hwnd=0,回退标题映射 */ }
     sessions.set(event.sessionId, { cwd: event.cwd || '', lastSeen: Date.now(), hwnd: fgHwnd });

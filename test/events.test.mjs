@@ -48,6 +48,11 @@ test('normalizeCwd 去尾部分隔符并小写,projectName 取最后一段', () 
   assert.equal(truncate('abcdef', 5), 'abcd…');
 });
 
+test('normalizeCwd 统一分隔符(反斜杠/正斜杠等价)', () => {
+  assert.equal(normalizeCwd('D:\\Foo\\Bar'), normalizeCwd('D:/Foo/Bar'));
+  assert.equal(normalizeCwd('D:/Foo/Bar/'), 'd:\\foo\\bar');
+});
+
 test('NOTIFY_TYPES 只含四类通知事件', () => {
   assert.deepEqual([...NOTIFY_TYPES].sort(), [
     'ask-user-question', 'permission-request', 'stop', 'tool-result',
