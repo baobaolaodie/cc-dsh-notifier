@@ -1,0 +1,13 @@
+{
+  "name": "cc-notifier",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Claude Code Windows 通知系统:Toast + 点击跳转",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

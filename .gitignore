@@ -1,0 +1,19 @@
+node_modules/
+*.log
+
+# Spike 实验脚本与恢复工具(历史痕迹保留在磁盘,不入库)
+scripts/spikes/
+recover.py
+test-fixture-*.json
+
+# Comet 运行时状态不入库(.comet.yaml 与 config.yaml 保留)
+.comet/current-change.json
+docs/openspec/changes/**/.comet/
+!docs/openspec/changes/**/.comet.yaml
+
+# 本机工具配置/技能目录不入库
+.codex/
+.claude/
+.agents/
+CLAUDE.md
+AGENTS.md
