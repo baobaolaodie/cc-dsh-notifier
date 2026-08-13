@@ -11,11 +11,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # ── 测试: 跨 Node 版本语法检查 + 单元测试 / Tests ──
+  # ── 测试: 跨 Node 版本 + 平台语法检查与单元测试 / Tests ──
+  # windows-latest 使 win32 专属断言(大小写归一化/聚焦判定)真正执行;
+  # ubuntu 矩阵保证跨平台兼容(本项目为 Windows 工具,ubuntu 是兼容性补充)
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest]
         node-version: [18, 20, 22]
     steps:
       - uses: actions/checkout@v4
@@ -26,6 +29,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Syntax check
+        shell: bash
         run: |
           for f in $(git ls-files '*.mjs'); do
             node --check "$f" || { echo "语法错误 / syntax error: $f"; exit 1; }
@@ -45,7 +49,10 @@ jobs:
           python - <<'EOF'
           import io, os
           pairs = [('README.md','README-zh.md'),('CONTRIBUTING.md','CONTRIBUTING-zh.md'),
-                   ('SECURITY.md','SECURITY-zh.md'),('CHANGELOG.md','CHANGELOG-zh.md')]
+                   ('SECURITY.md','SECURITY-zh.md'),('CHANGELOG.md','CHANGELOG-zh.md'),
+                   ('docs/INSTALLATION.md','docs/INSTALLATION-zh.md'),
+                   ('docs/USAGE.md','docs/USAGE-zh.md'),
+                   ('docs/TROUBLESHOOTING.md','docs/TROUBLESHOOTING-zh.md')]
           # CODE_OF_CONDUCT 除外:标准模板(Contributor Covenant)与官方翻译的段落行数天然不对齐
           for en, zh in pairs:
               if not os.path.isfile(en) or not os.path.isfile(zh):

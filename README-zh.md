@@ -18,6 +18,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/baobaolaodie/cc-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.0-4CAF50?style=flat" alt="version 0.1.0" /></a>
   <a href="https://docs.anthropic.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude_Code-D97757?style=flat&logo=claude&logoColor=white" alt="Claude Code" /></a>
   <img src="https://img.shields.io/badge/Windows_10%2F11-0078D6?style=flat&logo=windows&logoColor=white" alt="Windows 10/11" />
   <img src="https://img.shields.io/badge/Node.js_18+-339933?style=flat&logo=node.js&logoColor=white" alt="Node.js 18+" />
@@ -40,6 +41,10 @@ cc-notifier 在 Claude Code 需要你介入、而你未聚焦于会话窗口时�
 | 点击跳转 | `SetForegroundWindow` 精确聚焦会话窗口,通过进程工作目录与终端标签身份解析 |
 | 多会话 | 每个会话绑定各自窗口句柄;Toast 携带项目名,多会话可区分 |
 | 去重 | 失焦时同类事件在 10 秒窗口内合并 |
+
+## 文档
+
+详细指南:[安装](docs/INSTALLATION-zh.md) · [使用](docs/USAGE-zh.md) · [排障](docs/TROUBLESHOOTING-zh.md)
 
 ## 快速开始
 

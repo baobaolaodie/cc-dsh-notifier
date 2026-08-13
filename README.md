@@ -18,6 +18,7 @@ English · [中文](README-zh.md)
 </p>
 
 <p align="center">
+  <a href="https://github.com/baobaolaodie/cc-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.0-4CAF50?style=flat" alt="version 0.1.0" /></a>
   <a href="https://docs.anthropic.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude_Code-D97757?style=flat&logo=claude&logoColor=white" alt="Claude Code" /></a>
   <img src="https://img.shields.io/badge/Windows_10%2F11-0078D6?style=flat&logo=windows&logoColor=white" alt="Windows 10/11" />
   <img src="https://img.shields.io/badge/Node.js_18+-339933?style=flat&logo=node.js&logoColor=white" alt="Node.js 18+" />
@@ -40,6 +41,10 @@ cc-notifier alerts you when Claude Code needs your attention but you are not loo
 | Click-to-focus | `SetForegroundWindow` targets the exact session window, resolved by process working directory and terminal tab identity |
 | Multi-session | Each session binds its own window handle; toasts carry the project name so sessions are distinguishable |
 | Deduplication | Same-type events merge within a 10-second window while unfocused |
+
+## Documentation
+
+Detailed guides: [Installation](docs/INSTALLATION.md) · [Usage](docs/USAGE.md) · [Troubleshooting](docs/TROUBLESHOOTING.md)
 
 ## Quick Start
 
