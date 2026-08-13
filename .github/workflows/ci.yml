@@ -38,6 +38,23 @@ jobs:
       - name: Run tests
         run: npm test
 
+      # 覆盖率门禁:仅在 Node 22(最新)运行,避免矩阵重复
+      - name: Coverage gate (Node 22 only)
+        if: matrix.node-version == 22
+        shell: bash
+        run: |
+          COV=$(node --test --experimental-test-coverage test/config.test.mjs test/dedup.test.mjs test/events.test.mjs test/focus.test.mjs test/window-title.test.mjs 2>&1)
+          LINE=$(echo "$COV" | awk -F'|' '/all files/{gsub(/ /,"",$2); print $2}')
+          BRANCH=$(echo "$COV" | awk -F'|' '/all files/{gsub(/ /,"",$3); print $3}')
+          echo "line=${LINE}% branch=${BRANCH}%"
+          python -c "
+import sys
+line = float('$LINE'); branch = float('$BRANCH')
+if line < 90: print(f'FAIL: line coverage {line}% < 90%'); sys.exit(1)
+if branch < 75: print(f'FAIL: branch coverage {branch}% < 75%'); sys.exit(1)
+print('coverage gate PASS')
+"
+
   # ── 质量: 双语镜像对称 + BOM 防线 / Quality ──
   quality:
     runs-on: ubuntu-latest
@@ -77,6 +94,24 @@ jobs:
               echo "非预期 BOM / unexpected BOM in: $f"; exit 1
             fi
           done
+
+      - name: '版本一致性 / Version consistency'
+        run: |
+          # package.json version / README 版本徽章 / CHANGELOG 首个版本段 三者一致
+          V1=$(node -p "require('./package.json').version")
+          V2=$(grep -oE 'version-[0-9]+\.[0-9]+\.[0-9]+' README.md | head -1 | sed 's/version-//')
+          V3=$(grep -oE 'version-[0-9]+\.[0-9]+\.[0-9]+' README-zh.md | head -1 | sed 's/version-//')
+          V4=$(grep -m1 '^## \[' CHANGELOG.md | sed -E 's/## \[([0-9.]+).*/\1/')
+          V5=$(grep -m1 '^## \[' CHANGELOG-zh.md | sed -E 's/## \[([0-9.]+).*/\1/')
+          echo "package.json=$V1 README=$V2/$V3 CHANGELOG=$V4/$V5"
+          if [ "$V1" = "$V2" ] && [ "$V1" = "$V3" ] && [ "$V1" = "$V4" ] && [ "$V1" = "$V5" ]; then
+            :
+          else
+            echo "版本不一致 / version mismatch across docs"; exit 1
+          fi
+
+      - name: 'Workflow lint (actionlint)'
+        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.7 -color
 
   # ── PR 纪律: 标题/模板/分支前缀(服务端强制)/ PR policy ──
   pr-policy:
