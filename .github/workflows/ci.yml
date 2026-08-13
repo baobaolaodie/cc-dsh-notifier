@@ -47,13 +47,13 @@ jobs:
           LINE=$(echo "$COV" | awk -F'|' '/all files/{gsub(/ /,"",$2); print $2}')
           BRANCH=$(echo "$COV" | awk -F'|' '/all files/{gsub(/ /,"",$3); print $3}')
           echo "line=${LINE}% branch=${BRANCH}%"
-          python -c "
-import sys
-line = float('$LINE'); branch = float('$BRANCH')
-if line < 90: print(f'FAIL: line coverage {line}% < 90%'); sys.exit(1)
-if branch < 75: print(f'FAIL: branch coverage {branch}% < 75%'); sys.exit(1)
-print('coverage gate PASS')
-"
+          node -e '
+            const line = parseFloat(process.argv[1]);
+            const branch = parseFloat(process.argv[2]);
+            if (line < 90) { console.error(`FAIL: line coverage ${line}% < 90%`); process.exit(1); }
+            if (branch < 75) { console.error(`FAIL: branch coverage ${branch}% < 75%`); process.exit(1); }
+            console.log("coverage gate PASS");
+          ' "$LINE" "$BRANCH"
 
   # ── 质量: 双语镜像对称 + BOM 防线 / Quality ──
   quality:
