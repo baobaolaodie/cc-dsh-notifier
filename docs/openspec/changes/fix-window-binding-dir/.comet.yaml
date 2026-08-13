@@ -1,6 +1,6 @@
 workflow: hotfix
 language: zh-CN
-phase: build
+phase: archive
 context_compression: off
 build_mode: direct
 build_pause: null
@@ -13,13 +13,13 @@ auto_transition: true
 base_ref: 4088ff3bf16c22d58ca9f7fba870886ecdf91591
 design_doc: null
 plan: null
-verify_result: pending
+verify_result: pass
 verify_failures: 0
-verification_report: null
+verification_report: docs/superpowers/reports/2026-08-14-fix-window-binding-dir-verify.md
 branch_status: pending
 created_at: 2026-08-13
-verified_at: null
-archive_confirmation: null
+verified_at: 2026-08-13
+archive_confirmation: pending
 archived: false
 bound_branch: master
 direct_override: null
