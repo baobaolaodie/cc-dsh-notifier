@@ -10,6 +10,12 @@
 
 格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/);版本遵循 [语义化版本](https://semver.org/lang/zh-CN/)。版本记录于 git 标签与本文件。
 
+## Unreleased
+
+### 修复
+
+- test 命令改为显式列出测试文件(替代 glob),修复 Node 18 Windows 上 `npm test` 失败(`Could not find 'test/*.test.mjs'`)。
+
 ## [0.1.0] - 2026-08-14
 
 首个发布:Claude Code 会话的 Windows 桌面通知系统。

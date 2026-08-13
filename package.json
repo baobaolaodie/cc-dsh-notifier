@@ -5,7 +5,7 @@
   "description": "Claude Code Windows 通知系统:Toast + 点击跳转",
   "type": "module",
   "scripts": {
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/config.test.mjs test/dedup.test.mjs test/events.test.mjs test/focus.test.mjs test/window-title.test.mjs"
   },
   "engines": {
     "node": ">=18.0.0"

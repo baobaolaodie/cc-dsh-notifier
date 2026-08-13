@@ -10,6 +10,12 @@ All notable changes to this project are documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/). Versions are recorded in git tags and this document.
 
+## Unreleased
+
+### Fixed
+
+- Test command lists test files explicitly instead of a glob, fixing `npm test` on Node 18 Windows (`Could not find 'test/*.test.mjs'`).
+
 ## [0.1.0] - 2026-08-14
 
 Initial release: Windows desktop notifications for Claude Code sessions.
