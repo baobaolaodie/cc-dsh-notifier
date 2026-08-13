@@ -41,7 +41,9 @@ test('未知事件类型返回 null', () => {
 });
 
 test('normalizeCwd 去尾部分隔符并小写,projectName 取最后一段', () => {
-  assert.equal(normalizeCwd('D:\\Foo\\Bar\\'), 'd:\\foo\\bar');
+  // 平台无关断言:win32 小写化,其他平台保持原样(硬编码 win32 输出会使 CI(Linux)失败)
+  const expected = process.platform === 'win32' ? 'd:\\foo\\bar' : 'D:\\Foo\\Bar';
+  assert.equal(normalizeCwd('D:\\Foo\\Bar\\'), expected);
   assert.equal(projectName('D:\\Foo\\Bar'), 'Bar');
   assert.equal(projectName(''), '');
   assert.equal(truncate('abc', 5), 'abc');
@@ -50,7 +52,9 @@ test('normalizeCwd 去尾部分隔符并小写,projectName 取最后一段', () 
 
 test('normalizeCwd 统一分隔符(反斜杠/正斜杠等价)', () => {
   assert.equal(normalizeCwd('D:\\Foo\\Bar'), normalizeCwd('D:/Foo/Bar'));
-  assert.equal(normalizeCwd('D:/Foo/Bar/'), 'd:\\foo\\bar');
+  // 分隔符统一为反斜杠(平台无关:不依赖小写化行为)
+  const expected = process.platform === 'win32' ? 'd:\\foo\\bar' : 'D:\\foo\\bar';
+  assert.equal(normalizeCwd('D:/Foo/Bar/'), expected);
 });
 
 test('NOTIFY_TYPES 只含四类通知事件', () => {
