@@ -6,19 +6,20 @@ import { fileURLToPath } from 'node:url';
 const AGENT = fileURLToPath(new URL('./notify-agent.mjs', import.meta.url));
 const CWD = process.cwd();
 
+// fixtures 使用真实 Claude Code hook JSON 格式(扁平 tool_name/tool_input,2026-08-13 修复)
 const FIXTURES = {
   'permission-request': {
     session_id: 'test-session', cwd: CWD, hook_event_name: 'PermissionRequest',
-    tool_use: { id: 't1', name: 'Bash', input: { command: 'npm install' } },
+    tool_name: 'Bash', tool_input: { command: 'npm install' },
   },
   'ask-user-question': {
     session_id: 'test-session', cwd: CWD, hook_event_name: 'PreToolUse', matcher: 'AskUserQuestion',
-    tool_use: { id: 't2', name: 'AskUserQuestion', input: { questions: [{ prompt: '请确认是否继续?(测试问题预览)' }] } },
+    tool_name: 'AskUserQuestion', tool_input: { questions: [{ prompt: '请确认是否继续?(测试问题预览)' }] },
   },
   'tool-result': {
     session_id: 'test-session', cwd: CWD, hook_event_name: 'PostToolUse',
-    tool_use: { id: 't3', name: 'Bash', input: { command: 'npm test' } },
-    tool_response: { is_error: true, error: 'Command failed: npm test', content: [{ type: 'text', text: 'test failed' }] },
+    tool_name: 'Bash', tool_input: { command: 'npm test' },
+    tool_response: { type: 'tool_result', is_error: true, error: 'Command failed: npm test', content: [{ type: 'text', text: 'test failed' }] },
   },
   stop: { session_id: 'test-session', cwd: CWD, hook_event_name: 'Stop' },
   'session-start': { session_id: 'test-session', cwd: CWD, hook_event_name: 'SessionStart' },

@@ -47,9 +47,10 @@ export function parseEvent(eventType, hookJson = {}) {
     case 'session-end':
       return { ...base, type: 'session-end' };
     case 'permission-request': {
-      const tool = hookJson.tool_use || {};
-      const toolName = tool.name || '';
-      const input = tool.input || {};
+      // 真实 Claude Code hook JSON 是扁平格式(tool_name/tool_input);
+      // 嵌套 tool_use 仅为兼容旧测试/调用方(2026-08-13 修复 hook 格式不匹配)
+      const toolName = hookJson.tool_name || (hookJson.tool_use || {}).name || '';
+      const input = hookJson.tool_input || (hookJson.tool_use || {}).input || {};
       let summary = '';
       if (toolName === 'Bash') {
         summary = input.command ? `Bash 请求执行:${input.command}` : 'Bash 请求执行权限';
@@ -61,20 +62,19 @@ export function parseEvent(eventType, hookJson = {}) {
       return { ...base, type: 'permission-request', toolName, summary };
     }
     case 'ask-user-question': {
-      const tool = hookJson.tool_use || {};
-      const input = tool.input || {};
+      const input = hookJson.tool_input || (hookJson.tool_use || {}).input || {};
       const qs = Array.isArray(input.questions) ? input.questions : [];
       const prompt = qs.length > 0 && qs[0] ? String(qs[0].prompt || '') : '';
       return { ...base, type: 'ask-user-question', toolName: 'AskUserQuestion', summary: truncate(prompt) };
     }
     case 'tool-result': {
-      const tool = hookJson.tool_use || {};
+      const toolName = hookJson.tool_name || (hookJson.tool_use || {}).name || '';
       const resp = hookJson.tool_response || {};
       const isError = resp.is_error === true || Boolean(resp.error);
       if (!isError) return null; // 非错误不通知
       const errText = resp.error
         || (Array.isArray(resp.content) ? resp.content.map((c) => (c && c.text) || '').join(' ').trim() : String(resp.content || ''));
-      return { ...base, type: 'tool-result', toolName: tool.name || '', summary: truncate(errText) || '工具执行出错' };
+      return { ...base, type: 'tool-result', toolName, summary: truncate(errText) || '工具执行出错' };
     }
     case 'stop':
       return { ...base, type: 'stop', summary: 'Claude 等待输入' };
