@@ -10,7 +10,7 @@ import { loadConfig, DEFAULT_CONFIG } from './lib/config.mjs';
 import { readState, writeState, clearState, isPidAlive } from './lib/state.mjs';
 import { log } from './lib/logger.mjs';
 import { runWin32 } from './lib/win32.mjs';
-import { buildWindowMap } from './lib/window-map.mjs';
+import { buildWindowMap, isWhitelistedProcess } from './lib/window-map.mjs';
 import { decideFocus } from './lib/focus.mjs';
 
 const TOAST = fileURLToPath(new URL('./toast-agent.py', import.meta.url));
@@ -103,18 +103,21 @@ async function handleEvent(event) {
     let fgHwnd = 0;
     try {
       // 最强信号:窗口标题含 cwd 目录名(WindowsTerminal 默认标题含路径、VS Code 含文件夹名)
-      // 不采用 'Claude Code' 关键字/进程白名单(会误绑其他项目窗口,如 flow-comet 的 VS Code)
+      // 进程白名单过滤:只绑终端宿主(WindowsTerminal/Code/cmd/pwsh/powershell/conhost),
+      // 排除 explorer 等窗口(标题可能含项目名,如「cc-notifier 和 1 个其他选项卡」,
+      // 2026-08-14 实测误绑 explorer 导致点击跳转跳到资源管理器)
       const base = projectName(event.cwd || '').toLowerCase();
-      const matches = (title) => base && String(title || '').toLowerCase().includes(base);
+      const matches = (w) => base && isWhitelistedProcess(w.processName)
+        && String(w.title || '').toLowerCase().includes(base);
       // 1) 枚举匹配
       const all = await runWin32('enumerate');
       for (const w of all) {
-        if (matches(w.title)) { fgHwnd = w.hwnd; break; }
+        if (matches(w)) { fgHwnd = w.hwnd; break; }
       }
-      // 2) 前台兜底(同样按目录名;标题自定义的窗口无法绑定 → hwnd=0,回退标题映射)
+      // 2) 前台兜底(同样按目录名+白名单;标题自定义的窗口无法绑定 → hwnd=0,回退标题映射)
       if (!fgHwnd) {
         const fg = await runWin32('foreground');
-        if (fg && fg[0] && matches(fg[0].title)) fgHwnd = fg[0].hwnd;
+        if (fg && fg[0] && matches(fg[0])) fgHwnd = fg[0].hwnd;
       }
     } catch { /* 桥接失败则 hwnd=0,回退标题映射 */ }
     sessions.set(event.sessionId, { cwd: event.cwd || '', lastSeen: Date.now(), hwnd: fgHwnd });
