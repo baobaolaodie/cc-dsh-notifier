@@ -50,10 +50,8 @@ test('损坏 JSON 回退默认', () => {
 });
 
 test('projectConfigPath 拼接正确', () => {
-  // 平台无关:path.join 输出由平台决定(win32 反斜杠、其他平台正斜杠)
-  const expected = process.platform === 'win32'
-    ? 'D:\\proj\\.claude\\cc-notifier.json'
-    : 'D:/proj/.claude/cc-notifier.json';
+  // 平台无关:期望值由 path.join 动态构造(输入混用反斜杠在非 win32 会保留)
+  const expected = path.join('D:\\proj', '.claude', 'cc-notifier.json');
   assert.equal(projectConfigPath('D:\\proj'), expected);
   assert.equal(projectConfigPath(''), null);
 });

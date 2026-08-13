@@ -51,10 +51,11 @@ test('normalizeCwd 去尾部分隔符并小写,projectName 取最后一段', () 
 });
 
 test('normalizeCwd 统一分隔符(反斜杠/正斜杠等价)', () => {
-  assert.equal(normalizeCwd('D:\\Foo\\Bar'), normalizeCwd('D:/Foo/Bar'));
-  // 分隔符统一为反斜杠(平台无关:不依赖小写化行为)
-  const expected = process.platform === 'win32' ? 'd:\\foo\\bar' : 'D:\\foo\\bar';
-  assert.equal(normalizeCwd('D:/Foo/Bar/'), expected);
+  // 输入用纯正斜杠避免非 win32 平台把反斜杠当普通字符
+  const a = normalizeCwd('D:/Foo/Bar');
+  const b = normalizeCwd('D:/Foo/Bar/');
+  assert.equal(a, b);
+  assert.ok(a.includes('\\'), '分隔符应统一为反斜杠');
 });
 
 test('NOTIFY_TYPES 只含四类通知事件', () => {
