@@ -2,7 +2,7 @@
 
 Claude Code 在终端中通过 OSC 转义序列动态设置窗口标题(`? <当前任务文本>`),标题随任务变化且**不含项目名**。导致 SessionStart 窗口绑定(依赖标题含项目名)在 Windows Terminal 场景**永远 hwnd=0**——点击 Toast 无法跳转(fix-window-binding 后 explorer 误绑已排除,但正常终端也绑不上了)。
 
-实测:WindowsTerminal 启动命令行含可靠信号 `-d "D:\dev\cc-notifier"`(工作目录参数)。**用进程启动命令行匹配 cwd,比标题可靠**。
+实测:WindowsTerminal 启动命令行含可靠信号 `-d "<项目路径>"`(工作目录参数)。**用进程启动命令行匹配 cwd,比标题可靠**。
 
 ## What Changes
 

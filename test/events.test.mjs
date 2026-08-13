@@ -4,7 +4,7 @@ import {
   parseEvent, normalizeCwd, projectName, truncate, toastContent, NOTIFY_TYPES,
 } from '../scripts/lib/events.mjs';
 
-const CWD = 'D:\\LongYinHaHa\\VSCode\\cc-notifier';
+const CWD = 'D:\\dev\\cc-notifier';
 
 test('事件类型映射与基础载荷', () => {
   const ev = parseEvent('permission-request', {

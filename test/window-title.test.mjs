@@ -2,14 +2,14 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { titleToCwd, buildWindowMap, PROCESS_WHITELIST, isWhitelistedProcess } from '../scripts/lib/window-map.mjs';
 
-const CWD = 'D:\\LongYinHaHa\\VSCode\\cc-notifier';
+const CWD = 'D:\\dev\\cc-notifier';
 
 test('Windows Terminal 标题含路径(取最后一个路径段)', () => {
-  assert.equal(titleToCwd('bash — 80x24 D:\\LongYinHaHa\\VSCode\\cc-notifier', [CWD]), CWD);
+  assert.equal(titleToCwd('bash — 80x24 D:\\dev\\cc-notifier', [CWD]), CWD);
 });
 
 test('标题直接是路径', () => {
-  assert.equal(titleToCwd('D:\\LongYinHaHa\\VSCode\\cc-notifier', [CWD]), CWD);
+  assert.equal(titleToCwd('D:\\dev\\cc-notifier', [CWD]), CWD);
 });
 
 test('已知 cwd 以 basename 出现在标题(VS Code 风格)', () => {
