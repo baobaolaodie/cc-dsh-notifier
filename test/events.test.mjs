@@ -68,6 +68,14 @@ test('permission-request: 真实 hook JSON 扁平格式(仅命令本身)', () =>
   assert.equal(ev.summary, 'Bash 请求执行:npm install');
 });
 
+test('permission-request: AskUserQuestion 跳过(与 PreToolUse 提问去重)', () => {
+  const ev = parseEvent('permission-request', {
+    cwd: CWD, hook_event_name: 'PermissionRequest',
+    tool_name: 'AskUserQuestion', tool_input: { questions: [{ question: 'x' }] },
+  });
+  assert.equal(ev, null);
+});
+
 test('permission-request: 嵌套 tool_use 回退兼容', () => {
   const ev = parseEvent('permission-request', {
     session_id: 's1', cwd: CWD,
@@ -90,14 +98,22 @@ test('permission-request: Bash 无 command 时给默认文案', () => {
   assert.equal(ev.summary, 'Bash 请求执行权限');
 });
 
-test('ask-user-question: 真实 hook JSON 扁平格式取 questions[0].prompt 并截断', () => {
+test('ask-user-question: 真实 hook JSON 扁平格式取 questions[0].question 并截断', () => {
   const ev = parseEvent('ask-user-question', {
     cwd: CWD, hook_event_name: 'PreToolUse',
-    tool_name: 'AskUserQuestion', tool_input: { questions: [{ prompt: 'x'.repeat(200) }] },
+    tool_name: 'AskUserQuestion', tool_input: { questions: [{ question: 'x'.repeat(200) }] },
   });
   assert.equal(ev.toolName, 'AskUserQuestion');
   assert.equal(ev.summary.length, 80);
   assert.ok(ev.summary.endsWith('…'));
+});
+
+test('ask-user-question: question 字段缺失时回退 prompt(兼容旧调用方)', () => {
+  const ev = parseEvent('ask-user-question', {
+    cwd: CWD, hook_event_name: 'PreToolUse',
+    tool_name: 'AskUserQuestion', tool_input: { questions: [{ prompt: '旧格式' }] },
+  });
+  assert.equal(ev.summary, '旧格式');
 });
 
 test('ask-user-question: 嵌套 tool_use 回退兼容', () => {

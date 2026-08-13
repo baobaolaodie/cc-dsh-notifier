@@ -52,6 +52,9 @@ export function parseEvent(eventType, hookJson = {}) {
       // 真实 Claude Code hook JSON 是扁平格式(tool_name/tool_input);
       // 嵌套 tool_use 仅为兼容旧测试/调用方(2026-08-13 修复 hook 格式不匹配)
       const toolName = hookJson.tool_name || (hookJson.tool_use || {}).name || '';
+      // AskUserQuestion 权限请求与 PreToolUse 提问同时触发(同一工具调用),
+      // 跳过避免双通知(2026-08-14 实测双弹「提问」+「权限请求」)
+      if (toolName === 'AskUserQuestion') return null;
       const input = hookJson.tool_input || (hookJson.tool_use || {}).input || {};
       let summary = '';
       if (toolName === 'Bash') {
@@ -66,7 +69,9 @@ export function parseEvent(eventType, hookJson = {}) {
     case 'ask-user-question': {
       const input = hookJson.tool_input || (hookJson.tool_use || {}).input || {};
       const qs = Array.isArray(input.questions) ? input.questions : [];
-      const prompt = qs.length > 0 && qs[0] ? String(qs[0].prompt || '') : '';
+      // 真实 PreToolUse 载荷字段是 question(单数),兼容 prompt(旧测试/调用方)
+      // (2026-08-14 实测 hook-dump:questions[0].question,代码原用 .prompt 提取为空)
+      const prompt = qs.length > 0 && qs[0] ? String(qs[0].question || qs[0].prompt || '') : '';
       return { ...base, type: 'ask-user-question', toolName: 'AskUserQuestion', summary: truncate(prompt) };
     }
     case 'tool-result': {
