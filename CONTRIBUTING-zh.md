@@ -1,10 +1,10 @@
 <div align="right">
 
-English · [中文](CONTRIBUTING-zh.md)
+[English](CONTRIBUTING.md) · 中文
 
 </div>
 
-# Contributing to cc-notifier
+# 为 cc-notifier 贡献
 
 感谢你考虑为 cc-notifier 贡献代码。以下是参与开发的流程与约定。
 

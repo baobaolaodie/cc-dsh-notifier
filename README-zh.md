@@ -179,7 +179,7 @@ test/                    # 5 个测试文件,45 条断言(node:test)
 
 ## 贡献
 
-完整流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。简要步骤:
+完整流程见 [CONTRIBUTING-zh.md](CONTRIBUTING-zh.md)([英文版](CONTRIBUTING.md))。简要步骤:
 
 1. Fork 本仓库
 2. 创建功能分支(`git checkout -b feature/your-change`)
@@ -187,7 +187,7 @@ test/                    # 5 个测试文件,45 条断言(node:test)
 4. 推送到分支(`git push origin feature/your-change`)
 5. 发起 Pull Request
 
-安全问题:见 [SECURITY.md](SECURITY.md)。
+安全问题:见 [SECURITY-zh.md](SECURITY-zh.md)([英文版](SECURITY.md))。
 
 ## 许可证
 

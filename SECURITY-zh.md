@@ -1,18 +1,18 @@
 <div align="right">
 
-English · [中文](SECURITY-zh.md)
+[English](SECURITY.md) · 中文
 
 </div>
 
-# Security Policy
+# 安全策略
 
-## Supported Versions
+## 受支持的版本
 
-| Version | Supported |
+| 版本 | 支持状态 |
 |---------|-----------|
-| 0.1.x   | ✅ |
+| 0.1.x   | ✅ 支持 |
 
-## Reporting a Vulnerability
+## 报告安全漏洞
 
 请勿在公开 issue 中披露安全漏洞。请通过以下方式私下报告:
 
