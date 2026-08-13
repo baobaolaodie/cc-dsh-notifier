@@ -1,0 +1,74 @@
+name: 问题报告 / Bug report
+description: 报告通知行为异常 / Report abnormal notification behavior
+title: "[bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        <!-- 报告前请先搜索既有 issue,避免重复 / Search existing issues before filing -->
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际行为 / Actual behavior
+      description: 发生了什么 / What actually happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为 / Expected behavior
+      description: 应该怎样 / What should have happened
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+      description: 从触发事件到观察结果的最小化复现 / Minimal reproduction from event trigger to observed result
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: checkboxes
+    id: duplicates
+    attributes:
+      label: 查重 / Duplicate check
+      options:
+        - label: 我已搜索既有 issue / I have searched existing issues
+          required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: 影响 / Impact
+      options:
+        - 阻塞(无法继续)/ Blocking (cannot continue)
+        - 降级(功能部分失效)/ Degraded (partial functionality)
+        - 轻微 / Minor
+      default: 2
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境 / Environment
+      description: 用于定位问题的上下文 / Context for reproducing the issue
+      placeholder: |
+        - Windows 版本 / Windows version:
+        - Node 版本 / Node version:
+        - Python 版本 / Python version:
+        - Claude Code 版本 / Claude Code version:
+        - cc-notifier 版本 / cc-notifier version:
+        - 安装方式 / Install method(install.mjs / 手动):
+        - 会话类型 / Session type(Windows Terminal / VS Code 集成终端):
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志 / Logs
+      description: "%LOCALAPPDATA%\\cc-notifier\\ 下的 daemon.log / notify-agent.log / toast-click.log 相关片段 / Relevant snippets from daemon.log / notify-agent.log / toast-click.log"
+      render: shell
+  - type: textarea
+    id: additional
+    attributes:
+      label: 其他 / Additional context
+      description: 截图或补充说明 / Screenshots or extra details

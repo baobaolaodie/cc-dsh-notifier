@@ -1,0 +1,27 @@
+# 新贡献者欢迎 / First-interaction greeting
+name: greeting
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: |-
+            👋 感谢你的首个 PR / Thanks for your first PR to cc-notifier!
+
+            Before review, please make sure:
+            - PR title follows Conventional Commits (e.g. `fix: ...`, `docs: ...`, `ci: ...`)
+            - The checklist in the PR template stays complete (keep unchecked items as `[ ]`)
+            - Local pre-check: `npm test` → 45 pass
+
+            CI enforces the rest automatically (tests, bilingual mirror, BOM guard, PR conventions, dead links).
