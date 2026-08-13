@@ -10,7 +10,7 @@
   - **39/39 测试通过**(与 verify 报告一致;第一次记忆重建仅 38/38,因 window-title 测试断言被删减)
   - 9 个文件与记忆版有差异,其中 4 个含真实功能回归(toast-agent.py 的 -nosound 静音、daemon.mjs 的 clearState 所有权检查、install.mjs 的 AUMID 失败提示、uninstall.mjs 的 GBK 解码),已全部恢复为真实版
   - **历史中无工具目录(.codex/.claude/.agents/CLAUDE.md/AGENTS.md)、无 node_modules、无 .comet 运行时、无 spikes 实验脚本**
-- **恢复源**:主会话 `42368c4c-b951-4e15-8c54-ed76773c9dec.jsonl`(4988 行,9.3M)+ 子代理 `<项目对应 projects 目录>/<session-id>/subagents/*.jsonl`(20 个,全部非空)。**注意:子代理记录在 `subagents/` 目录而非 `%TEMP%\tasks\*.output`(后者会被清理且当时为 0 字节)**
+- **恢复源**:主会话 `<session-id>.jsonl`(4988 行,9.3M)+ 子代理 `<项目对应 projects 目录>/<session-id>/subagents/*.jsonl`(20 个,全部非空)。**注意:子代理记录在 `subagents/` 目录而非 `%TEMP%\tasks\*.output`(后者会被清理且当时为 0 字节)**
 - **spikes 实验脚本**:`scripts/spikes/`(21 个文件,含 AUMID/激活器/lnk/协议/COM 五条路径调试记录)恢复在磁盘但**不入库**(.gitignore 已排除);`recover.py`、`test-fixture-*.json` 同样恢复不入库
 
 ## 已知问题(遗留,需修复)
