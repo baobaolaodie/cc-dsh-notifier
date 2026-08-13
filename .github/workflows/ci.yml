@@ -111,7 +111,7 @@ jobs:
           fi
 
       - name: 'Workflow lint (actionlint)'
-        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.7 -color
+        uses: reviewdog/action-actionlint@v1
 
   # ── PR 纪律: 标题/模板/分支前缀(服务端强制)/ PR policy ──
   pr-policy:
