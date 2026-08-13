@@ -1,0 +1,12 @@
+# Comet 项目配置(2026-08-13 重建:项目归档后 config.yaml 丢失导致 hook guard 不可用)
+schema: comet.project.v1
+default_workflow: classic
+workflows:
+  - classic
+ambient_resume: true
+classic:
+  artifact_layout: docs
+  language: zh-CN
+  context_compression: off
+  review_mode: standard
+  auto_transition: true
