@@ -1,0 +1,10 @@
+# 换行符规范:仓库统一 LF;Windows 检出可转 CRLF
+* text=auto
+
+# win32.ps1 依赖 UTF-8 BOM(PS 5.1 按 BOM 解码中文注释),禁止换行符转换破坏 BOM
+scripts/lib/win32.ps1 text eol=lf
+
+# 二进制/脚本格式保护
+*.py text eol=lf
+*.mjs text eol=lf
+*.ps1 text eol=lf

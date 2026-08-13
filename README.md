@@ -14,7 +14,7 @@ English · [中文](README-zh.md)
 
 <p align="center">
   <a href="#quick-start"><img src="https://img.shields.io/badge/Quick_Start-4CAF50?style=for-the-badge" alt="Quick Start" /></a>
-  <a href="#configuration"><img src="https://img.shields.io/badge/Configuration-8B5CF6?style=for-the-badge" alt="Configuration" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License" /></a>
 </p>
 
 <p align="center">
@@ -179,10 +179,16 @@ All runtime files live under `%LOCALAPPDATA%\cc-notifier\`:
 
 ## Contributing
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow. In short:
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/your-change`)
 3. Commit your changes (`git commit -m 'fix: describe the change'`)
 4. Push to the branch (`git push origin feature/your-change`)
 5. Open a Pull Request
 
-No LICENSE file detected. Add a LICENSE to clarify project licensing.
+Security issues: see [SECURITY.md](SECURITY.md).
+
+## License
+
+[MIT](LICENSE)

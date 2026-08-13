@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="#快速开始"><img src="https://img.shields.io/badge/快速开始-4CAF50?style=for-the-badge" alt="快速开始" /></a>
-  <a href="#配置"><img src="https://img.shields.io/badge/配置-8B5CF6?style=for-the-badge" alt="配置" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License" /></a>
 </p>
 
 <p align="center">
@@ -179,10 +179,16 @@ test/                    # 5 个测试文件,45 条断言(node:test)
 
 ## 贡献
 
+完整流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。简要步骤:
+
 1. Fork 本仓库
 2. 创建功能分支(`git checkout -b feature/your-change`)
 3. 提交改动(`git commit -m 'fix: describe the change'`)
 4. 推送到分支(`git push origin feature/your-change`)
 5. 发起 Pull Request
 
-未检测到 LICENSE 文件。建议添加 LICENSE 以明确项目许可。
+安全问题:见 [SECURITY.md](SECURITY.md)。
+
+## 许可证
+
+[MIT](LICENSE)
