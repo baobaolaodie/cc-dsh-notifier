@@ -2,7 +2,7 @@
 
 在 Claude Code 需要用户介入且用户未聚焦于会话窗口时,通过桌面通知弹窗及时提醒用户,包含事件上下文与项目信息,并支持点击跳回会话窗口。
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: 中断事件触发通知
 系统 SHALL 在以下 Claude Code 中断事件发生时评估并触发通知:Claude 请求工具执行权限、Claude 通过 AskUserQuestion 向用户提问、Claude 完成本轮输出停下等待用户输入、工具执行失败。
