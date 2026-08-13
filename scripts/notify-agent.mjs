@@ -121,16 +121,21 @@ function waitDaemonReady() {
   });
 }
 
+// fire-and-forget:spawn 后立即 resolve,不等待 toast-agent.py 退出。
+// toast-agent.py 显示 Toast 后存活至用户点击或超时(默认 25s);若等待其退出,
+// fallback 路径会把 hook 阻塞最长 25 秒,违反 spec「通知失败不阻断会话」
+// (BUG-1,2026-08-13 实测 25282ms 阻塞)。Toast 仍正常显示,仅生命周期与 hook 解耦。
 function showBasicToast(cfg, event) {
   const { title, body } = toastContent(event);
   const args = [TOAST, '-Title', title, '-Body', body];
   if (event.projectName) args.push('-Project', event.projectName);
   if (cfg.sound === false) args.push('-nosound'); // 统一参数名(toast-agent.py 小写比较解析)
-  return new Promise((resolve) => {
-    const child = spawn('python', args, { windowsHide: true, stdio: 'ignore' });
-    child.on('exit', () => resolve());
-    child.on('error', () => resolve());
-  });
+  // detached:true:notify-agent 退出后 toast-agent.py 不被宿主 Job Object 连带杀掉。
+  // (实测:不 detached 时 hook 退出即杀子进程,Toast 不显示——fallback 静默丢失)
+  const child = spawn('python', args, { detached: true, windowsHide: true, stdio: 'ignore' });
+  child.on('error', () => {}); // 吞掉 spawn 失败(如 Python 缺失),hook 不受影响
+  child.unref(); // 父进程退出不等待子进程
+  return Promise.resolve();
 }
 
 main().catch((err) => {
