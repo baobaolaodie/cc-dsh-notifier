@@ -43,6 +43,27 @@
 - 异常退出(无 SessionEnd)后 daemon 最长滞留约 12h(TTL 设计权衡)
 - **.comet/config.yaml 缺失**(项目+全局均无)→ Comet hook guard 报「Classic artifact layout is unavailable」,写文件需临时禁用 settings.local.json hooks;重建需 `comet init --scope project`
 
+## 2026-08-14 教训(CI/PR 排查)
+
+### ① CIExpected — Waiting for status to be reported(已修复,机制易被误改)
+
+- 现象:PR 全部检查通过仍无法合并,分支保护卡 "CIExpected"。
+- 根因:master 分支保护 `required_checks=["CI"]` 匹配 workflow 名,但 GitHub **不为此工作流产生工作流级 "CI" check run**(只产生 job 级,实测 check suite 仅 9 个 job 条目)→ 保护永远等不到该状态。
+- 修复:ci.yml 新增**同名汇总 job `CI`**(`needs: [test, quality, pr-policy, docs-links]`)承担该 check;`if: !cancelled() && !failure()` 防 push 路径(pr-policy 被跳过)连带跳过。
+- **警告:勿把 if 改为 `always()`**——依赖失败也会报告通过,门禁失效。
+
+### ② pr-policy 的 webhook 快照坑(排查耗时最久)
+
+- `context.payload.pull_request.body` 是 **run 触发瞬间的 webhook 快照**;`gh pr edit` 更新 body 后,已有 run(含重跑)仍用旧 body。
+- 排查特征:**本地模拟检查逻辑全过但 CI 必失败**——先怀疑快照。
+- 解决:新 push(如 `git commit --allow-empty`)触发新 run 生成新快照。
+
+### ③ PR 模板 checkbox label 逐字节匹配
+
+- ci.yml 用 `body.includes('- [x] ' + label)` 检查 PR body 每个复选框,label 须与 `.github/PULL_REQUEST_TEMPLATE.md` **逐字节一致**(含空格/箭头符号)。
+- **模板 label 变更会立即破坏所有未更新 body 的已开 PR**——改模板前先同步已开 PR 的 body,或改后立即更新。
+- 模板不应写死动态值(如测试数,2026-08-14 已去硬编码)。
+
 ## 恢复方法(如再次误删)
 
 1. 会话记录:`~/.claude/projects/<项目路径编码>/*.jsonl`(含全部 Write/Edit)
