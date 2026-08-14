@@ -14,16 +14,16 @@ English · [中文](SECURITY-zh.md)
 
 ## Reporting a Vulnerability
 
-请勿在公开 issue 中披露安全漏洞。请通过以下方式私下报告:
+Do not disclose security vulnerabilities in public issues. Please report privately through:
 
-- 打开一个 issue 并标记 `security`,说明问题但不含利用细节
-- 或在 PR 中描述修复方案(不包含漏洞细节)
+- Open an issue and tag it `security`, describing the problem without exploit details
+- Or describe the fix in a PR (without vulnerability details)
 
-项目维护者会在 48 小时内响应。
+Project maintainers respond within 48 hours.
 
-## 安全设计说明
+## Security design notes
 
-- 本项目零第三方 npm 依赖,攻击面仅限本机
-- 通知链路任何环节失败都不会阻塞 Claude Code 会话
-- 运行数据(日志、历史)仅存于 `%LOCALAPPDATA%\cc-notifier\`,不跨进程/网络传输
-- 本地 HTTP IPC 仅监听 127.0.0.1 随机端口,无外部可达
+- Zero third-party npm dependencies; the attack surface is limited to the local machine
+- No failure in the notification pipeline blocks the Claude Code session
+- Runtime data (logs, history) is stored only in `%LOCALAPPDATA%\cc-notifier\`, never transmitted across processes or network
+- The local HTTP IPC listens only on 127.0.0.1 on a random port, not reachable externally
