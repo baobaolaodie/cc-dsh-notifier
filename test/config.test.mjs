@@ -77,6 +77,19 @@ test('项目级覆盖优先于全局', () => {
   assert.equal(cfg.dedupWindowMs, 5000); // 未覆盖字段继承全局
 });
 
+test('language 项目级覆盖:项目级 en 生效,非法值回退 auto', () => {
+  const dir = tmpDir();
+  const g = path.join(dir, 'global.json');
+  fs.writeFileSync(g, JSON.stringify({ language: 'zh' })); // 全局 zh
+  const proj = path.join(dir, 'proj');
+  fs.mkdirSync(path.join(proj, '.claude'), { recursive: true });
+  fs.writeFileSync(path.join(proj, '.claude', 'cc-notifier.json'), JSON.stringify({ language: 'en' }));
+  assert.equal(resolveLanguage(loadConfig(proj, { globalConfig: g })), 'en'); // 项目级覆盖全局
+  fs.writeFileSync(path.join(proj, '.claude', 'cc-notifier.json'), JSON.stringify({ language: 'xx' }));
+  // 非法值 → normalizeLanguage 回退 auto → 系统检测(平台相关,恒 ∈ {zh,en})
+  assert.ok(['zh', 'en'].includes(resolveLanguage(loadConfig(proj, { globalConfig: g }))));
+});
+
 test('损坏 JSON 回退默认', () => {
   const dir = tmpDir();
   const g = path.join(dir, 'global.json');

@@ -1,7 +1,7 @@
 ## 1. 复现与改造
 
 - [x] 1.1 复现:确认通知文案恒为中文且无语言输入(读 `events.mjs` TYPE_LABELS/模板 + `config.mjs` 无 language 字段;实测英文系统下 Toast 为中文)
-- [x] 1.2 `config.mjs`:新增 `language` 配置(默认 auto)+ `detectSystemLanguage()`(reg query LocaleName,zh-*/en-* 映射,失败/其他回退 zh)+ 解析逻辑
+- [x] 1.2 `config.mjs`:新增 `language` 配置(默认 auto)+ `detectSystemLanguage()`(reg query LocaleName,zh-*/en-* 映射,失败/其他回退 en)+ 解析逻辑
 - [x] 1.3 `events.mjs`:TYPE_LABELS 双语表 + `summarize(lang, kind, payload)` 模板函数;`parseEvent(eventType, hookJson, lang)` 载荷携带 lang;`toastContent` 按语言取标签
 - [x] 1.4 `notify-agent.mjs`:loadConfig 后把 `cfg.language` 传入 `parseEvent`
 - [x] 1.5 测试:`test/events.test.mjs` 补 zh/en/回退断言;`test/config.test.mjs` 补 auto/zh/en/旧配置兼容断言(detectSystemLanguage mock,不真跑 reg)
@@ -28,3 +28,10 @@
 - [x] 4.6 性能:`notify-agent.mjs` 仅对 `NOTIFY_TYPES` 事件解析语言(消除 session-start/end 的 reg 开销)
 - [x] 4.7 测试补强:`tool-run` zh/en 断言;`detectSystemLanguage` 失败/未知语言确定性断言(注入 exec 实现)
 - [x] 4.8 验证:全量 `npm test` 通过;pre-commit 全过
+
+## 5. 最终符合性审查修复(用户要求二次完整自检,verify-fail 回退)
+
+- [x] 5.1 悬空冒号补完:`install.mjs` / `uninstall.mjs` 剩余 12 处英文半句并入值(含模板字符串 2 处);精确扫描无残留
+- [x] 5.2 陈旧措辞:tasks.md 1.2、验证报告 §2「回退 zh」→ `en`(报告 45/46 行为历史记录,保留原样)
+- [x] 5.3 测试补强:`language` 项目级覆盖断言(全局 zh + 项目 en → en;非法值回退 auto)
+- [x] 5.4 验证:全量 `npm test` 通过;pre-commit 全过

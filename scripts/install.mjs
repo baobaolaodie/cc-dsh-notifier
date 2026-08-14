@@ -74,7 +74,7 @@ function main() {
     try {
       settings = JSON.parse(fs.readFileSync(SETTINGS, 'utf8'));
     } catch (err) {
-      console.error('settings.json 解析失败:', err.message, '/ settings.json parse failed:');
+      console.error('settings.json 解析失败:', err.message, '/ settings.json parse failed: ' + err.message);
       process.exit(1);
     }
   }
@@ -84,13 +84,13 @@ function main() {
     const present = list.some((entry) =>
       entry && entry.hooks && entry.hooks.some((h) => h.command && h.command.includes('notify-agent.mjs')));
     if (present) {
-      console.log(`跳过(已注入): ${hookName} / skipped (already injected):`);
+      console.log(`跳过(已注入): ${hookName} / skipped (already injected): ${hookName}`);
       continue;
     }
     const entry = { hooks: [{ type: 'command', command: commandFor(event) }] };
     if (matcher) entry.matcher = matcher;
     list.push(entry);
-    console.log(`注入: ${hookName} → ${commandFor(event)} / injected:`);
+    console.log(`注入: ${hookName} → ${commandFor(event)} / injected: ${hookName} → ${commandFor(event)}`);
   }
   fs.mkdirSync(path.dirname(SETTINGS), { recursive: true });
   fs.writeFileSync(SETTINGS, JSON.stringify(settings, null, 2) + '\n');
@@ -100,7 +100,7 @@ function main() {
   if (!fs.existsSync(GLOBAL_CONFIG)) {
     fs.mkdirSync(GLOBAL_DIR, { recursive: true });
     fs.writeFileSync(GLOBAL_CONFIG, JSON.stringify(DEFAULT_CONFIG, null, 2) + '\n');
-    console.log('生成默认配置:', GLOBAL_CONFIG, '/ wrote default config:');
+    console.log('生成默认配置:', GLOBAL_CONFIG, '/ wrote default config: ' + GLOBAL_CONFIG);
   }
   console.log('安装完成。新开 Claude Code 会话后生效。 / Install complete. Takes effect in new Claude Code sessions.');
 }
