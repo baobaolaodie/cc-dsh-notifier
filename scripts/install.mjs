@@ -56,9 +56,9 @@ function registerAumid() {
   try {
     execFileSync('reg', ['add', AUMID, '/v', 'DisplayName', '/t', 'REG_SZ', '/d', 'cc-notifier', '/f'], { stdio: 'ignore' });
     execFileSync('reg', ['add', AUMID, '/v', 'IconUri', '/t', 'REG_SZ', '/d', ICON_URI, '/f'], { stdio: 'ignore' });
-    console.log('AUMID 已注册(Toast 显示前提):', AUMID, '/ AUMID registered (required for toasts):');
+    console.log('AUMID 已注册(Toast 显示前提):', AUMID, '/ AUMID registered (required for toasts):', AUMID);
   } catch (err) {
-    console.warn('AUMID 注册失败,Toast 可能无法显示:', err.message, '/ AUMID registration failed, toasts may not display:');
+    console.warn('AUMID 注册失败,Toast 可能无法显示:', err.message, '/ AUMID registration failed, toasts may not display:', err.message);
   }
 }
 
@@ -69,7 +69,7 @@ function main() {
   if (fs.existsSync(SETTINGS)) {
     if (!fs.existsSync(BACKUP)) {
       fs.copyFileSync(SETTINGS, BACKUP); // 先备份,防合并破坏用户配置
-      console.log('已备份 settings.json →', BACKUP, '/ settings.json backed up →');
+      console.log('已备份 settings.json →', BACKUP, '/ settings.json backed up →', BACKUP);
     }
     try {
       settings = JSON.parse(fs.readFileSync(SETTINGS, 'utf8'));

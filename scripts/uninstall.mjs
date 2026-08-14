@@ -29,7 +29,7 @@ function unregisterAumid() {
   try {
     // 显式 stdio: 'pipe' 以捕获 stderr 供分类判断(默认 options 下子进程 stderr 会同时泄漏到控制台)
     execFileSync('reg', ['delete', AUMID, '/f'], { stdio: 'pipe' });
-    console.log('AUMID 已清理:', AUMID, '/ AUMID cleaned up:');
+    console.log('AUMID 已清理:', AUMID, '/ AUMID cleaned up:', AUMID);
   } catch (err) {
     // reg delete 对不存在的键返回退出码 1 并在 stderr 提示「找不到」,据此区分两种失败
     const stderr = decodeRegStderr(err.stderr);

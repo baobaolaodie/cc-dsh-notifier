@@ -27,7 +27,8 @@ async function main() {
 
   // 语言先于 parseEvent 解析:summary/标题文案在事件解析时即按语言生成
   const cfg = loadConfig(hookJson.cwd || ''); // 含项目级 .claude/cc-notifier.json 关闭
-  const lang = resolveLanguage(cfg); // auto → 系统显示语言检测
+  // 仅通知事件解析语言(session-start/end 不弹 Toast,省去 reg 检测开销 ~30-80ms/hook)
+  const lang = NOTIFY_TYPES.has(eventType) ? resolveLanguage(cfg) : 'zh';
   const event = parseEvent(eventType, hookJson, lang);
   if (!event) process.exit(0); // tool-result 非错误 / 未知类型
   if (cfg.enabled === false) process.exit(0);

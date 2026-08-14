@@ -75,7 +75,7 @@ def main():
     display = f"{opts['project']} · {opts['title']}" if opts['project'] else opts['title']
     audio_line = '' if opts['nosound'] else '<audio src="ms-winsoundevent:Notification.Default"/>'
     # lang 属性(zh/en):提示系统按语言处理文本(如朗读);未传则不输出
-    lang_attr = f' lang="{opts["lang"]}"' if opts['lang'] else ''
+    lang_attr = f' lang="{esc(opts["lang"])}"' if opts['lang'] else ''
     xml_text = f"""<toast{lang_attr} duration="long">
   <visual><binding template="ToastGeneric">
     <text>{esc(display)}</text>

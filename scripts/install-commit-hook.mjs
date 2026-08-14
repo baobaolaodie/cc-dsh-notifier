@@ -52,7 +52,7 @@ function main() {
   }
   fs.writeFileSync(HOOK, HOOK_BODY, 'utf8');
   fs.chmodSync(HOOK, 0o755);
-  console.log('pre-commit 钩子已安装:', HOOK, '/ pre-commit hook installed:');
+  console.log('pre-commit 钩子已安装:', HOOK, '/ pre-commit hook installed:', HOOK);
   console.log('提交前将自动运行:npm test + 双语镜像检查 + BOM 检查 / Before each commit: npm test + bilingual mirror check + BOM guard');
 }
 

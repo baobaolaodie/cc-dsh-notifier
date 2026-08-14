@@ -240,3 +240,10 @@ test('i18n: 非 Bash 工具 file_path 文案按语言', () => {
   const en = parseEvent('permission-request', { cwd: CWD, tool_use: { name: 'Read', input: { file_path: 'a.txt' } } }, 'en');
   assert.equal(en.summary, 'Read requests access to: a.txt');
 });
+
+test('i18n: 非 Bash 无 file_path 工具(tool-run)文案按语言', () => {
+  const zh = parseEvent('permission-request', { cwd: CWD, tool_use: { name: 'Grep' } });
+  assert.equal(zh.summary, 'Grep 请求执行');
+  const en = parseEvent('permission-request', { cwd: CWD, tool_use: { name: 'Grep' } }, 'en');
+  assert.equal(en.summary, 'Grep requested to run');
+});

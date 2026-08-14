@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process';
 
 export const GLOBAL_DIR = path.join(os.homedir(), '.cc-notifier');
 export const GLOBAL_CONFIG = path.join(GLOBAL_DIR, 'config.json');
-// language: 'auto'(按系统显示语言)| 'zh' | 'en';缺省 auto,未知语言回退 zh(与旧行为一致)
+// language: 'auto'(按系统显示语言)| 'zh' | 'en';缺省 auto,未知语言回退 en
 export const DEFAULT_CONFIG = { enabled: true, dedupWindowMs: 10000, sound: true, language: 'auto' };
 
 export function readJsonSafe(file) {
@@ -49,9 +49,10 @@ export function parseLocaleName(raw) {
 
 // 系统显示语言检测:reg query HKCU\Control Panel\International /v LocaleName
 // 查询失败/未知语言 → 回退 'en'(项目英文主版;中文系统检测 zh-CN 仍得 zh,不受影响)
-export function detectSystemLanguage() {
+// execImpl 可注入(测试用),生产默认 execFileSync
+export function detectSystemLanguage(execImpl = execFileSync) {
   try {
-    const out = execFileSync('reg', ['query', 'HKCU\\Control Panel\\International', '/v', 'LocaleName'], { encoding: 'utf8' });
+    const out = execImpl('reg', ['query', 'HKCU\\Control Panel\\International', '/v', 'LocaleName'], { encoding: 'utf8' });
     return parseLocaleName(out) || 'en';
   } catch {
     return 'en';

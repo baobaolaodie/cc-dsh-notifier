@@ -48,10 +48,12 @@ test('resolveLanguage:zh/en 直取,auto/未知走系统检测', () => {
   assert.ok(['zh', 'en'].includes(resolveLanguage(null)));
 });
 
-test('detectSystemLanguage:非 win32 回退 en(回退策略)', () => {
-  if (process.platform !== 'win32') {
-    assert.equal(detectSystemLanguage(), 'en'); // reg 不存在 → catch → 回退 en
-  }
+test('detectSystemLanguage:失败/未知语言回退 en,zh/en 直取(注入 exec 确定性验证)', () => {
+  assert.equal(detectSystemLanguage(() => { throw new Error('no reg'); }), 'en'); // 查询失败 → en
+  assert.equal(detectSystemLanguage(() => '    LocaleName    REG_SZ    fr-FR'), 'en'); // 未知语言 → en
+  assert.equal(detectSystemLanguage(() => '    LocaleName    REG_SZ    en-US'), 'en');
+  assert.equal(detectSystemLanguage(() => '    LocaleName    REG_SZ    zh-CN'), 'zh');
+  assert.equal(detectSystemLanguage(() => ''), 'en'); // 空输出 → en
 });
 
 test('全局配置覆盖默认', () => {

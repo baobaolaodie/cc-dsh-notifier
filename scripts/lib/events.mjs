@@ -112,8 +112,8 @@ export function parseEvent(eventType, hookJson = {}, lang = 'zh') {
       if (!isError) return null; // 非错误不通知
       const errText = resp.error
         || (Array.isArray(resp.content) ? resp.content.map((c) => (c && c.text) || '').join(' ').trim() : String(resp.content || ''));
-      // 错误文本透传(原文),仅缺省时用语言化默认文案
-      return { ...base, type: 'tool-result', toolName, summary: truncate(errText) || summarize(lang, 'tool-error', {}) };
+      // 错误文本透传(原文),仅缺省时用语言化默认文案(模板自包含)
+      return { ...base, type: 'tool-result', toolName, summary: summarize(lang, 'tool-error', { errText: truncate(errText) }) };
     }
     case 'stop':
       return { ...base, type: 'stop', summary: summarize(lang, 'stop') };
