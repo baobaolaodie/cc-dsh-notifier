@@ -38,15 +38,15 @@ function checkPython() {
   try {
     execFileSync('python', ['--version'], { stdio: 'ignore' });
   } catch (err) {
-    console.warn('未检测到 Python:Toast 通知依赖 Python 3 + winrt 包(scripts/toast-agent.py)。');
-    console.warn('请先安装 Python 3(https://www.python.org)后再使用通知功能;未安装不影响 Claude Code 会话本身。');
+    console.warn('未检测到 Python:Toast 通知依赖 Python 3 + winrt 包(scripts/toast-agent.py)。 / Python not detected: toasts require Python 3 + the winrt packages (scripts/toast-agent.py).');
+    console.warn('请先安装 Python 3(https://www.python.org)后再使用通知功能;未安装不影响 Claude Code 会话本身。 / Install Python 3 first; Claude Code sessions work regardless.');
     return;
   }
   try {
     execFileSync('python', ['-c', winrtProbe], { stdio: 'ignore' });
-    console.log('Python 与 winrt 包可用(python)。');
+    console.log('Python 与 winrt 包可用(python)。 / Python and the winrt packages are available (python).');
   } catch (err) {
-    console.warn('检测到 Python,但缺少 winrt 包。请手动安装:');
+    console.warn('检测到 Python,但缺少 winrt 包。请手动安装: / Python found, but the winrt packages are missing. Install manually:');
     console.warn('  pip install winrt-runtime winrt-Windows.UI.Notifications winrt-Windows.Data.Xml.Dom winrt-Windows.Foundation');
   }
 }
@@ -56,9 +56,9 @@ function registerAumid() {
   try {
     execFileSync('reg', ['add', AUMID, '/v', 'DisplayName', '/t', 'REG_SZ', '/d', 'cc-notifier', '/f'], { stdio: 'ignore' });
     execFileSync('reg', ['add', AUMID, '/v', 'IconUri', '/t', 'REG_SZ', '/d', ICON_URI, '/f'], { stdio: 'ignore' });
-    console.log('AUMID 已注册(Toast 显示前提):', AUMID);
+    console.log('AUMID 已注册(Toast 显示前提):', AUMID, '/ AUMID registered (required for toasts):');
   } catch (err) {
-    console.warn('AUMID 注册失败,Toast 可能无法显示:', err.message);
+    console.warn('AUMID 注册失败,Toast 可能无法显示:', err.message, '/ AUMID registration failed, toasts may not display:');
   }
 }
 
@@ -69,12 +69,12 @@ function main() {
   if (fs.existsSync(SETTINGS)) {
     if (!fs.existsSync(BACKUP)) {
       fs.copyFileSync(SETTINGS, BACKUP); // 先备份,防合并破坏用户配置
-      console.log('已备份 settings.json →', BACKUP);
+      console.log('已备份 settings.json →', BACKUP, '/ settings.json backed up →');
     }
     try {
       settings = JSON.parse(fs.readFileSync(SETTINGS, 'utf8'));
     } catch (err) {
-      console.error('settings.json 解析失败:', err.message);
+      console.error('settings.json 解析失败:', err.message, '/ settings.json parse failed:');
       process.exit(1);
     }
   }
@@ -84,13 +84,13 @@ function main() {
     const present = list.some((entry) =>
       entry && entry.hooks && entry.hooks.some((h) => h.command && h.command.includes('notify-agent.mjs')));
     if (present) {
-      console.log(`跳过(已注入): ${hookName}`);
+      console.log(`跳过(已注入): ${hookName} / skipped (already injected):`);
       continue;
     }
     const entry = { hooks: [{ type: 'command', command: commandFor(event) }] };
     if (matcher) entry.matcher = matcher;
     list.push(entry);
-    console.log(`注入: ${hookName} → ${commandFor(event)}`);
+    console.log(`注入: ${hookName} → ${commandFor(event)} / injected:`);
   }
   fs.mkdirSync(path.dirname(SETTINGS), { recursive: true });
   fs.writeFileSync(SETTINGS, JSON.stringify(settings, null, 2) + '\n');
@@ -100,9 +100,9 @@ function main() {
   if (!fs.existsSync(GLOBAL_CONFIG)) {
     fs.mkdirSync(GLOBAL_DIR, { recursive: true });
     fs.writeFileSync(GLOBAL_CONFIG, JSON.stringify(DEFAULT_CONFIG, null, 2) + '\n');
-    console.log('生成默认配置:', GLOBAL_CONFIG);
+    console.log('生成默认配置:', GLOBAL_CONFIG, '/ wrote default config:');
   }
-  console.log('安装完成。新开 Claude Code 会话后生效。');
+  console.log('安装完成。新开 Claude Code 会话后生效。 / Install complete. Takes effect in new Claude Code sessions.');
 }
 
 main();

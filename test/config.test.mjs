@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { loadConfig, DEFAULT_CONFIG, GLOBAL_DIR, GLOBAL_CONFIG, projectConfigPath, normalizeLanguage, parseLocaleName, resolveLanguage } from '../scripts/lib/config.mjs';
+import { loadConfig, DEFAULT_CONFIG, GLOBAL_DIR, GLOBAL_CONFIG, projectConfigPath, normalizeLanguage, parseLocaleName, resolveLanguage, detectSystemLanguage } from '../scripts/lib/config.mjs';
 
 function tmpDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'ccn-config-')); }
 
@@ -42,10 +42,16 @@ test('parseLocaleName:zh-*/en-* 映射,其余/无法解析为 null', () => {
 test('resolveLanguage:zh/en 直取,auto/未知走系统检测', () => {
   assert.equal(resolveLanguage({ language: 'zh' }), 'zh');
   assert.equal(resolveLanguage({ language: 'en' }), 'en');
-  // auto:win32 真跑 reg(zh-CN/en-US),非 win32 reg 不存在 → 回退 zh;两者都 ∈ {zh,en}
+  // auto:win32 真跑 reg(zh-CN/en-US),非 win32 reg 不存在 → 回退 en;两者都 ∈ {zh,en}
   assert.ok(['zh', 'en'].includes(resolveLanguage({ language: 'auto' })));
   assert.ok(['zh', 'en'].includes(resolveLanguage({})));
   assert.ok(['zh', 'en'].includes(resolveLanguage(null)));
+});
+
+test('detectSystemLanguage:非 win32 回退 en(回退策略)', () => {
+  if (process.platform !== 'win32') {
+    assert.equal(detectSystemLanguage(), 'en'); // reg 不存在 → catch → 回退 en
+  }
 });
 
 test('全局配置覆盖默认', () => {

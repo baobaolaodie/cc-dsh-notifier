@@ -40,20 +40,20 @@ node -e "
 const fs = require('fs');
 const buf = fs.readFileSync('scripts/lib/win32.ps1');
 const hasBom = buf[0] === 0xEF && buf[1] === 0xBB && buf[2] === 0xBF;
-if (!hasBom) { console.error('win32.ps1 缺少 UTF-8 BOM(PS 5.1 必需)'); process.exit(1); }
+if (!hasBom) { console.error('win32.ps1 缺少 UTF-8 BOM(PS 5.1 必需) / win32.ps1 missing UTF-8 BOM (required by PS 5.1)'); process.exit(1); }
 console.log('win32.ps1 BOM OK');
 "
 `;
 
 function main() {
   if (!fs.existsSync(path.join(ROOT, '.git'))) {
-    console.error('未找到 .git 目录(不是 git 仓库?)');
+    console.error('未找到 .git 目录(不是 git 仓库?) / no .git directory found (not a git repository?)');
     process.exit(1);
   }
   fs.writeFileSync(HOOK, HOOK_BODY, 'utf8');
   fs.chmodSync(HOOK, 0o755);
-  console.log('pre-commit 钩子已安装:', HOOK);
-  console.log('提交前将自动运行:npm test + 双语镜像检查 + BOM 检查');
+  console.log('pre-commit 钩子已安装:', HOOK, '/ pre-commit hook installed:');
+  console.log('提交前将自动运行:npm test + 双语镜像检查 + BOM 检查 / Before each commit: npm test + bilingual mirror check + BOM guard');
 }
 
 main();

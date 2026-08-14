@@ -27,16 +27,17 @@ def log(msg):
         pass
 
 def parse_args(args):
-    opts = {'title': 'cc-notifier', 'body': '', 'project': '', 'hwnd': 0, 'duration': 20, 'nosound': False}
+    opts = {'title': 'cc-notifier', 'body': '', 'project': '', 'hwnd': 0, 'duration': 20, 'nosound': False, 'lang': ''}
     i = 0
     while i < len(args):
         a = args[i].lower()
-        if a in ('-title', '-body', '-project', '-duration') and i + 1 < len(args):
+        if a in ('-title', '-body', '-project', '-duration', '-lang') and i + 1 < len(args):
             v = args[i + 1]
             if a == '-title': opts['title'] = v
             elif a == '-body': opts['body'] = v
             elif a == '-project': opts['project'] = v
             elif a == '-duration': opts['duration'] = int(v)
+            elif a == '-lang': opts['lang'] = v
             i += 2
         elif a == '-hwnd' and i + 1 < len(args):
             opts['hwnd'] = int(args[i + 1]); i += 2
@@ -73,7 +74,9 @@ def main():
     app_id = 'cc-notifier'
     display = f"{opts['project']} · {opts['title']}" if opts['project'] else opts['title']
     audio_line = '' if opts['nosound'] else '<audio src="ms-winsoundevent:Notification.Default"/>'
-    xml_text = f"""<toast duration="long">
+    # lang 属性(zh/en):提示系统按语言处理文本(如朗读);未传则不输出
+    lang_attr = f' lang="{opts["lang"]}"' if opts['lang'] else ''
+    xml_text = f"""<toast{lang_attr} duration="long">
   <visual><binding template="ToastGeneric">
     <text>{esc(display)}</text>
     <text>{esc(opts['body'])}</text>

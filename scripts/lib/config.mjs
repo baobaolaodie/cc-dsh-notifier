@@ -48,13 +48,13 @@ export function parseLocaleName(raw) {
 }
 
 // 系统显示语言检测:reg query HKCU\Control Panel\International /v LocaleName
-// 查询失败/未知语言 → 回退 'zh'(与旧行为一致,不引入第三种语言)
+// 查询失败/未知语言 → 回退 'en'(项目英文主版;中文系统检测 zh-CN 仍得 zh,不受影响)
 export function detectSystemLanguage() {
   try {
     const out = execFileSync('reg', ['query', 'HKCU\\Control Panel\\International', '/v', 'LocaleName'], { encoding: 'utf8' });
-    return parseLocaleName(out) || 'zh';
+    return parseLocaleName(out) || 'en';
   } catch {
-    return 'zh';
+    return 'en';
   }
 }
 

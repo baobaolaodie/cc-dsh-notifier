@@ -129,6 +129,7 @@ function waitDaemonReady() {
 function showBasicToast(cfg, event) {
   const { title, body } = toastContent(event);
   const args = [TOAST, '-Title', title, '-Body', body];
+  if (event.lang) args.push('-Lang', event.lang); // Toast XML lang 属性
   if (event.projectName) args.push('-Project', event.projectName);
   if (cfg.sound === false) args.push('-nosound'); // 统一参数名(toast-agent.py 小写比较解析)
   // detached:true:notify-agent 退出后 toast-agent.py 不被宿主 Job Object 连带杀掉。
