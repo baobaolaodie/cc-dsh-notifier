@@ -181,3 +181,69 @@ test('toastContent: 标题=事件类型标签,正文=摘要', () => {
   assert.equal(c.title, '权限请求');
   assert.equal(c.body, 'Bash 请求执行:npm install');
 });
+
+test('i18n: lang=en 时标题与摘要为英文', () => {
+  const ev = parseEvent('permission-request', {
+    cwd: CWD, tool_use: { name: 'Bash', input: { command: 'npm install' } },
+  }, 'en');
+  assert.equal(ev.lang, 'en');
+  const c = toastContent(ev);
+  assert.equal(c.title, 'Permission request');
+  assert.equal(c.body, 'Bash requested to run: npm install');
+});
+
+test('i18n: lang=en 覆盖四类事件标题', () => {
+  const cases = [
+    ['permission-request', {}, 'Permission request'],
+    ['ask-user-question', { tool_use: { name: 'AskUserQuestion', input: { questions: [{ question: 'q' }] } } }, 'Question'],
+    ['tool-result', { tool_use: { name: 'Bash' }, tool_response: { is_error: true, error: 'boom' } }, 'Tool error'],
+    ['stop', {}, 'Waiting for input'],
+  ];
+  for (const [type, hook, title] of cases) {
+    const c = toastContent(parseEvent(type, { cwd: CWD, ...hook }, 'en'));
+    assert.equal(c.title, title, type);
+  }
+});
+
+test('i18n: lang 缺省回退 zh(旧行为不变)', () => {
+  const ev = parseEvent('stop', { cwd: CWD }); // 不传 lang
+  assert.equal(ev.lang, 'zh');
+  const c = toastContent(ev);
+  assert.equal(c.title, '等待输入');
+  assert.equal(c.body, 'Claude 等待输入');
+});
+
+test('i18n: 未知 lang 的 toastContent 回退 zh 标签', () => {
+  const c = toastContent({ type: 'stop', summary: 'x', lang: 'fr' });
+  assert.equal(c.title, '等待输入');
+});
+
+test('i18n: 工具错误原文透传,默认文案按语言', () => {
+  const zh = parseEvent('tool-result', { cwd: CWD, tool_use: { name: 'Bash' }, tool_response: { is_error: true } });
+  assert.equal(zh.summary, '工具执行出错');
+  const en = parseEvent('tool-result', { cwd: CWD, tool_use: { name: 'Bash' }, tool_response: { is_error: true } }, 'en');
+  assert.equal(en.summary, 'Tool execution failed');
+  const raw = parseEvent('tool-result', { cwd: CWD, tool_use: { name: 'Bash' }, tool_response: { is_error: true, error: 'EACCES denied' } }, 'en');
+  assert.equal(raw.summary, 'EACCES denied'); // 错误原文透传不翻译
+});
+
+test('i18n: Bash 无 command 时默认文案按语言', () => {
+  const zh = parseEvent('permission-request', { cwd: CWD, tool_use: { name: 'Bash' } });
+  assert.equal(zh.summary, 'Bash 请求执行权限');
+  const en = parseEvent('permission-request', { cwd: CWD, tool_use: { name: 'Bash' } }, 'en');
+  assert.equal(en.summary, 'Bash requests permission to run');
+});
+
+test('i18n: 非 Bash 工具 file_path 文案按语言', () => {
+  const zh = parseEvent('permission-request', { cwd: CWD, tool_use: { name: 'Read', input: { file_path: 'a.txt' } } });
+  assert.equal(zh.summary, 'Read 请求访问:a.txt');
+  const en = parseEvent('permission-request', { cwd: CWD, tool_use: { name: 'Read', input: { file_path: 'a.txt' } } }, 'en');
+  assert.equal(en.summary, 'Read requests access to: a.txt');
+});
+
+test('i18n: 非 Bash 无 file_path 工具(tool-run)文案按语言', () => {
+  const zh = parseEvent('permission-request', { cwd: CWD, tool_use: { name: 'Grep' } });
+  assert.equal(zh.summary, 'Grep 请求执行');
+  const en = parseEvent('permission-request', { cwd: CWD, tool_use: { name: 'Grep' } }, 'en');
+  assert.equal(en.summary, 'Grep requested to run');
+});

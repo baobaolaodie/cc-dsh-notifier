@@ -12,10 +12,12 @@ Claude Code 需要你介入、且会话窗口未聚焦时,cc-notifier 弹出带�
 
 | 事件 | Hook | Toast 标题 | Toast 正文 |
 |---|---|---|---|
-| 权限请求 | `PermissionRequest` | 权限请求 | 工具 + 命令/路径(如 `Bash 请求执行:npm install`) |
-| 提问 | `PreToolUse`(AskUserQuestion) | 提问 | 问题文本 |
-| 工具报错 | `PostToolUse` | 工具出错 | 错误摘要 |
-| 等待输入 | `Stop` | 等待输入 | `Claude 等待输入` |
+| 权限请求 | `PermissionRequest` | 权限请求 / Permission request | 工具 + 命令/路径(如 `Bash 请求执行:npm install` / `Bash requested to run: npm install`) |
+| 提问 | `PreToolUse`(AskUserQuestion) | 提问 / Question | 问题文本 |
+| 工具报错 | `PostToolUse` | 工具出错 / Tool error | 错误摘要 |
+| 等待输入 | `Stop` | 等待输入 / Waiting for input | `Claude 等待输入` / `Claude is waiting for input` |
+
+Toast 文案默认跟随系统显示语言(`auto`),可由配置项 `language`(`zh`/`en`)覆盖。
 
 会话窗口聚焦时静默,不通知。
 

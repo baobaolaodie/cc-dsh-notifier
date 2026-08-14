@@ -218,6 +218,7 @@ function showToast(event) {
   }
   // toast-agent.py:Python winrt 显示 Toast + 进程内 Activated 回调点击跳转(进程存活期间)
   const args = [TOAST, '-Title', title, '-Body', body];
+  if (event.lang) args.push('-Lang', event.lang); // Toast XML lang 属性
   if (event.projectName) args.push('-Project', event.projectName);
   if (hwnd) args.push('-Hwnd', String(hwnd));
   if (cfg.sound === false) args.push('-nosound'); // sound:false → toast 静音
