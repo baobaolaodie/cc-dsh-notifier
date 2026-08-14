@@ -6,51 +6,51 @@ English · [中文](CONTRIBUTING-zh.md)
 
 # Contributing to cc-notifier
 
-感谢你考虑为 cc-notifier 贡献代码。以下是参与开发的流程与约定。
+Thank you for considering contributing to cc-notifier. This page describes the development workflow and conventions.
 
-## 开发环境
+## Development environment
 
 - Windows 10/11
 - Node.js 18+
-- Python 3 + winrt 包:`pip install winrt-runtime winrt-Windows.UI.Notifications winrt-Windows.Data.Xml.Dom`
-- 可选:一个正在运行的 Claude Code 会话(用于手动触发测试)
+- Python 3 + winrt packages: `pip install winrt-runtime winrt-Windows.UI.Notifications winrt-Windows.Data.Xml.Dom`
+- Optional: a running Claude Code session (for manual trigger testing)
 
-## 运行测试
+## Running tests
 
 ```bash
-npm test                    # 全部单元测试(45 断言,node:test)
-node --test test/events.test.mjs   # 单个测试文件
-node scripts/test.mjs <事件> # 经真实管线手动触发(permission-request|ask-user-question|tool-result|stop|session-start)
+npm test                    # all unit tests (45 assertions, node:test)
+node --test test/events.test.mjs   # single test file
+node scripts/test.mjs <event> # manual trigger through the real pipeline (permission-request|ask-user-question|tool-result|stop|session-start)
 ```
 
-手动触发注意:需 daemon 运行(有活跃会话);当前窗口聚焦时不弹(聚焦静默),需切走窗口观察。
+Manual trigger notes: a running daemon is required (an active session); toasts are suppressed while the session window is focused (focus silence) — switch focus away to observe.
 
-## 变更流程
+## Change workflow
 
-本项目使用 Comet Classic workflow 管理变更。开始任何改动前:
+This project uses the Comet Classic workflow to manage changes. Before starting any change:
 
-1. 运行 `comet resume-probe . --stdin --json` 检查是否存在活跃 change
-2. 无活跃 change 时,通过 `/comet-classic`(完整流程)或 `/comet-hotfix`(缺陷修复预设)创建 change
-3. 写操作受 Comet hook 守卫约束:无 active change 时 Write/Edit 会被拦截,必须先走 Comet 流程
+1. Run `comet resume-probe . --stdin --json` to check for an active change
+2. With no active change, create one via `/comet-classic` (full workflow) or `/comet-hotfix` (bugfix preset)
+3. Write operations are guarded by the Comet hook guard: without an active change, Write/Edit are blocked — go through the Comet workflow first
 
-修复缺陷优先用 hotfix 预设(open → build → verify → archive),新增能力走完整流程。
+Prefer the hotfix preset for bugfixes (open → build → verify → archive); use the full workflow for new capabilities.
 
-## 代码约定
+## Code conventions
 
-- 零第三方 npm 依赖是硬约束——新功能不得引入 npm 包
-- `events.mjs` 的 `parseEvent` 必须兼容真实 hook JSON 扁平格式(`tool_name`/`tool_input`)与嵌套 `tool_use` 回退;AskUserQuestion 字段是 `questions[0].question`
-- `win32.ps1` 必须保持 UTF-8 BOM(PS 5.1 解码中文注释依赖它)
-- 新增逻辑需配套单元测试(`test/*.test.mjs`,node:test)
+- Zero third-party npm dependencies is a hard constraint — new features must not introduce npm packages
+- `parseEvent` in `events.mjs` must support both the real hook JSON flat format (`tool_name`/`tool_input`) and the nested `tool_use` fallback; the AskUserQuestion field is `questions[0].question`
+- `win32.ps1` must keep its UTF-8 BOM (PS 5.1 relies on it to decode Chinese comments)
+- New logic requires accompanying unit tests (`test/*.test.mjs`, node:test)
 
-## 提交规范
+## Commit conventions
 
-- 提交信息遵循 Conventional Commits:`fix:` / `feat:` / `docs:` / `chore:` 前缀
-- 每个 Comet change 完成后由流程自动提交,勿混入无关改动
+- Commit messages follow Conventional Commits: `fix:` / `feat:` / `docs:` / `chore:` prefixes
+- Each Comet change is committed automatically by the workflow when complete; do not mix in unrelated changes
 
-## 提交流程
+## Submission workflow
 
-1. Fork 本仓库
-2. 创建功能分支(`git checkout -b feature/your-change`)
-3. 提交改动(`git commit -m 'fix: describe the change'`)
-4. 推送到分支(`git push origin feature/your-change`)
-5. 发起 Pull Request
+1. Fork this repository
+2. Create a feature branch (`git checkout -b feature/your-change`)
+3. Commit your changes (`git commit -m 'fix: describe the change'`)
+4. Push the branch (`git push origin feature/your-change`)
+5. Open a Pull Request
