@@ -152,7 +152,7 @@ scripts/
     ├── state.mjs        # daemon.json 单实例状态
     ├── logger.mjs       # 轮转文件日志
     └── win32.mjs/.ps1   # PowerShell 桥:枚举/前台窗口
-test/                    # 5 个测试文件,全部断言通过(node:test)
+test/                    # 测试文件,全部断言通过(node:test)
 ```
 
 ## 技术栈
@@ -162,7 +162,7 @@ test/                    # 5 个测试文件,全部断言通过(node:test)
 | 运行时 | Node.js 18+ | hook 转发器与常驻 daemon |
 | 通知 | Python 3 + winrt | Windows Toast 显示与 `Activated` 回调 |
 | 窗口桥 | PowerShell 5.1+ | P/Invoke `EnumWindows`/`GetForegroundWindow` |
-| 测试 | `node:test` | 5 个测试文件全部断言通过 |
+| 测试 | `node:test` | 全部测试文件断言通过 |
 | 依赖 | 无 | 零第三方 npm 包 |
 
 ## 日志与状态
