@@ -152,7 +152,7 @@ scripts/
     ├── state.mjs        # daemon.json single-instance state
     ├── logger.mjs       # Rotating file logger
     └── win32.mjs/.ps1   # PowerShell bridge: enumerate/foreground windows
-test/                    # 5 test files, 45 assertions (node:test)
+test/                    # test files, all assertions pass (node:test)
 ```
 
 ## Tech Stack
@@ -162,7 +162,7 @@ test/                    # 5 test files, 45 assertions (node:test)
 | Runtime | Node.js 18+ | Hook forwarder and resident daemon |
 | Notifications | Python 3 + winrt | Windows toast display and `Activated` callback |
 | Window bridge | PowerShell 5.1+ | `EnumWindows`/`GetForegroundWindow` via P/Invoke |
-| Testing | `node:test` | 45 assertions across 5 files |
+| Testing | `node:test` | all assertions pass across test files |
 | Dependencies | none | Zero third-party npm packages |
 
 ## Logs and State

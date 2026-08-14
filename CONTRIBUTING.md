@@ -18,7 +18,7 @@ Thank you for considering contributing to cc-notifier. This page describes the d
 ## Running tests
 
 ```bash
-npm test                    # all unit tests (45 assertions, node:test)
+npm test                    # all unit tests (all assertions pass, node:test)
 node --test test/events.test.mjs   # single test file
 node scripts/test.mjs <event> # manual trigger through the real pipeline (permission-request|ask-user-question|tool-result|stop|session-start)
 ```
