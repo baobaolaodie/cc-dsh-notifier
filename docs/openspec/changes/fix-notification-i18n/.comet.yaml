@@ -1,6 +1,6 @@
 workflow: hotfix
 language: zh-CN
-phase: build
+phase: verify
 context_compression: off
 build_mode: direct
 build_pause: null
@@ -13,7 +13,7 @@ auto_transition: true
 base_ref: 5f9ab596825136dd03a8f805abb792963a600bc1
 design_doc: null
 plan: null
-verify_result: fail
+verify_result: pending
 verify_failures: 1
 verification_report: docs/superpowers/reports/2026-08-14-fix-notification-i18n-verify.md
 branch_status: pending

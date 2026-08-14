@@ -1,22 +1,22 @@
 # 验证报告:fix-notification-i18n
 
 - change:fix-notification-i18n(hotfix)
-- 日期:2026-08-14(复审调整 + 独立审查修复后重新验证)
-- verify_mode:full(规模评估:任务 15 > 3、变更文件 > 8)
+- 日期:2026-08-14(复审调整 + 独立审查 ×2 + 最终符合性审查修复后重新验证)
+- verify_mode:full(规模评估:任务 19 > 3、变更文件 > 8)
 - 产物语言:zh-CN
-- 复审历史:①归档前用户选择「需要调整」,verify-fail 回 build,补 3 项调整;②用户要求完整自检,独立代码审查(无 Critical)发现文档漂移与小问题,verify-fail 回 build 修复后重新验证(verify_failures=2)
+- 复审历史:①归档前用户选择「需要调整」,verify-fail 回 build,补 3 项调整;②用户要求完整自检,独立代码审查(无 Critical)发现文档漂移与小问题,修复后验证;③用户要求二次完整自检,最终符合性审查(无 Critical)发现悬空冒号补修不完整等,修复后重新验证(verify_failures=3,未达自动修复上限)
 
 ## Summary
 
 | 维度 | 状态 |
 | --- | --- |
-| Completeness | 15/15 tasks 完成;无 delta spec(0 capabilities) |
-| Correctness | proposal 目标满足;npm test 57/57 通过(exit=0,已记录 verify check) |
+| Completeness | 19/19 tasks 完成;无 delta spec(0 capabilities) |
+| Correctness | proposal 目标满足;npm test 58/58 通过(exit=0,已记录 verify check) |
 | Coherence | 实现与 design.md 逐项一致(文档漂移已修复);无 design doc(检查跳过) |
 
 ## 检查项明细(full 模式 7 项)
 
-1. **tasks.md 全部完成**:✅ 15/15 勾选(含复审调整 3.1-3.4、独立审查修复 4.1-4.8)
+1. **tasks.md 全部完成**:✅ 19/19 勾选(含复审调整 3.1-3.4、独立审查修复 4.1-4.8、最终符合性审查修复 5.1-5.4)
 2. **实现符合 design.md 高层决策**:✅ 逐项对照:
    - `config.mjs`:`language` 默认 auto、`normalizeLanguage`(只认 zh/en)、`parseLocaleName`(zh-*/en-* 映射,其他 null)、`detectSystemLanguage`(reg query `HKCU\Control Panel\International` LocaleName,失败/未知回退 en)、`resolveLanguage` —— 与 design 一致
    - `events.mjs`:`TYPE_LABELS` 双语表(zh/en)、`summarize(lang, kind, payload)` 覆盖 5 类模板、`parseEvent(eventType, hookJson, lang)` 载荷携带 lang、`toastContent` 按 `event.lang` 取标签(缺省回退 zh)—— 与 design 一致
@@ -31,7 +31,7 @@
 
 | 检查 | 命令/方法 | 结果 |
 | --- | --- | --- |
-| 单元测试 | `npm test` | 57/57 pass(原 45 + 新增 12),exit=0(recorded 2026-08-14T09:5x,verify check) |
+| 单元测试 | `npm test` | 58/58 pass(原 45 + 新增 13),exit=0(recorded 2026-08-14T10:0x,verify check) |
 | 复审 3.1 回退策略 | 代码 + 测试 | `detectSystemLanguage` 失败/未知 → `'en'`;`config.test.mjs` 新增「非 win32 回退 en」断言(CI ubuntu 生效,win32 跳过);中文系统 zh-CN 检测不受影响(本机实测解析为 zh) |
 | 复审 3.2 Toast lang | 代码 + 语法 + 链路 | `toast-agent.py` `-Lang` 参数拼入 `<toast lang="...">`(未传则不输出);notify-agent/daemon 双触发点传递 `event.lang`;`node --check` 8 个脚本全过;实测 `parseEvent('stop',…,'en')` → 事件 lang=en → `-Lang en` → `<toast lang="en">` |
 | 复审 3.3 CLI 双语 | 代码 + 语法 | install 12 处 / uninstall 15 处 / install-commit-hook 4 处 / test 1 处 console 输出中英双写;`node --check` 通过 |
@@ -51,6 +51,17 @@
 | `tool-run` 模板无测试;reg 失败路径无确定性断言(设计承诺的注入未兑现) | 测试缺口 | 4.7 补 tool-run zh/en + `detectSystemLanguage(execImpl)` 注入断言(失败/未知/空→en,zh-CN→zh) |
 
 审查同时确认:zh 文案与旧行为逐字一致(逐字符串 diff 过)、array-form exec 无注入风险、向后兼容真实且被测试覆盖、覆盖率高于 CI 门禁(events 96.9%/80%,config 96.9%/91%)。
+
+### 最终符合性审查(第二轮,用户要求二次完整自检)
+
+审查 agent 结论:**无 Critical**;核查项:proposal 8 项 What Changes 逐项有证据;零依赖/BOM/双语镜像/版本一致性/代码风格/spec 10 条需求全 PASS;遗留问题全部闭环:
+
+| 发现 | 严重度 | 修复(5.x) |
+| --- | --- | --- |
+| 4.5 悬空冒号仅修 4 处,剩余 12 处(含模板字符串) | Important | 5.1 补完 12 处,精确扫描无残留 |
+| tasks.md 1.2 / 报告 §2 陈旧「回退 zh」措辞 | Minor | 5.2 同步 en(报告 45/46 行历史记录保留) |
+| `language` 项目级覆盖无断言(自检发现) | Minor | 5.3 新增断言:全局 zh + 项目 en → en;非法值回退 auto |
+| verify 阶段产物未提交 | Minor | 已随 d726570 提交(测试/报告/.comet.yaml) |
 | 双语输出 sanity | `parseEvent('stop', …, 'zh'/'en')` | zh:「等待输入 / Claude 等待输入」;en:「Waiting for input / Claude is waiting for input」 |
 | 根因消除 | grep `events.mjs` 残留单层中文文案 | 无残留;中文全部并入 `TYPE_LABELS.zh` 与 `summarize` zh 分支(设计内) |
 | 双语镜像 | 7 对中英行数差 | 全部 0(README 200/200、CHANGELOG 46/46、USAGE 73/73 等),CI 阈值 ≤10 |
@@ -78,4 +89,4 @@
 
 ## Final Assessment
 
-无 CRITICAL、无 WARNING;1 条 SUGGESTION(内部日志中文,不面向用户,不改)。独立代码审查全部发现已闭环修复,测试完备性缺口已补(工具模板全覆盖 + 注入式回退验证;toast-agent.py 无测试为既有 Python 测试基础设施缺口,已记录)。**验证通过,可进入归档。**
+无 CRITICAL、无 WARNING;1 条 SUGGESTION(内部日志中文,不面向用户,不改)。两轮独立审查(正确性/安全 + 符合性/实践)全部发现已闭环修复;测试完备性经审查确认:语言纯函数全覆盖、注入式回退验证、项目级覆盖断言,58/58 通过,覆盖率 99.63% 行 / 90.13% 分支(门禁 90/75)。唯一未覆盖:toast-agent.py 无测试(既有 Python 测试基础设施缺口,已记录)。**验证通过,可进入归档。**
