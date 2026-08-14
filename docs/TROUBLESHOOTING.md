@@ -45,3 +45,8 @@ Check in order:
 ## Notification content is empty
 
 - Real hook JSON uses the flat format (`tool_name`/`tool_input`). If you see empty toasts, check the hook payload via a debug hook: the `ask-user-question` field is `questions[0].question` (not `prompt`).
+
+## Toast language is not what I expect
+
+- Toast text follows the Windows display language by default (`language: auto`). Override by setting `language` to `zh` or `en` in `~/.cc-notifier/config.json` (or the project-level `.claude/cc-notifier.json`).
+- `auto` maps `zh-*` locales to Chinese and `en-*` to English; any other locale or a failed detection falls back to English.

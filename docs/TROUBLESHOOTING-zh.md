@@ -45,3 +45,8 @@
 ## 通知内容为空
 
 - 真实 hook JSON 是扁平格式(`tool_name`/`tool_input`)。若看到空 Toast,通过调试 hook 检查载荷:`ask-user-question` 的字段是 `questions[0].question`(非 `prompt`)。
+
+## Toast 语言不符合预期
+
+- Toast 文案默认跟随系统显示语言(`language: auto`)。可在 `~/.cc-notifier/config.json`(或项目级 `.claude/cc-notifier.json`)将 `language` 设为 `zh` 或 `en` 覆盖。
+- `auto` 将 `zh-*` 区域映射为中文、`en-*` 映射为英文;其他区域或检测失败回退英文。

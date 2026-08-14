@@ -36,6 +36,7 @@ cc-notifier 在 Claude Code 需要你介入、而你未聚焦于会话窗口时�
 | 功能 | 说明 |
 |---|---|
 | 中断事件通知 | 覆盖权限请求、AskUserQuestion 提问、工具失败、Stop(等待输入)四类中断时刻 |
+| 本地化通知 | Toast 文案默认跟随系统显示语言(`auto`),可由 `language` 配置(`zh`/`en`)覆盖 |
 | 聚焦感知 | 会话窗口聚焦时静默,失焦时才通知 |
 | 原生 Toast | Python winrt 显示带声音的 Windows Toast;点击跳转走进程内 `Activated` 回调 |
 | 点击跳转 | `SetForegroundWindow` 精确聚焦会话窗口,通过进程工作目录与终端标签身份解析 |
@@ -131,6 +132,7 @@ graph LR
 | `enabled` | `true` | 设为 `false` 全局关闭通知 |
 | `dedupWindowMs` | `10000` | 失焦时同类事件去重窗口(毫秒) |
 | `sound` | `true` | 设为 `false` 时 Toast 静音 |
+| `language` | `auto` | Toast 语言:`auto`(系统显示语言,`zh-*`→中文、`en-*`→英文,其他/检测失败→英文)、`zh` 或 `en` |
 
 ## 项目结构
 

@@ -36,6 +36,7 @@ cc-notifier alerts you when Claude Code needs your attention but you are not loo
 | Feature | Description |
 |---|---|
 | Interruption events | Notifies on permission requests, AskUserQuestion prompts, tool failures, and Stop (waiting for input) |
+| Localized notifications | Toast text follows the Windows display language (`auto`) or a `language` config field (`zh`/`en`) |
 | Focus awareness | Suppresses notifications while the session window is focused; notifies only when it is not |
 | Native toasts | Windows toast with sound via Python winrt; click-to-return uses the in-process `Activated` callback |
 | Click-to-focus | `SetForegroundWindow` targets the exact session window, resolved by process working directory and terminal tab identity |
@@ -131,6 +132,7 @@ The forwarder parses each hook event, normalizes it, and posts it to the residen
 | `enabled` | `true` | Set to `false` to disable notifications globally |
 | `dedupWindowMs` | `10000` | Deduplication window for same-type events while unfocused (ms) |
 | `sound` | `true` | Set to `false` to mute toast sound |
+| `language` | `auto` | Toast language: `auto` (system display language, `zh-*`→zh, `en-*`→en, other/failure→en), `zh`, or `en` |
 
 ## Project Structure
 
