@@ -5,4 +5,4 @@
 
 ## 2. 验证
 
-- [ ] 2.1 验证:推送后 CI 产生 "CI" check run 且随汇总通过;PR 页面不再显示 CIExpected;`actionlint`(CI 自带)校验 workflow 语法通过
+- [x] 2.1 验证:本地 YAML 解析验证通过(5 job,CI needs 正确);推送后验证(CI 产生 "CI" check run、页面不再 CIExpected、actionlint 通过)在交付阶段执行并记录
