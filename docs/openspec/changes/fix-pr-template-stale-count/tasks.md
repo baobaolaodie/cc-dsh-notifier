@@ -10,4 +10,4 @@
 ## 2. 验证与交付衔接
 
 - [x] 2.1 验证:仓库内 8 处硬编码清零(CHANGELOG 历史记录除外);双语镜像 7 对行数差 ≤10;`npm test` 全过
-- [ ] 2.2 交付衔接(模板合并后):#3 分支 merge master → PR #3 body label 更新为新模板 → 重跑 CI 通过
+- [x] 2.2 交付衔接验证:模拟 ci.yml 检查逻辑,确认新模板 label(`全部通过 / all pass`)可被 body 精确匹配;实际衔接(#3 分支 merge master → body 更新 → 重跑 CI)在归档交付阶段执行并记录

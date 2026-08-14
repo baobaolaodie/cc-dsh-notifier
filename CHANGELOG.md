@@ -15,6 +15,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 ### Fixed
 
 - Test command lists test files explicitly instead of a glob, fixing `npm test` on Node 18 Windows (`Could not find 'test/*.test.mjs'`).
+- PR template and docs no longer pin the test count (`npm test` → all pass); the PR template checkbox label no longer drifts out of sync with the actual test suite.
 
 ## [0.1.0] - 2026-08-14
 

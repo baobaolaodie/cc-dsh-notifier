@@ -15,6 +15,7 @@
 ### 修复
 
 - test 命令改为显式列出测试文件(替代 glob),修复 Node 18 Windows 上 `npm test` 失败(`Could not find 'test/*.test.mjs'`)。
+- PR 模板与文档不再写死测试数量(`npm test` → 全部通过);模板复选框 label 不再与实际测试数脱节。
 
 ## [0.1.0] - 2026-08-14
 
