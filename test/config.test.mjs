@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { loadConfig, DEFAULT_CONFIG, GLOBAL_DIR, GLOBAL_CONFIG, projectConfigPath } from '../scripts/lib/config.mjs';
+import { loadConfig, DEFAULT_CONFIG, GLOBAL_DIR, GLOBAL_CONFIG, projectConfigPath, normalizeLanguage, parseLocaleName, resolveLanguage } from '../scripts/lib/config.mjs';
 
 function tmpDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'ccn-config-')); }
 
@@ -11,13 +11,41 @@ test('默认配置', () => {
   assert.equal(DEFAULT_CONFIG.enabled, true);
   assert.equal(DEFAULT_CONFIG.dedupWindowMs, 10000);
   assert.equal(DEFAULT_CONFIG.sound, true);
+  assert.equal(DEFAULT_CONFIG.language, 'auto');
   assert.equal(GLOBAL_CONFIG, path.join(GLOBAL_DIR, 'config.json'));
 });
 
 test('无任何配置文件时返回默认值', () => {
   const dir = tmpDir();
   const cfg = loadConfig(path.join(dir, 'proj'), { globalConfig: path.join(dir, 'missing.json') });
-  assert.deepEqual(cfg, { enabled: true, dedupWindowMs: 10000, sound: true });
+  assert.deepEqual(cfg, { enabled: true, dedupWindowMs: 10000, sound: true, language: 'auto' });
+});
+
+test('normalizeLanguage:只认 zh/en,其余回退 auto', () => {
+  assert.equal(normalizeLanguage('zh'), 'zh');
+  assert.equal(normalizeLanguage('en'), 'en');
+  assert.equal(normalizeLanguage('auto'), 'auto');
+  assert.equal(normalizeLanguage('fr'), 'auto');
+  assert.equal(normalizeLanguage(undefined), 'auto');
+  assert.equal(normalizeLanguage(null), 'auto');
+});
+
+test('parseLocaleName:zh-*/en-* 映射,其余/无法解析为 null', () => {
+  assert.equal(parseLocaleName('    LocaleName    REG_SZ    zh-CN'), 'zh');
+  assert.equal(parseLocaleName('    LocaleName    REG_SZ    en-US'), 'en');
+  assert.equal(parseLocaleName('    LocaleName    REG_SZ    fr-FR'), null); // 不引入第三种语言
+  assert.equal(parseLocaleName(''), null);
+  assert.equal(parseLocaleName('no match here'), null);
+  assert.equal(parseLocaleName(null), null);
+});
+
+test('resolveLanguage:zh/en 直取,auto/未知走系统检测', () => {
+  assert.equal(resolveLanguage({ language: 'zh' }), 'zh');
+  assert.equal(resolveLanguage({ language: 'en' }), 'en');
+  // auto:win32 真跑 reg(zh-CN/en-US),非 win32 reg 不存在 → 回退 zh;两者都 ∈ {zh,en}
+  assert.ok(['zh', 'en'].includes(resolveLanguage({ language: 'auto' })));
+  assert.ok(['zh', 'en'].includes(resolveLanguage({})));
+  assert.ok(['zh', 'en'].includes(resolveLanguage(null)));
 });
 
 test('全局配置覆盖默认', () => {

@@ -6,7 +6,7 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseEvent, toastContent, NOTIFY_TYPES } from './lib/events.mjs';
-import { loadConfig } from './lib/config.mjs';
+import { loadConfig, resolveLanguage } from './lib/config.mjs';
 import { readState, isPidAlive } from './lib/state.mjs';
 import { log } from './lib/logger.mjs';
 
@@ -25,10 +25,11 @@ async function main() {
     log('notify-agent', 'hook JSON 解析失败', err.message);
   }
 
-  const event = parseEvent(eventType, hookJson);
+  // 语言先于 parseEvent 解析:summary/标题文案在事件解析时即按语言生成
+  const cfg = loadConfig(hookJson.cwd || ''); // 含项目级 .claude/cc-notifier.json 关闭
+  const lang = resolveLanguage(cfg); // auto → 系统显示语言检测
+  const event = parseEvent(eventType, hookJson, lang);
   if (!event) process.exit(0); // tool-result 非错误 / 未知类型
-
-  const cfg = loadConfig(event.cwd); // 含项目级 .claude/cc-notifier.json 关闭
   if (cfg.enabled === false) process.exit(0);
 
   const state = readState();

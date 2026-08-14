@@ -6,12 +6,41 @@ export const NOTIFY_TYPES = new Set([
   'stop',
 ]);
 
+// 双语 Toast 标题(zh 与旧行为逐字一致;en 供英文系统);语言由 config.language 解析
 export const TYPE_LABELS = {
-  'permission-request': '权限请求',
-  'ask-user-question': '提问',
-  'tool-result': '工具出错',
-  stop: '等待输入',
+  zh: {
+    'permission-request': '权限请求',
+    'ask-user-question': '提问',
+    'tool-result': '工具出错',
+    stop: '等待输入',
+  },
+  en: {
+    'permission-request': 'Permission request',
+    'ask-user-question': 'Question',
+    'tool-result': 'Tool error',
+    stop: 'Waiting for input',
+  },
 };
+
+// summary 模板(按语言);zh 文案与旧行为逐字一致
+export function summarize(lang, kind, payload = {}) {
+  const zh = lang === 'zh';
+  switch (kind) {
+    case 'bash-request':
+      if (!payload.command) return zh ? 'Bash 请求执行权限' : 'Bash requests permission to run';
+      return zh ? `Bash 请求执行:${payload.command}` : `Bash requested to run: ${payload.command}`;
+    case 'tool-file':
+      return zh ? `${payload.toolName} 请求访问:${payload.filePath}` : `${payload.toolName} requests access to: ${payload.filePath}`;
+    case 'tool-run':
+      return zh ? `${payload.toolName} 请求执行` : `${payload.toolName} requested to run`;
+    case 'tool-error':
+      return payload.errText || (zh ? '工具执行出错' : 'Tool execution failed');
+    case 'stop':
+      return zh ? 'Claude 等待输入' : 'Claude is waiting for input';
+    default:
+      return '';
+  }
+}
 
 export function normalizeCwd(cwd) {
   if (!cwd) return '';
@@ -34,7 +63,8 @@ export function truncate(s, max = 80) {
 }
 
 // 返回规范化事件载荷;tool-result 非错误或未知类型返回 null
-export function parseEvent(eventType, hookJson = {}) {
+// lang ∈ 'zh' | 'en',决定 summary 文案语言(缺省 zh 保持旧行为)
+export function parseEvent(eventType, hookJson = {}, lang = 'zh') {
   const base = {
     ts: Date.now(),
     sessionId: hookJson.session_id || null,
@@ -42,6 +72,7 @@ export function parseEvent(eventType, hookJson = {}) {
     projectName: projectName(hookJson.cwd || ''),
     toolName: '',
     summary: '',
+    lang,
   };
   switch (eventType) {
     case 'session-start':
@@ -58,11 +89,11 @@ export function parseEvent(eventType, hookJson = {}) {
       const input = hookJson.tool_input || (hookJson.tool_use || {}).input || {};
       let summary = '';
       if (toolName === 'Bash') {
-        summary = input.command ? `Bash 请求执行:${input.command}` : 'Bash 请求执行权限';
+        summary = summarize(lang, 'bash-request', { command: input.command });
       } else if (typeof input.file_path === 'string') {
-        summary = `${toolName} 请求访问:${input.file_path}`;
+        summary = summarize(lang, 'tool-file', { toolName, filePath: input.file_path });
       } else if (toolName) {
-        summary = `${toolName} 请求执行`;
+        summary = summarize(lang, 'tool-run', { toolName });
       }
       return { ...base, type: 'permission-request', toolName, summary };
     }
@@ -81,10 +112,11 @@ export function parseEvent(eventType, hookJson = {}) {
       if (!isError) return null; // 非错误不通知
       const errText = resp.error
         || (Array.isArray(resp.content) ? resp.content.map((c) => (c && c.text) || '').join(' ').trim() : String(resp.content || ''));
-      return { ...base, type: 'tool-result', toolName, summary: truncate(errText) || '工具执行出错' };
+      // 错误文本透传(原文),仅缺省时用语言化默认文案
+      return { ...base, type: 'tool-result', toolName, summary: truncate(errText) || summarize(lang, 'tool-error', {}) };
     }
     case 'stop':
-      return { ...base, type: 'stop', summary: 'Claude 等待输入' };
+      return { ...base, type: 'stop', summary: summarize(lang, 'stop') };
     default:
       return null;
   }
@@ -92,5 +124,6 @@ export function parseEvent(eventType, hookJson = {}) {
 
 // 返回 { title: 事件类型标签, body: 摘要 };项目名前缀由 toast-agent.py 拼接
 export function toastContent(event) {
-  return { title: TYPE_LABELS[event.type] || event.type, body: event.summary || '' };
+  const labels = TYPE_LABELS[event.lang] || TYPE_LABELS.zh;
+  return { title: labels[event.type] || event.type, body: event.summary || '' };
 }

@@ -2,10 +2,12 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 export const GLOBAL_DIR = path.join(os.homedir(), '.cc-notifier');
 export const GLOBAL_CONFIG = path.join(GLOBAL_DIR, 'config.json');
-export const DEFAULT_CONFIG = { enabled: true, dedupWindowMs: 10000, sound: true };
+// language: 'auto'(按系统显示语言)| 'zh' | 'en';缺省 auto,未知语言回退 zh(与旧行为一致)
+export const DEFAULT_CONFIG = { enabled: true, dedupWindowMs: 10000, sound: true, language: 'auto' };
 
 export function readJsonSafe(file) {
   try {
@@ -28,4 +30,36 @@ export function loadConfig(cwd, overrides = {}) {
   const proj = projFile ? readJsonSafe(projFile) : null;
   if (proj && typeof proj === 'object' && !Array.isArray(proj)) Object.assign(cfg, proj); // 项目级优先级最高
   return cfg;
+}
+
+// 规范化 language 配置:只认 'zh' | 'en',其余一律 'auto'
+export function normalizeLanguage(lang) {
+  return lang === 'zh' || lang === 'en' ? lang : 'auto';
+}
+
+// 从 reg query 输出解析显示语言:zh-* → 'zh',en-* → 'en',无法解析 → null
+export function parseLocaleName(raw) {
+  const m = /LocaleName\s+REG_SZ\s+(\S+)/i.exec(raw || '');
+  if (!m) return null;
+  const code = m[1].toLowerCase();
+  if (code.startsWith('zh')) return 'zh';
+  if (code.startsWith('en')) return 'en';
+  return null;
+}
+
+// 系统显示语言检测:reg query HKCU\Control Panel\International /v LocaleName
+// 查询失败/未知语言 → 回退 'zh'(与旧行为一致,不引入第三种语言)
+export function detectSystemLanguage() {
+  try {
+    const out = execFileSync('reg', ['query', 'HKCU\\Control Panel\\International', '/v', 'LocaleName'], { encoding: 'utf8' });
+    return parseLocaleName(out) || 'zh';
+  } catch {
+    return 'zh';
+  }
+}
+
+// 解析最终通知语言:auto → 系统检测;zh/en 直取
+export function resolveLanguage(cfg) {
+  const lang = normalizeLanguage(cfg && cfg.language);
+  return lang === 'auto' ? detectSystemLanguage() : lang;
 }
