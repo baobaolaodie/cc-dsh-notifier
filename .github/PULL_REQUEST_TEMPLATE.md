@@ -19,7 +19,7 @@
 ## 验证(勾选已执行)/ Verification (check executed)
 
 <!-- 关键验证输出请粘贴到验证段下方,reviewer 可直接核验 / Paste key verification output below so reviewers can check directly -->
-- [ ] 单元测试 / Unit tests:`npm test` → 45 pass
+- [ ] 单元测试 / Unit tests:`npm test` → 全部通过 / all pass
 - [ ] 手动验证 / Manual verification(描述场景 / describe the scenario):
 - [ ] 文档改动:中英双语同步 / Doc changes: EN and ZH mirrored
 - [ ] 如有未运行的验证项(说明原因)/ Not run if any (explain):

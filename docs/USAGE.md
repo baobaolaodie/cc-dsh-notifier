@@ -12,10 +12,12 @@ cc-notifier raises a toast (with sound) when Claude Code needs you and your sess
 
 | Event | Hook | Toast title | Toast body |
 |---|---|---|---|
-| Permission request | `PermissionRequest` | 权限请求 | Tool + command/path (e.g. `Bash 请求执行:npm install`) |
-| Question | `PreToolUse` (AskUserQuestion) | 提问 | The question text |
-| Tool error | `PostToolUse` | 工具出错 | The error summary |
-| Waiting for input | `Stop` | 等待输入 | `Claude 等待输入` |
+| Permission request | `PermissionRequest` | 权限请求 / Permission request | Tool + command/path (e.g. `Bash 请求执行:npm install` / `Bash requested to run: npm install`) |
+| Question | `PreToolUse` (AskUserQuestion) | 提问 / Question | The question text |
+| Tool error | `PostToolUse` | 工具出错 / Tool error | The error summary |
+| Waiting for input | `Stop` | 等待输入 / Waiting for input | `Claude 等待输入` / `Claude is waiting for input` |
+
+The toast language follows the Windows display language by default (`auto`) and can be overridden by the `language` config field (`zh`/`en`).
 
 While the session window is focused, notifications are suppressed.
 

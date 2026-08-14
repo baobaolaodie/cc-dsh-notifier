@@ -6,7 +6,7 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseEvent, toastContent, NOTIFY_TYPES } from './lib/events.mjs';
-import { loadConfig } from './lib/config.mjs';
+import { loadConfig, resolveLanguage } from './lib/config.mjs';
 import { readState, isPidAlive } from './lib/state.mjs';
 import { log } from './lib/logger.mjs';
 
@@ -25,10 +25,12 @@ async function main() {
     log('notify-agent', 'hook JSON 解析失败', err.message);
   }
 
-  const event = parseEvent(eventType, hookJson);
+  // 语言先于 parseEvent 解析:summary/标题文案在事件解析时即按语言生成
+  const cfg = loadConfig(hookJson.cwd || ''); // 含项目级 .claude/cc-notifier.json 关闭
+  // 仅通知事件解析语言(session-start/end 不弹 Toast,省去 reg 检测开销 ~30-80ms/hook)
+  const lang = NOTIFY_TYPES.has(eventType) ? resolveLanguage(cfg) : 'zh';
+  const event = parseEvent(eventType, hookJson, lang);
   if (!event) process.exit(0); // tool-result 非错误 / 未知类型
-
-  const cfg = loadConfig(event.cwd); // 含项目级 .claude/cc-notifier.json 关闭
   if (cfg.enabled === false) process.exit(0);
 
   const state = readState();
@@ -128,6 +130,7 @@ function waitDaemonReady() {
 function showBasicToast(cfg, event) {
   const { title, body } = toastContent(event);
   const args = [TOAST, '-Title', title, '-Body', body];
+  if (event.lang) args.push('-Lang', event.lang); // Toast XML lang 属性
   if (event.projectName) args.push('-Project', event.projectName);
   if (cfg.sound === false) args.push('-nosound'); // 统一参数名(toast-agent.py 小写比较解析)
   // detached:true:notify-agent 退出后 toast-agent.py 不被宿主 Job Object 连带杀掉。

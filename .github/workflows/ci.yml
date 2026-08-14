@@ -177,3 +177,16 @@ jobs:
         uses: lycheeverse/lychee-action@v2
         with:
           args: --no-progress README.md README-zh.md CONTRIBUTING.md CONTRIBUTING-zh.md SECURITY.md SECURITY-zh.md CODE_OF_CONDUCT.md CODE_OF_CONDUCT-zh.md CHANGELOG.md CHANGELOG-zh.md docs/ .github/
+
+  # ── 汇总门禁:分支保护 required check "CI" 的落点 ──
+  # GitHub 不为此工作流产生名为 "CI" 的工作流级 check run(实测 check suite 仅 9 个 job 级),
+  # 分支保护 required_checks=["CI"] 永远等待 → PR 卡 "CIExpected — Waiting for status to be reported"。
+  # 本 job 产生同名 job 级 check run,全部检查通过后合并条件即满足。
+  CI:
+    needs: [test, quality, pr-policy, docs-links]
+    # push 到 master 时 pr-policy 被跳过(if: pull_request),默认 success() 语义会让本 job 连带跳过;
+    # !cancelled() && !failure():依赖成功或被跳过都运行,任一失败则跳过(保持门禁 fail-closed)
+    if: ${{ !cancelled() && !failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "all CI checks passed"
