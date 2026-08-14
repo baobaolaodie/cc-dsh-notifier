@@ -176,7 +176,7 @@ jobs:
       - name: '死链检查 / Dead-link check'
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress README.md README-zh.md CONTRIBUTING.md CONTRIBUTING-zh.md SECURITY.md SECURITY-zh.md CODE_OF_CONDUCT.md CODE_OF_CONDUCT-zh.md CHANGELOG.md CHANGELOG-zh.md docs/ .github/
+          args: --no-progress README.md README-zh.md CONTRIBUTING.md CONTRIBUTING-zh.md SECURITY.md SECURITY-zh.md CODE_OF_CONDUCT.md CODE_OF_CONDUCT-zh.md CHANGELOG.md CHANGELOG-zh.md docs/INSTALLATION.md docs/INSTALLATION-zh.md docs/USAGE.md docs/USAGE-zh.md docs/TROUBLESHOOTING.md docs/TROUBLESHOOTING-zh.md .github/
 
   # ── 汇总门禁:分支保护 required check "CI" 的落点 ──
   # GitHub 不为此工作流产生名为 "CI" 的工作流级 check run(实测 check suite 仅 9 个 job 级),

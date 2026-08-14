@@ -6,10 +6,10 @@ scripts/spikes/
 recover.py
 test-fixture-*.json
 
-# Comet 运行时状态不入库(.comet.yaml 与 config.yaml 保留)
-.comet/current-change.json
-docs/openspec/changes/**/.comet/
-!docs/openspec/changes/**/.comet.yaml
+# Comet 产物与状态不入库(磁盘保留):change 产物、归档、spec、报告、运行时状态
+.comet/
+docs/openspec/
+docs/superpowers/
 skills-lock.json
 
 # 本机工具配置/技能目录不入库

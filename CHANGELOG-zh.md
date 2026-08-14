@@ -17,6 +17,7 @@
 - test 命令改为显式列出测试文件(替代 glob),修复 Node 18 Windows 上 `npm test` 失败(`Could not find 'test/*.test.mjs'`)。
 - 通知文案按系统显示语言输出(`auto`),可由新配置项 `language`(`zh`/`en`)覆盖;英文系统用户收到英文通知。
 - PR 模板与文档不再写死测试数量(`npm test` → 全部通过);模板复选框 label 不再与实际测试数脱节。
+- Comet 产物(`.comet/`、`docs/openspec/`、`docs/superpowers/`)不再纳入版本控制;磁盘保留,作为本地过程产物。
 
 ## [0.1.0] - 2026-08-14
 
