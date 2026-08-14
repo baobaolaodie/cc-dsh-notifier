@@ -22,6 +22,6 @@ jobs:
             Before review, please make sure:
             - PR title follows Conventional Commits (e.g. `fix: ...`, `docs: ...`, `ci: ...`)
             - The checklist in the PR template stays complete (keep unchecked items as `[ ]`)
-            - Local pre-check: `npm test` → 45 pass
+            - Local pre-check: `npm test` → all pass
 
             CI enforces the rest automatically (tests, bilingual mirror, BOM guard, PR conventions, dead links).

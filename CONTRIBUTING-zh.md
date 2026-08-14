@@ -18,7 +18,7 @@
 ## 运行测试
 
 ```bash
-npm test                    # 全部单元测试(45 断言,node:test)
+npm test                    # 全部单元测试(全部断言通过,node:test)
 node --test test/events.test.mjs   # 单个测试文件
 node scripts/test.mjs <事件> # 经真实管线手动触发(permission-request|ask-user-question|tool-result|stop|session-start)
 ```
