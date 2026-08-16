@@ -104,13 +104,13 @@ test('聚焦判定使用事件到达时的实时前台:切走后立即判定失�
 
 test('浏览器兜底:会话未绑定(daemon 重启场景)+ 前台=白名单浏览器含 dsh 标题 → silent-focused', async () => {
   // 2026-08-16 用户实测「聚焦也弹」:daemon 重启后会话表为空,绑定/映射双双失效,
-  // 本兜底保证:前台是白名单浏览器且标题含 DeepSeek Harness → 视为聚焦
+  // 本兜底保证:前台是白名单浏览器且标题含 DeepSeek Harness → 视为聚焦(仅 web 事件)
   const { core } = makeCore({}, { browserWhitelist: ['msedge.exe'] });
   const ctx = makeCtx({
     getForeground: async () => ({ hwnd: 700, processName: 'msedge', title: '仔细研究这个repo给dsh做适配 — DeepSeek Harness — 个人 — Microsoft Edge' }),
   });
-  // 无 session-start!会话表为空(模拟 daemon 重启后绑定丢失)
-  const r = await core.handleEvent(ev('permission-request'), ctx);
+  // 无 session-start!会话表为空(模拟 daemon 重启后绑定丢失);事件自带 surface 兜底
+  const r = await core.handleEvent(ev('permission-request', { surface: 'web' }), ctx);
   assert.equal(r, 'silent-focused');
   assert.equal(ctx.calls.showToast, 0);
 });
@@ -120,7 +120,7 @@ test('浏览器兜底:前台=浏览器但标题不含 dsh(在看其他网站)→
   const ctx = makeCtx({
     getForeground: async () => ({ hwnd: 700, processName: 'msedge', title: 'B站 - 哔哩哔哩' }),
   });
-  const r = await core.handleEvent(ev('permission-request'), ctx);
+  const r = await core.handleEvent(ev('permission-request', { surface: 'web' }), ctx);
   assert.equal(r, 'toast');
   assert.equal(ctx.calls.showToast, 1);
 });
@@ -130,8 +130,30 @@ test('浏览器兜底:前台=非白名单进程(不在浏览器名单)→ 不适
   const ctx = makeCtx({
     getForeground: async () => ({ hwnd: 700, processName: 'notepad', title: 'xx — DeepSeek Harness' }),
   });
-  const r = await core.handleEvent(ev('permission-request'), ctx);
+  const r = await core.handleEvent(ev('permission-request', { surface: 'web' }), ctx);
   assert.equal(r, 'toast');
+});
+
+test('tui 事件 + 前台 dsh 浏览器页面 → 照常通知(浏览器兜底不得误伤 tui,2026-08-16 实测回归防护)', async () => {
+  // 用户在看 dsh web 页面 ≠ 在看 tui 终端;tui 事件只认终端窗口聚焦
+  const { core } = makeCore({}, { browserWhitelist: ['msedge.exe'] });
+  await core.handleEvent(ev('session-start', { sessionId: 'T1', surface: 'tui' }), makeCtx({ bindWindow: async () => 500 }));
+  const ctx = makeCtx({
+    getForeground: async () => ({ hwnd: 700, processName: 'msedge', title: '仔细研究这个repo给dsh做适配 — DeepSeek Harness — 个人 — Microsoft Edge' }),
+  });
+  const r = await core.handleEvent(ev('permission-request', { sessionId: 'T1', surface: 'tui' }), ctx);
+  assert.equal(r, 'toast');
+  assert.equal(ctx.calls.showToast, 1);
+});
+
+test('tui 事件 + 绑定终端窗口在前台 → 静默(终端句柄匹配仍生效)', async () => {
+  const { core } = makeCore({}, { browserWhitelist: ['msedge.exe'] });
+  await core.handleEvent(ev('session-start', { sessionId: 'T1', surface: 'tui' }), makeCtx({ bindWindow: async () => 500 }));
+  const ctx = makeCtx({
+    getForeground: async () => ({ hwnd: 500, processName: 'Code', title: 'Claude Code - flow-comet - Visual Studio Code' }),
+  });
+  const r = await core.handleEvent(ev('permission-request', { sessionId: 'T1', surface: 'tui' }), ctx);
+  assert.equal(r, 'silent-focused');
 });
 
 test('web 会话 + 同窗口切走(句柄不变但标题不含 dsh,如 dsh tab → GitHub tab)→ 照常通知(假静默回归防护)', async () => {

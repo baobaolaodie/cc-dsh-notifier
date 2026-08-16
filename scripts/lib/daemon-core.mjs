@@ -78,17 +78,20 @@ export function createDaemonCore(deps) {
     const fg = await ctx.getForeground();
     const fgHwnd = fg ? fg.hwnd : 0;
     const sessNow = event.sessionId ? sessions.get(event.sessionId) : null;
-    const isWeb = !!(sessNow && sessNow.surface === 'web');
+    // web 判定:会话表优先,事件自带 surface 兜底(daemon 重启后会话表为空仍可靠)
+    const isWeb = (sessNow && sessNow.surface === 'web') || event.surface === 'web';
     // 浏览器窗口句柄是「窗口级」而非「tab 级」:同一 Edge 窗口内从 dsh tab 切到其他网站,
     // 句柄不变 → 句柄匹配会误判聚焦 → 假静默(2026-08-16 用户实测「toast 又不触发了」)。
     // web 会话的聚焦判据 = 前台是白名单浏览器且**标题含 DeepSeek Harness**(活动 tab 是 dsh);
     // 终端类(claude/tui)保持窗口句柄匹配(终端窗口即会话窗口)。
     const boundFocused = !isWeb && !!(sessNow && sessNow.hwnd && fgHwnd === sessNow.hwnd);
     const mappedFocused = decideFocus(fgHwnd, await ctx.getWindowMap(), event.cwd) === 'focused';
-    const fgIsDshBrowser = !!fg && browserWhitelist.some((p) =>
+    // 浏览器兜底**仅对 web 事件生效**(2026-08-16 用户实测:tui 会话事件被误静默 —
+    // 用户在看 dsh web 页面不代表在看 tui 终端);daemon 重启/绑定丢失时,
+    // 前台 dsh 页 → web 事件静默;看其他网站 → 照常通知
+    const fgIsDshBrowser = isWeb && !!fg && browserWhitelist.some((p) =>
       String(fg.processName || '').toLowerCase() === String(p).toLowerCase().replace(/\.exe$/i, '')
       && /deepseek harness/i.test(fg.title || ''));
-    // 浏览器兜底:daemon 重启/绑定丢失时,前台 dsh 页 → 静默;看其他网站 → 照常通知
     if (boundFocused || mappedFocused || fgIsDshBrowser) {
       log('daemon', '聚焦,静默', event.type, 'bound=' + (sessNow && sessNow.hwnd), 'dshBrowser=' + fgIsDshBrowser);
       return 'silent-focused';
