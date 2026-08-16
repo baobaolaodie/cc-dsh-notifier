@@ -1,8 +1,11 @@
-# 仓库根 bundle patch(git 安装/自动发现用):
-# awesome-dsh-plugins 等生态按「仓库根 package.json 的 dsh.bundle」识别插件;
-# git 安装(dsh plugin add github:baobaolaodie/cc-notifier)时 loader 按相对源码路径
-# 解析插件行(与 --patch overlay 同语义),运行时自包含(引用包内 ./runtime/)。
+# 仓库根 bundle patch(git 安装/生态自动发现用):
+# awesome-dsh-plugins 等雷达按「仓库根 package.json 的 dsh.bundle」识别插件;
+# git 安装(dsh plugin add github:baobaolaodie/cc-notifier)时依赖名为 cc-notifier,
+# loader 按包名从 node_modules 解析,入口取根 package.json 的 main
+# (plugins/dsh-notifier/lib/index.js),运行时自包含(引用包内 ./runtime/)。
+# 注意:patch 的插件行 name 必须是包名——相对源码路径会按 profile 目录解析,
+# 找不到模块(2026-08-16 git 安装实测暴露,已改为包名)。
 # 子包安装(tarball/registry 的 dsh-notifier)使用 plugins/dsh-notifier/cordis.patch.yml。
 - insert:
     - id: dsh-notifier
-      name: ./plugins/dsh-notifier/lib/index.js
+      name: cc-notifier
