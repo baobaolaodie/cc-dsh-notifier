@@ -56,7 +56,7 @@ Verify the profile layer, then restart the profile:
 dsh --profile web --dump-config   # expect a "# == @baobaolaodie/cc-dsh-notifier" layer
 ```
 
-A packaged tarball (`pnpm pack`) or a registry release installs without the repair step.
+A packaged tarball (`pnpm pack`) or a registry release installs without the repair step. Three distribution forms are available — **tarball** (one file, no clone, no credentials; easiest), **git install** (`dsh plugin add github:baobaolaodie/cc-dsh-notifier`, clones the whole repository, zero config), and **GitHub Packages** (`dsh plugin add @baobaolaodie/cc-dsh-notifier`, needs a `read:packages` token in the profile `.npmrc` even for public packages). See the plugin README for details.
 
 ## Verify
 

@@ -56,7 +56,7 @@ dsh plugin --profile web list   # 只读 pnpm 命令触发 reconcile
 dsh --profile web --dump-config   # 应出现 "# == @baobaolaodie/cc-dsh-notifier" 层
 ```
 
-打包为 tarball(`pnpm pack`)或发布 registry 后安装无需修复步骤。
+打包为 tarball(`pnpm pack`)或发布 registry 后安装无需修复步骤。三种分发形态可选 —— **tarball**(单个文件,不 clone 仓库、无凭据,最方便)、**git 安装**(`dsh plugin add github:baobaolaodie/cc-dsh-notifier`,会 clone 整个仓库,零配置)、**GitHub Packages**(`dsh plugin add @baobaolaodie/cc-dsh-notifier`,即使包 public 也需在 profile 的 .npmrc 配 `read:packages` token)。详见插件 README。
 
 ## 验证
 

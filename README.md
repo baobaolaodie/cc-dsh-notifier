@@ -56,8 +56,10 @@ The installer backs up `~/.claude/settings.json`, injects five hooks, registers 
 ### Install (DeepSeek Harness)
 
 ```bash
-# published package (GitHub Packages; first add this line to the profile's .npmrc:
-#   @baobaolaodie:registry=https://npm.pkg.github.com)
+# published package (GitHub Packages; first add these lines to the profile's .npmrc:
+#   @baobaolaodie:registry=https://npm.pkg.github.com
+#   //npm.pkg.github.com/:_authToken=<GitHub PAT with read:packages>
+# downloads from GitHub Packages always require the token, even for public packages)
 dsh plugin --profile web add @baobaolaodie/cc-dsh-notifier
 dsh plugin --profile dsh-tui add @baobaolaodie/cc-dsh-notifier
 

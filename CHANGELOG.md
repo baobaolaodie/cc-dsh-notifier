@@ -29,7 +29,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 - Existing Claude Code sessions that never re-fire `session-start` get a lazy binding fallback: unbound claude-surface toasts pick the latest `?`-tagged terminal window as the jump target, so click-to-return works without restarting the session.
 - Plugin published to GitHub Packages as `@baobaolaodie/cc-dsh-notifier` (public); tarball and git installs keep working (root patch stays `cc-dsh-notifier`, matching the git-install dependency name).
 - Bundle patch entry name quoted (`"@baobaolaodie/cc-dsh-notifier"`): a bare `@` prefix is a reserved YAML indicator and broke profile config parsing (0.1.3); 0.1.4 fixes it.
-
 - Test command lists test files explicitly instead of a glob, fixing `npm test` on Node 18 Windows (`Could not find 'test/*.test.mjs'`).
 - Toast text follows the Windows display language (`auto`) or a new `language` config field (`zh`/`en`); English users now get English notifications.
 - PR template and docs no longer pin the test count (`npm test` → all pass); the PR template checkbox label no longer drifts out of sync with the actual test suite.
