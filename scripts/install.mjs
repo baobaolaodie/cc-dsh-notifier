@@ -21,7 +21,7 @@ const HOOKS = [
   ['SessionStart', 'session-start', ''],
   ['PermissionRequest', 'permission-request', ''],
   ['PreToolUse', 'ask-user-question', 'AskUserQuestion'],
-  ['PostToolUse', 'tool-result', ''],
+  // PostToolUse(tool-result)已移除:工具出错不再通知(2026-08-16 用户决策)
   ['Stop', 'stop', ''],
   ['SessionEnd', 'session-end', ''],
 ];

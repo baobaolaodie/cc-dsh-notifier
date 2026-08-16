@@ -16,18 +16,13 @@ const FIXTURES = {
     session_id: 'test-session', cwd: CWD, hook_event_name: 'PreToolUse', matcher: 'AskUserQuestion',
     tool_name: 'AskUserQuestion', tool_input: { questions: [{ prompt: '请确认是否继续?(测试问题预览)' }] },
   },
-  'tool-result': {
-    session_id: 'test-session', cwd: CWD, hook_event_name: 'PostToolUse',
-    tool_name: 'Bash', tool_input: { command: 'npm test' },
-    tool_response: { type: 'tool_result', is_error: true, error: 'Command failed: npm test', content: [{ type: 'text', text: 'test failed' }] },
-  },
   stop: { session_id: 'test-session', cwd: CWD, hook_event_name: 'Stop' },
   'session-start': { session_id: 'test-session', cwd: CWD, hook_event_name: 'SessionStart' },
 };
 
 const type = process.argv[2];
 if (!type || !FIXTURES[type]) {
-  console.error('用法: node scripts/test.mjs <permission-request|ask-user-question|tool-result|stop|session-start> / Usage: node scripts/test.mjs <permission-request|ask-user-question|tool-result|stop|session-start>');
+  console.error('用法: node scripts/test.mjs <permission-request|ask-user-question|stop|session-start> / Usage: node scripts/test.mjs <permission-request|ask-user-question|stop|session-start>');
   process.exit(1);
 }
 const child = spawn(process.execPath, [AGENT, type], { stdio: ['pipe', 'inherit', 'inherit'] });

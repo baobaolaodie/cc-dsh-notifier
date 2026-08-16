@@ -58,9 +58,9 @@ test('normalizeCwd 统一分隔符(反斜杠/正斜杠等价)', () => {
   assert.ok(a.includes('\\'), '分隔符应统一为反斜杠');
 });
 
-test('NOTIFY_TYPES 只含四类通知事件', () => {
+test('NOTIFY_TYPES 只含三类通知事件(tool-result 已移除)', () => {
   assert.deepEqual([...NOTIFY_TYPES].sort(), [
-    'ask-user-question', 'permission-request', 'stop', 'tool-result',
+    'ask-user-question', 'permission-request', 'stop',
   ]);
 });
 
@@ -131,41 +131,18 @@ test('ask-user-question: 嵌套 tool_use 回退兼容', () => {
   assert.ok(ev.summary.endsWith('…'));
 });
 
-test('tool-result: 真实 hook JSON 扁平格式错误时通知并提取错误摘要', () => {
-  const ev = parseEvent('tool-result', {
+test('tool-result 已移除通知(2026-08-16 用户决策):parseEvent 返回 null', () => {
+  // 工具出错不会让 agent 停下,只徒增通知噪音 → 不再触发 Toast
+  const err = parseEvent('tool-result', {
     cwd: CWD, hook_event_name: 'PostToolUse',
     tool_name: 'Bash', tool_input: { command: 'npm test' },
     tool_response: { type: 'tool_result', is_error: true, content: [{ type: 'text', text: 'Command failed' }] },
   });
-  assert.equal(ev.type, 'tool-result');
-  assert.equal(ev.toolName, 'Bash');
-  assert.equal(ev.summary, 'Command failed');
-});
-
-test('tool-result: 嵌套 tool_use 回退兼容', () => {
-  const ev = parseEvent('tool-result', {
-    cwd: CWD,
-    tool_use: { name: 'Bash', input: { command: 'npm test' } },
-    tool_response: { is_error: true, content: [{ type: 'text', text: 'Command failed' }] },
-  });
-  assert.equal(ev.type, 'tool-result');
-  assert.equal(ev.toolName, 'Bash');
-  assert.equal(ev.summary, 'Command failed');
-});
-
-test('tool-result: error 字段兜底', () => {
-  const ev = parseEvent('tool-result', {
-    cwd: CWD, tool_use: { name: 'Bash' },
-    tool_response: { error: 'Command failed: npm test' },
-  });
-  assert.equal(ev.summary, 'Command failed: npm test');
-});
-
-test('tool-result: 非错误返回 null(不通知)', () => {
-  const ev = parseEvent('tool-result', {
+  assert.equal(err, null);
+  const ok = parseEvent('tool-result', {
     cwd: CWD, tool_use: { name: 'Bash' }, tool_response: { is_error: false, content: 'ok' },
   });
-  assert.equal(ev, null);
+  assert.equal(ok, null);
 });
 
 test('stop: 等待输入文案', () => {
@@ -192,11 +169,10 @@ test('i18n: lang=en 时标题与摘要为英文', () => {
   assert.equal(c.body, 'Bash requested to run: npm install');
 });
 
-test('i18n: lang=en 覆盖四类事件标题', () => {
+test('i18n: lang=en 覆盖三类事件标题(tool-result 已移除)', () => {
   const cases = [
     ['permission-request', {}, 'Permission request'],
     ['ask-user-question', { tool_use: { name: 'AskUserQuestion', input: { questions: [{ question: 'q' }] } } }, 'Question'],
-    ['tool-result', { tool_use: { name: 'Bash' }, tool_response: { is_error: true, error: 'boom' } }, 'Tool error'],
     ['stop', {}, 'Waiting for input'],
   ];
   for (const [type, hook, title] of cases) {
@@ -216,15 +192,6 @@ test('i18n: lang 缺省回退 zh(旧行为不变)', () => {
 test('i18n: 未知 lang 的 toastContent 回退 zh 标签', () => {
   const c = toastContent({ type: 'stop', summary: 'x', lang: 'fr' });
   assert.equal(c.title, '等待输入');
-});
-
-test('i18n: 工具错误原文透传,默认文案按语言', () => {
-  const zh = parseEvent('tool-result', { cwd: CWD, tool_use: { name: 'Bash' }, tool_response: { is_error: true } });
-  assert.equal(zh.summary, '工具执行出错');
-  const en = parseEvent('tool-result', { cwd: CWD, tool_use: { name: 'Bash' }, tool_response: { is_error: true } }, 'en');
-  assert.equal(en.summary, 'Tool execution failed');
-  const raw = parseEvent('tool-result', { cwd: CWD, tool_use: { name: 'Bash' }, tool_response: { is_error: true, error: 'EACCES denied' } }, 'en');
-  assert.equal(raw.summary, 'EACCES denied'); // 错误原文透传不翻译
 });
 
 test('i18n: Bash 无 command 时默认文案按语言', () => {

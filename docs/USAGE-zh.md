@@ -14,7 +14,6 @@ Claude Code 或 DeepSeek Harness 需要你介入、且会话窗口未聚焦时,c
 |---|---|---|---|
 | 权限请求 | Claude:`PermissionRequest`;dsh:`approval/asked` | 权限请求 / Permission request | 工具 + 原因(如 `Bash 请求执行:npm install` / `Bash requested to run: npm install`) |
 | 提问 | Claude:`PreToolUse`(AskUserQuestion);dsh:`tool/call` | 提问 / Question | 问题文本 |
-| 工具报错 | Claude:`PostToolUse`;dsh:`tool/result`(isError) | 工具出错 / Tool error | 错误摘要 |
 | 等待输入 | Claude:`Stop`;dsh:`agent/status` idle | 等待输入 / Waiting for input | `Claude 等待输入` / `DeepSeek Harness 等待输入` |
 
 Toast 文案默认跟随系统显示语言(`auto`),可由配置项 `language`(`zh`/`en`)覆盖。
@@ -46,7 +45,6 @@ daemon 生命周期全自动:任意通知事件唤醒;最后一个会话结束�
 ```bash
 node scripts/test.mjs permission-request
 node scripts/test.mjs ask-user-question
-node scripts/test.mjs tool-result
 node scripts/test.mjs stop
 node scripts/test.mjs session-start
 ```

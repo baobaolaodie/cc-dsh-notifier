@@ -3,7 +3,7 @@
 <p align="center">
   <strong>Windows desktop notifications for Claude Code and DeepSeek Harness sessions</strong>
   <br />
-  <em>Permission requests · Questions · Tool errors · Waiting for input · Click-to-return</em>
+  <em>Permission requests · Questions · Waiting for input · Click-to-return</em>
 </p>
 
 <p align="center">
@@ -30,7 +30,7 @@ cc-dsh-notifier raises a native Windows toast with sound when an agent needs you
 
 | Feature | Description |
 |---|---|
-| Interruption events | Notifies on permission requests, questions, tool errors, and waiting for input |
+| Interruption events | Notifies on permission requests, questions, and waiting for input |
 | Focus awareness | Suppresses notifications while the session window is focused; notifies only when it is not |
 | Click-to-return | `SetForegroundWindow` targets the session window; browser tabs activate via UIA |
 | Multi-session | Each session binds its own window handle; toasts carry the session identity |
@@ -61,7 +61,7 @@ dsh plugin --profile web add ./plugins/dsh-notifier
 dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
 ```
 
-Verified against dsh 0.1.0-rc.6 on Windows 11 (2026-08-16): web and tui profiles, all four notification types, focus-aware silence, click-to-return, and the tarball install flow.
+Verified against dsh 0.1.0-rc.6 on Windows 11 (2026-08-16): web and tui profiles, permission/question/waiting-for-input notifications, focus-aware silence, click-to-return, and the tarball install flow.
 
 ### Verify
 
@@ -73,7 +73,7 @@ npm test
 
 ### Claude Code
 
-Start a session and switch away. The system notifies when Claude requests a permission, asks a question, finishes a turn, or hits a tool error:
+Start a session and switch away. The system notifies when Claude requests a permission, asks a question, finishes a turn, :
 
 ```bash
 claude
@@ -92,7 +92,7 @@ dsh-tui          # or: dsh --profile dsh-tui
 ### Manual trigger (testing)
 
 ```bash
-node scripts/test.mjs permission-request   # permission-request | ask-user-question | tool-result | stop | session-start
+node scripts/test.mjs permission-request   # permission-request | ask-user-question | stop | session-start
 ```
 
 Toasts are suppressed while the target window is focused, so switch away to observe them.

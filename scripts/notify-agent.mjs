@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // 转发器:node scripts/notify-agent.mjs <eventType>,hook JSON 从 stdin 读取
-// eventType ∈ session-start | session-end | permission-request | ask-user-question | tool-result | stop
+// eventType ∈ session-start | session-end | permission-request | ask-user-question | stop
+// (tool-result 已移除通知:工具出错不会让 agent 停下,徒增噪音,2026-08-16 用户决策)
 import http from 'node:http';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
@@ -30,7 +31,7 @@ async function main() {
   // 仅通知事件解析语言(session-start/end 不弹 Toast,省去 reg 检测开销 ~30-80ms/hook)
   const lang = NOTIFY_TYPES.has(eventType) ? resolveLanguage(cfg) : 'zh';
   const event = parseEvent(eventType, hookJson, lang);
-  if (!event) process.exit(0); // tool-result 非错误 / 未知类型
+  if (!event) process.exit(0); // 未知类型(含已移除的 tool-result)
   if (cfg.enabled === false) process.exit(0);
 
   const state = readState();

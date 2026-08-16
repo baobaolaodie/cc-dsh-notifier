@@ -64,41 +64,6 @@ export function toAskUserQuestion(session, event, lang, surface = 'tui', session
   };
 }
 
-// tool/result(isError)→ tool-result;错误文本取自 message.content / error.info。
-// dsh 实测(2026-08-16 tui):命令失败时 message.isError 为 **false**(命令失败被当作
-// 正常结果),错误信息在文本里,格式为 `[stderr]\n...\n[exit code: N]`(N≠0)。
-// 因此错误识别 = isError 为真 **或** 文本含 `[stderr]` / `[exit code: 非零]`。
-export function extractText(content) {
-  if (typeof content === 'string') return content;
-  if (Array.isArray(content)) return content.map(extractText).filter(Boolean).join(' ');
-  if (content && typeof content === 'object') {
-    if (typeof content.text === 'string') return content.text;
-    if (content.content !== undefined) return extractText(content.content);
-  }
-  return '';
-}
-
-export function isErrorResult(event) {
-  const data = (event && event.data) || {};
-  if (data.message && data.message.isError === true) return true;
-  const text = extractText(data.message && data.message.content);
-  return /\[exit code: [1-9]\d*\]/.test(text) || /\[stderr\]/.test(text);
-}
-
-export function toToolResult(session, event, lang, surface = 'tui', sessionTitle = '') {
-  const cwd = cwdOf(session);
-  const data = (event && event.data) || {};
-  const message = data.message || {};
-  const errText = (data.error && (data.error.message || (data.error.info && data.error.info.name)))
-    || extractText(message.content);
-  return {
-    type: 'tool-result', ts: Date.now(), sessionId: session.id, cwd,
-    projectName: projectName(cwd), toolName: data.name || '',
-    summary: summarize(lang, 'tool-error', { errText: truncate(errText) }),
-    lang, surface, sessionTitle,
-  };
-}
-
 // agent/status running→idle 沿 → stop(等待输入);dsh 专用文案(区别于 Claude Code 的 stop 模板)
 export function toStop(session, lang, surface = 'tui', sessionTitle = '') {
   const cwd = cwdOf(session);
@@ -113,13 +78,12 @@ export function toStop(session, lang, surface = 'tui', sessionTitle = '') {
 // 性能红线:先纯内存过滤(Set.has)再解析语言/读配置——session/event 是高频流
 // (assistant/chunk 每 token 一条),过滤前做任何 I/O(reg 子进程、readFileSync)
 // 都会同步阻塞 host event loop 导致卡顿(2026-08-16 实测,已修复)。
-// tool/call 与 tool/result 频率低(每次工具调用),入白名单后仍须在 mapSessionEvent
-// 内做纯字段判断(name/isError),不得引入 I/O。
-export const NOTIFY_SESSION_EVENT_TYPES = new Set(['approval/asked', 'tool/call', 'tool/result']);
+// tool/result 已移除通知(2026-08-16 用户决策:工具出错不会让 agent 停下,徒增噪音)。
+export const NOTIFY_SESSION_EVENT_TYPES = new Set(['approval/asked', 'tool/call']);
 
 // 过滤映射:非通知事件返回 null。
-// 四类通知:approval/asked(权限)、tool/call+ask_user_question(提问)、
-// tool/result+isError(报错);等待输入走 agent/status(非 session/event,见 index.js)。
+// 三类通知:approval/asked(权限)、tool/call+ask_user_question(提问);
+// 等待输入走 agent/status(非 session/event,见 index.js)。
 export function mapSessionEvent(session, event, lang, surface = 'tui', sessionTitle = '') {
   const data = (event && event.data) || {};
   switch (event && event.type) {
@@ -127,8 +91,6 @@ export function mapSessionEvent(session, event, lang, surface = 'tui', sessionTi
       return toApprovalAsked(session, event, lang, surface, sessionTitle);
     case 'tool/call':
       return data.name === QUESTION_TOOL ? toAskUserQuestion(session, event, lang, surface, sessionTitle) : null;
-    case 'tool/result':
-      return isErrorResult(event) ? toToolResult(session, event, lang, surface, sessionTitle) : null;
     default:
       return null;
   }

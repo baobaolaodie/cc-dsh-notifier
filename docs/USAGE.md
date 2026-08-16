@@ -14,7 +14,6 @@ cc-dsh-notifier raises a toast (with sound) when Claude Code or DeepSeek Harness
 |---|---|---|---|
 | Permission request | Claude: `PermissionRequest`; dsh: `approval/asked` | 权限请求 / Permission request | Tool + reason (e.g. `Bash 请求执行:npm install` / `Bash requested to run: npm install`) |
 | Question | Claude: `PreToolUse` (AskUserQuestion); dsh: `tool/call` | 提问 / Question | The question text |
-| Tool error | Claude: `PostToolUse`; dsh: `tool/result` (isError) | 工具出错 / Tool error | The error summary |
 | Waiting for input | Claude: `Stop`; dsh: `agent/status` idle | 等待输入 / Waiting for input | `Claude 等待输入` / `DeepSeek Harness 等待输入` |
 
 The toast language follows the Windows display language by default (`auto`) and can be overridden by the `language` config field (`zh`/`en`).
@@ -46,7 +45,6 @@ Requires a running daemon (an active session). Switch focus away from the sessio
 ```bash
 node scripts/test.mjs permission-request
 node scripts/test.mjs ask-user-question
-node scripts/test.mjs tool-result
 node scripts/test.mjs stop
 node scripts/test.mjs session-start
 ```

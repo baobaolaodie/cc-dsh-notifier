@@ -4,8 +4,7 @@ DeepSeek Harness → cc-dsh-notifier 适配插件:订阅 dsh 会话事件,转发
 daemon,复用其 Windows Toast + 点击跳转管线。web 与 tui 两个 surface 共用同一插件。
 
 - **事件映射**:`session/created` → session-start;`approval/asked` → permission-request;
-  `tool/call(ask_user_question)` → ask-user-question;`tool/result(isError)` → tool-result;
-  `agent/status` running→idle → stop(等待输入);`session/disposed` → session-end
+  `tool/call(ask_user_question)` → ask-user-question;  `agent/status` running→idle → stop(等待输入);`session/disposed` → session-end
 - **surface 检测**:argv 含 `--profile web` → web(浏览器绑定);其余(dsh-tui 等)→ tui(终端绑定);
   `CCN_SURFACE` 可强制覆盖
 - **与 cc-dsh-notifier 共享库经相对路径引用**(插件随仓库分发);daemon/toast 路径可用

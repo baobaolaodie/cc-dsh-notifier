@@ -14,7 +14,7 @@
 
 ### 新增
 
-- DeepSeek Harness(dsh)支持:`dsh-notifier` 组合包插件(web + tui profile)把 dsh 会话事件接入现有 cc-dsh-notifier 管线 —— 权限请求、提问、工具报错、等待输入全部以 Windows Toast 呈现并支持点击跳转;daemon 生命周期全自动(任何事件拉起、空闲/宿主存活退出、代码变更自我重启、daemon 重启后会话重注册)。
+- DeepSeek Harness(dsh)支持:`dsh-notifier` 组合包插件(web + tui profile)把 dsh 会话事件接入现有 cc-dsh-notifier 管线 —— 权限请求、提问、等待输入全部以 Windows Toast 呈现并支持点击跳转;daemon 生命周期全自动(任何事件拉起、空闲/宿主存活退出、代码变更自我重启、daemon 重启后会话重注册)。
 - 新配置项 `dedupWindowMs`(默认 `0` = 不去重)、`pythonPath`(Toast 解释器,安装时写入)、`pollIntervalMs`(daemon 窗口轮询周期,默认 `10000`)。移除等待输入交互抑制:是否通知完全由聚焦判定决定。
 - 按来源区分的 Toast 图标:dsh 用黑鲸鱼(透明底),Claude Code 用官方星形 logo。
 - 预编译助手 `foreground.exe`(实时前台查询,~150ms)与 `activate-tab.exe`(UIA tab 激活),源码入库。
@@ -23,6 +23,8 @@
 - 非 Windows 平台以降级模式加载插件并输出明确日志(Toast 依赖 Windows;headless/雷达环境保持可用)。
 
 ### 修复
+
+- 移除工具出错通知(用户决策):工具失败不会让 agent 停下,通知只徒增噪音。`tool-result` 从通知类型移除(Claude Code 不再注入 PostToolUse hook;dsh `tool/result` 不再映射)。
 
 - test 命令改为显式列出测试文件(替代 glob),修复 Node 18 Windows 上 `npm test` 失败(`Could not find 'test/*.test.mjs'`)。
 - 通知文案按系统显示语言输出(`auto`),可由新配置项 `language`(`zh`/`en`)覆盖;英文系统用户收到英文通知。
@@ -38,7 +40,7 @@
 
 ### 新增
 
-- 四类中断事件通知:权限请求、AskUserQuestion 提问、工具失败、Stop(等待输入)
+- 三类中断事件通知:权限请求、AskUserQuestion 提问、Stop(等待输入)
 - 聚焦感知:会话窗口聚焦时静默,失焦时才通知
 - 原生 Windows Toast + 声音(Python winrt);点击跳转走进程内 `Activated` 回调与 `SetForegroundWindow`
 - 多会话支持:每会话独立窗口绑定,Toast 携带项目名

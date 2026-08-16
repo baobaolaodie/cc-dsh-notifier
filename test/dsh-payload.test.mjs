@@ -6,7 +6,6 @@ import {
   toSessionEnd,
   toApprovalAsked,
   toAskUserQuestion,
-  toToolResult,
   toStop,
   mapSessionEvent,
 } from '../plugins/dsh-notifier/lib/payload.mjs';
@@ -114,53 +113,16 @@ test('toAskUserQuestion:无 questions 时摘要为空不抛错', () => {
   assert.equal(e.summary, '');
 });
 
-test('toToolResult:isError → 工具报错,摘要含错误文本', () => {
-  const e = toToolResult(
-    session,
-    { type: 'tool/result', data: { name: 'Pwsh', message: { isError: true, content: [{ type: 'text', text: 'Access denied' }] } } },
-    'zh',
-  );
-  assert.equal(e.type, 'tool-result');
-  assert.equal(e.toolName, 'Pwsh');
-  assert.match(e.summary, /Access denied/);
-});
-
-test('命令失败识别:dsh 的 isError=false 但文本含 [stderr] + [exit code: 非零] → 触发报错', () => {
-  // 2026-08-16 tui 实测:dsh 把命令失败当正常结果(isError=false),
-  // 错误在文本里,格式 `[stderr]\n...\n[exit code: 1]`;按文本特征识别
-  const raw = {
+test('tool/result 已移除通知(2026-08-16 用户决策):mapSessionEvent 返回 null', () => {
+  // 工具出错不会让 agent 停下,只徒增通知噪音 → 不再触发 Toast
+  const err = { type: 'tool/result', data: { name: 'Pwsh', message: { isError: true, content: 'Access denied' } } };
+  assert.equal(mapSessionEvent(session, err, 'zh'), null);
+  const cmdFail = {
     type: 'tool/result',
-    data: {
-      name: 'Pwsh',
-      message: {
-        isError: false,
-        content: [{ type: 'tool-result', toolCallId: 'c1', content: [{ type: 'text', text: '[stderr]\nasdfgh12345 : not recognized\n[exit code: 1]' }] }],
-      },
-    },
+    data: { name: 'Pwsh', message: { isError: false, content: '[stderr]\nfailed\n[exit code: 1]' } },
   };
-  assert.equal(mapSessionEvent(session, raw, 'zh').type, 'tool-result');
-  assert.match(mapSessionEvent(session, raw, 'zh').summary, /not recognized/);
-});
-
-test('命令成功识别:exit code 0 / 无错误标记 → 不触发', () => {
-  const ok = { type: 'tool/result', data: { name: 'Pwsh', message: { isError: false, content: [{ type: 'text', text: 'hello [exit code: 0]' }] } } };
-  assert.equal(mapSessionEvent(session, ok, 'zh'), null);
-  const plain = { type: 'tool/result', data: { name: 'Pwsh', message: { isError: false, content: 'done' } } };
-  assert.equal(mapSessionEvent(session, plain, 'zh'), null);
-});
-
-test('嵌套 content 结构文本提取(实测 dsh tool/result 形态)', () => {
-  const raw = {
-    type: 'tool/result',
-    data: {
-      name: 'Pwsh',
-      message: {
-        content: [{ type: 'tool-result', toolCallId: 'c1', content: [{ type: 'text', text: '[stderr]\nfailed\n[exit code: 2]' }] }],
-      },
-    },
-  };
-  const e = toToolResult(session, raw, 'zh');
-  assert.match(e.summary, /failed/);
+  assert.equal(mapSessionEvent(session, cmdFail, 'zh'), null);
+  assert.equal(mapSessionEvent(session, { type: 'tool/result', data: {} }, 'zh'), null);
 });
 
 test('toStop:dsh 等待输入文案(区别于 Claude Code 的 stop,带产品名)', () => {

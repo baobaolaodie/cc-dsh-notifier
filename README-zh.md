@@ -3,7 +3,7 @@
 <p align="center">
   <strong>Claude Code 与 DeepSeek Harness 会话的 Windows 桌面通知系统</strong>
   <br />
-  <em>权限请求 · 提问 · 工具报错 · 等待输入 · 点击跳转</em>
+  <em>权限请求 · 提问 · 等待输入 · 点击跳转</em>
 </p>
 
 <p align="center">
@@ -30,7 +30,7 @@ cc-dsh-notifier 在代理需要你介入、而你没有看着它的窗口时,弹
 
 | 功能 | 说明 |
 |---|---|
-| 中断事件 | 权限请求、提问、工具报错、等待输入均会通知 |
+| 中断事件 | 权限请求、提问、等待输入均会通知 |
 | 聚焦感知 | 会话窗口聚焦时静默,失焦时才通知 |
 | 点击跳转 | `SetForegroundWindow` 聚焦会话窗口;浏览器 tab 经 UIA 激活 |
 | 多会话 | 每个会话绑定各自窗口句柄;Toast 携带会话身份 |
@@ -61,7 +61,7 @@ dsh plugin --profile web add ./plugins/dsh-notifier
 dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
 ```
 
-已在 Windows 11 + dsh 0.1.0-rc.6 实测(2026-08-16):web 与 tui 双 profile、四类通知、聚焦感知静默、点击跳转、tarball 安装流程。
+已在 Windows 11 + dsh 0.1.0-rc.6 实测(2026-08-16):web 与 tui 双 profile、三类通知(权限/提问/等待输入)、聚焦感知静默、点击跳转、tarball 安装流程。
 
 ### 验证
 
@@ -73,7 +73,7 @@ npm test
 
 ### Claude Code
 
-启动会话后切走。Claude 请求权限、提问、完成回合或工具报错时,系统会通知你:
+启动会话后切走。Claude 请求权限、提问、完成回合时,系统会通知你:
 
 ```bash
 claude
@@ -92,7 +92,7 @@ dsh-tui          # 或:dsh --profile dsh-tui
 ### 手动触发(测试)
 
 ```bash
-node scripts/test.mjs permission-request   # permission-request | ask-user-question | tool-result | stop | session-start
+node scripts/test.mjs permission-request   # permission-request | ask-user-question | stop | session-start
 ```
 
 目标窗口聚焦时 Toast 会被静默,因此请切走窗口观察。
