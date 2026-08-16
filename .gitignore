@@ -2,6 +2,11 @@ node_modules/
 __pycache__/
 *.log
 
+# dsh-notifier 发布包运行时(vendor 生成物,scripts/vendor-dsh-plugin.mjs 同步)
+plugins/dsh-notifier/lib/runtime/
+# 打包产物
+*.tgz
+
 # Spike 实验脚本与恢复工具(历史痕迹保留在磁盘,不入库)
 scripts/spikes/
 recover.py

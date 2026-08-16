@@ -2,7 +2,7 @@
 // 订阅 dsh 会话事件,转发给 cc-notifier daemon(Windows Toast 通知)。
 // web 与 tui profile 共用同一 host 核心,本插件装进任一 profile 即覆盖该 surface。
 // 失败隔离:所有处理 try/catch + logger,绝不抛出到 dsh host。
-import { loadConfig, resolveLanguage } from '../../../scripts/lib/config.mjs';
+import { loadConfig, resolveLanguage } from './runtime/lib/config.mjs';
 import { mapSessionEvent, toSessionStart, toSessionEnd, toStop, NOTIFY_SESSION_EVENT_TYPES } from './payload.mjs';
 import { forward, readState, isPidAlive } from './forwarder.mjs';
 import { createDaemonResync } from './resync.mjs';

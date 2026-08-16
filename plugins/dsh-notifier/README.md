@@ -34,9 +34,23 @@ dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
      Junction -Path <profile>/node_modules/dsh-notifier -Target <仓库>/plugins/dsh-notifier`
   2. 触发 reconcile(只读 pnpm 命令,不重建死链):`dsh plugin --profile <name> list`
 - 验证:`dsh --profile <name> --dump-config` 出现 `# == dsh-notifier` 层
-- **零手工路径**:打包自包含 tarball 后 `dsh plugin add ./dsh-notifier-0.1.0.tgz`
-  (从 store 提取,不走 junction);或发布 registry 后 `dsh plugin add dsh-notifier`
+- **零手工路径(推荐)**:打包自包含 tarball 后一条命令安装(从 store 提取,不走 junction,
+  无跨盘缺陷);或发布 registry 后 `dsh plugin add dsh-notifier`
 - 卸载:`dsh plugin --profile <name> remove dsh-notifier`
+
+## 发布打包
+
+运行时(daemon/toast-agent/win32 桥/共享库/图标)由 `scripts/vendor-dsh-plugin.mjs`
+同步进本包的 `lib/runtime/`(`npm test` 与 `pnpm pack` 自动执行,幂等;runtime 为
+生成物,不入库)。打包:
+
+```bash
+cd plugins/dsh-notifier && pnpm pack    # → dsh-notifier-<version>.tgz(prepack 自动 vendor)
+# 安装(零手工):
+dsh plugin --profile <web|dsh-tui> add ./dsh-notifier-0.1.0.tgz
+```
+
+发布到 registry 后:`dsh plugin --profile <name> add dsh-notifier`。
 
 ## 依赖
 

@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { toastContent } from '../../../scripts/lib/events.mjs';
+import { toastContent } from './runtime/lib/events.mjs';
 
 // 与 scripts/lib/state.mjs 的 STATE_FILE 同路径;env 覆盖仅测试/部署用
 export const STATE_FILE = process.env.CCN_STATE_FILE || path.join(
@@ -15,8 +15,9 @@ export const STATE_FILE = process.env.CCN_STATE_FILE || path.join(
   'cc-notifier',
   'daemon.json',
 );
-const DAEMON = process.env.CCN_DAEMON_PATH || fileURLToPath(new URL('../../../scripts/daemon.mjs', import.meta.url));
-const TOAST = process.env.CCN_TOAST_PATH || fileURLToPath(new URL('../../../scripts/toast-agent.py', import.meta.url));
+// 运行时随发布包分发(runtime/ 由 scripts/vendor-dsh-plugin.mjs 同步);env 覆盖仅测试用
+const DAEMON = process.env.CCN_DAEMON_PATH || fileURLToPath(new URL('./runtime/daemon.mjs', import.meta.url));
+const TOAST = process.env.CCN_TOAST_PATH || fileURLToPath(new URL('./runtime/toast-agent.py', import.meta.url));
 
 export function readState() {
   try {
