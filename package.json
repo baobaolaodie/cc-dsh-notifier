@@ -1,6 +1,6 @@
 {
   "name": "cc-dsh-notifier",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Claude Code + DeepSeek Harness Windows 通知系统:Toast + 点击跳转",
   "type": "module",

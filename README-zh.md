@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/baobaolaodie/cc-dsh-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.0-4CAF50?style=flat" alt="version 0.1.0" /></a>
+  <a href="https://github.com/baobaolaodie/cc-dsh-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.1-4CAF50?style=flat" alt="version 0.1.1" /></a>
   <a href="https://docs.anthropic.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude_Code-D97757?style=flat&logo=claude&logoColor=white" alt="Claude Code" /></a>
   <img src="https://img.shields.io/badge/DeepSeek_Harness-4D6BFE?style=flat&logo=deepseek&logoColor=white" alt="DeepSeek Harness" />
   <img src="https://img.shields.io/badge/Windows_10%2F11-0078D6?style=flat&logo=windows&logoColor=white" alt="Windows 10/11" />

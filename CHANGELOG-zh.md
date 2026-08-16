@@ -12,6 +12,10 @@
 
 ## Unreleased
 
+## [0.1.1] - 2026-08-16
+
+
+
 ### 新增
 
 - DeepSeek Harness(dsh)支持:`dsh-notifier` 组合包插件(web + tui profile)把 dsh 会话事件接入现有 cc-dsh-notifier 管线 —— 权限请求、提问、等待输入全部以 Windows Toast 呈现并支持点击跳转;daemon 生命周期全自动(任何事件拉起、空闲/宿主存活退出、代码变更自我重启、daemon 重启后会话重注册)。

@@ -12,6 +12,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ## Unreleased
 
+## [0.1.1] - 2026-08-16
+
+## Unreleased
+
 ### Added
 
 - DeepSeek Harness (dsh) support: a `dsh-notifier` bundle plugin (web + tui profiles) forwards dsh session events into the existing cc-dsh-notifier pipeline — permission requests, questions, and waiting-for-input all surface as Windows toasts with click-to-jump; daemon lifecycle is fully automatic (spawn on any event, idle/host-liveness exit, self-restart on code change, session re-registration on daemon restart).
