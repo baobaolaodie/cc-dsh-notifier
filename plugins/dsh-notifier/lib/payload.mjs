@@ -1,12 +1,12 @@
-// 事件载荷映射:dsh 会话事件 → cc-notifier 事件载荷
+// 事件载荷映射:dsh 会话事件 → cc-dsh-notifier 事件载荷
 // 与 scripts/lib/events.mjs 的 parseEvent 输出同构,daemon 侧零改动。
-// 共享库经相对路径引用 cc-notifier 仓库(插件随仓库分发,保持单一事实源;
+// 共享库经相对路径引用 cc-dsh-notifier 仓库(插件随仓库分发,保持单一事实源;
 // 若日后独立发布,将 scripts/lib 的纯函数 vendored 进本包)。
 import { projectName, summarize, truncate } from './runtime/lib/events.mjs';
 
 const cwdOf = (session) => (session && session.header && session.header.cwd) || '';
 
-// dsh 的 ask_user_question 工具名(对应 cc-notifier 的 ask-user-question 通知)
+// dsh 的 ask_user_question 工具名(对应 cc-dsh-notifier 的 ask-user-question 通知)
 export const QUESTION_TOOL = 'ask_user_question';
 
 // session/created → session-start(daemon 绑定窗口 + 注册会话)

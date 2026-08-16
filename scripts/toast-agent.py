@@ -30,7 +30,7 @@ def log(msg):
         pass
 
 def parse_args(args):
-    opts = {'title': 'cc-notifier', 'body': '', 'project': '', 'session_title': '', 'surface': '', 'hwnd': 0, 'cdp_port': 0, 'duration': 20, 'nosound': False, 'lang': ''}
+    opts = {'title': 'cc-dsh-notifier', 'body': '', 'project': '', 'session_title': '', 'surface': '', 'hwnd': 0, 'cdp_port': 0, 'duration': 20, 'nosound': False, 'lang': ''}
     i = 0
     while i < len(args):
         a = args[i].lower()

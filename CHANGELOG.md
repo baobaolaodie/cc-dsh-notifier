@@ -19,6 +19,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 - Per-source toast icons: black whale (transparent) for dsh, official Claude Code starburst for Claude Code.
 - Precompiled helpers `foreground.exe` (real-time foreground query, ~150 ms) and `activate-tab.exe` (UIA tab activation) with source checked in.
 - dsh ecosystem discovery: the repository root declares a `dsh.bundle` patch and `main` entry, so git installs (`dsh plugin add github:baobaolaodie/cc-dsh-notifier`) and the awesome-dsh-plugins radar recognize it; the vendored runtime is tracked in git and kept in sync by the `prepare`/`pretest` vendor script; git installs verified end to end (package-name patch resolution, module load).
+- **Rename to cc-dsh-notifier**: the project now serves both Claude Code and DeepSeek Harness; repository, root and plugin package names, bundle patch entry names, and docs are renamed (runtime identifiers — `%LOCALAPPDATA%\cc-notifier` data dir, `AppUserModelId\cc-notifier` AUMID, `.claude/cc-notifier.json` — stay for backward compatibility).
+- Non-Windows platforms load the plugin in degraded mode with an explicit log line (toasts require Windows; headless/radar environments stay functional).
 
 ### Fixed
 

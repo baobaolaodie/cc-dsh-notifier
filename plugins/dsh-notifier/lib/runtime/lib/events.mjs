@@ -46,7 +46,7 @@ export function summarize(lang, kind, payload = {}) {
     case 'stop':
       return zh ? 'Claude 等待输入' : 'Claude is waiting for input';
     // dsh 适配新增:agent 空闲(等待输入)文案,区别于 Claude Code 的 stop 模板;
-    // 内容带产品名「DeepSeek Harness」(用户要求:Toast 身份不该是项目名 cc-notifier)
+    // 内容带产品名「DeepSeek Harness」(用户要求:Toast 身份不该是项目名 cc-dsh-notifier)
     case 'stop-dsh':
       return zh ? 'DeepSeek Harness 等待输入' : 'DeepSeek Harness is waiting for input';
     default:

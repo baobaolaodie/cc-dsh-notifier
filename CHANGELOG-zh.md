@@ -19,6 +19,8 @@
 - 按来源区分的 Toast 图标:dsh 用黑鲸鱼(透明底),Claude Code 用官方星形 logo。
 - 预编译助手 `foreground.exe`(实时前台查询,~150ms)与 `activate-tab.exe`(UIA tab 激活),源码入库。
 - dsh 生态发现:仓库根声明 `dsh.bundle` patch 与 `main` 入口,git 安装(`dsh plugin add github:baobaolaodie/cc-dsh-notifier`)与 awesome-dsh-plugins 雷达可识别;vendor runtime 入库并由 `prepare`/`pretest` 保持同步;git 安装已端到端验证(包名 patch 解析、模块加载)。
+- **更名为 cc-dsh-notifier**:项目现同时服务 Claude Code 与 DeepSeek Harness;仓库、根/插件包名、bundle patch 条目名与文档同步改名(运行时标识 —— `%LOCALAPPDATA%\cc-notifier` 数据目录、`AppUserModelId\cc-notifier` AUMID、`.claude/cc-notifier.json` —— 保持向后兼容)。
+- 非 Windows 平台以降级模式加载插件并输出明确日志(Toast 依赖 Windows;headless/雷达环境保持可用)。
 
 ### 修复
 

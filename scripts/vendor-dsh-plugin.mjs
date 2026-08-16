@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// vendor-dsh-plugin — 把 cc-notifier 运行时同步进 dsh-notifier 发布包。
+// vendor-dsh-plugin — 把 cc-dsh-notifier 运行时同步进 dsh-notifier 发布包。
 // 插件发布形态必须自包含(pnpm pack 后独立于仓库运行),因此把 daemon/toast-agent/
 // win32 桥/共享库/图标 复制到 plugins/dsh-notifier/lib/runtime/。
 // - daemon.mjs 与 toast-agent.py 内部全部使用相对引用,复制后自动适配

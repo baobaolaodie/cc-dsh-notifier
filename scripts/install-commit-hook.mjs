@@ -9,7 +9,7 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const HOOK = path.join(ROOT, '.git', 'hooks', 'pre-commit');
 
 const HOOK_BODY = `#!/bin/sh
-# cc-notifier pre-commit:本地检查(CI 服务端兜底)
+# cc-dsh-notifier pre-commit:本地检查(CI 服务端兜底)
 set -e
 cd "$(git rev-parse --show-toplevel)"
 
