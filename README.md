@@ -55,18 +55,21 @@ The installer backs up `~/.claude/settings.json`, injects five hooks, registers 
 
 ### Install (DeepSeek Harness)
 
-```bash
-# published package (GitHub Packages; first add these lines to the profile's .npmrc:
-#   @baobaolaodie:registry=https://npm.pkg.github.com
-#   //npm.pkg.github.com/:_authToken=<GitHub PAT with read:packages>
-# downloads from the package require the token while it stays private; if made public, no token is needed)
-dsh plugin --profile web add @baobaolaodie/cc-dsh-notifier
-dsh plugin --profile dsh-tui add @baobaolaodie/cc-dsh-notifier
+**Recommended — download the tarball from the [latest release](https://github.com/baobaolaodie/cc-dsh-notifier/releases) and install it** (no repository clone, no credentials):
 
-# or from the repository root (relative paths only)
-dsh plugin --profile web add ./plugins/dsh-notifier
-dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
+```bash
+dsh plugin --profile web add ./cc-dsh-notifier-0.1.4.tgz
+dsh plugin --profile dsh-tui add ./cc-dsh-notifier-0.1.4.tgz
 ```
+
+**Alternative — git install** (clones the whole repository, zero config):
+
+```bash
+dsh plugin --profile web add github:baobaolaodie/cc-dsh-notifier
+dsh plugin --profile dsh-tui add github:baobaolaodie/cc-dsh-notifier
+```
+
+> GitHub Packages (`@baobaolaodie/cc-dsh-notifier`) exists as a maintainer convenience channel only: the package is currently **private**, so downloads require a `read:packages` token in the profile's `.npmrc`. Use the tarball or git install instead.
 
 Verified against dsh 0.1.0-rc.6 on Windows 11 (2026-08-16): web and tui profiles, permission/question/waiting-for-input notifications, focus-aware silence, click-to-return, and the tarball install flow.
 

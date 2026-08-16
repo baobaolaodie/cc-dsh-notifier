@@ -55,18 +55,21 @@ node scripts/install.mjs
 
 ### 安装(DeepSeek Harness)
 
-```bash
-# 已发布包(GitHub Packages;先在 profile 的 .npmrc 加两行:
-#   @baobaolaodie:registry=https://npm.pkg.github.com
-#   //npm.pkg.github.com/:_authToken=<GitHub PAT,read:packages 权限>
-# 包当前为 private,下载需要 token;改为 public 后可匿名安装)
-dsh plugin --profile web add @baobaolaodie/cc-dsh-notifier
-dsh plugin --profile dsh-tui add @baobaolaodie/cc-dsh-notifier
+**推荐 —— 从[最新 Release](https://github.com/baobaolaodie/cc-dsh-notifier/releases)下载 tarball 后安装**(无需 clone 仓库、无凭据):
 
-# 或仓库根目录执行(务必使用相对路径)
-dsh plugin --profile web add ./plugins/dsh-notifier
-dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
+```bash
+dsh plugin --profile web add ./cc-dsh-notifier-0.1.4.tgz
+dsh plugin --profile dsh-tui add ./cc-dsh-notifier-0.1.4.tgz
 ```
+
+**备选 —— git 安装**(会 clone 整个仓库,零配置):
+
+```bash
+dsh plugin --profile web add github:baobaolaodie/cc-dsh-notifier
+dsh plugin --profile dsh-tui add github:baobaolaodie/cc-dsh-notifier
+```
+
+> GitHub Packages(`@baobaolaodie/cc-dsh-notifier`)仅为维护者个人便捷渠道:包当前为 **private**,下载需在 profile 的 .npmrc 配 `read:packages` token。请优先使用 tarball 或 git 安装。
 
 已在 Windows 11 + dsh 0.1.0-rc.6 实测(2026-08-16):web 与 tui 双 profile、三类通知(权限/提问/等待输入)、聚焦感知静默、点击跳转、tarball 安装流程。
 

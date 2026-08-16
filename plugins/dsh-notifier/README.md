@@ -33,18 +33,19 @@ dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
      Junction -Path <profile>/node_modules/@baobaolaodie/cc-dsh-notifier -Target <仓库>/plugins/dsh-notifier`
   2. 触发 reconcile(只读 pnpm 命令,不重建死链):`dsh plugin --profile <name> list`
 - 验证:`dsh --profile <name> --dump-config` 出现 `# == @baobaolaodie/cc-dsh-notifier` 层
-- **零手工路径(推荐)**:打包自包含 tarball 后一条命令安装(从 store 提取,不走 junction,
-  无跨盘缺陷)——最简单,不需要 clone 仓库,也不需要任何凭据;
-- **git 安装(公开可用,零配置)**:`dsh plugin add github:baobaolaodie/cc-dsh-notifier`(会 clone
-  整个仓库,依赖名取根 package.json 的 name);
-- **GitHub Packages(个人便捷渠道)**:`dsh plugin --profile <name> add @baobaolaodie/cc-dsh-notifier`
+- **推荐(公开,零配置)**:从[仓库 Release](https://github.com/baobaolaodie/cc-dsh-notifier/releases)下载
+  tarball 后一条命令安装(从 store 提取,不走 junction、无跨盘缺陷;不 clone 仓库、无凭据):
+  ```bash
+  dsh plugin --profile <name> add ./baobaolaodie-cc-dsh-notifier-<version>.tgz
+  ```
+- **git 安装(公开,零配置)**:`dsh plugin add github:baobaolaodie/cc-dsh-notifier`(会 clone 整个
+  仓库;依赖名取根 package.json 的 name `cc-dsh-notifier`,root patch 按该名解析;已端到端验证)
+- **GitHub Packages(仅维护者个人渠道)**:`dsh plugin --profile <name> add @baobaolaodie/cc-dsh-notifier`
   ```bash
   # profile 的 .npmrc 加两行(包当前为 private,下载需要 token;改为 public 后可匿名):
   @baobaolaodie:registry=https://npm.pkg.github.com
   //npm.pkg.github.com/:_authToken=<GitHub PAT with read:packages>
   ```
-- **git 安装**:`dsh plugin add github:baobaolaodie/cc-dsh-notifier`(仓库根声明 `dsh.bundle`,
-  插件行按包名 `cc-dsh-notifier` 解析,入口取根 package.json 的 `main`;已端到端验证)
 - 卸载:`dsh plugin --profile <name> remove @baobaolaodie/cc-dsh-notifier`
 
 ## 发布打包
