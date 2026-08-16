@@ -51,7 +51,7 @@ cc-dsh-notifier 在代理需要你介入、而你没有看着它的窗口时,弹
 node scripts/install.mjs
 ```
 
-安装器会备份 `~/.claude/settings.json`、注入六个 hooks、注册 `cc-dsh-notifier` AppUserModelID 并写入默认配置。之后新建 Claude Code 会话即可生效。
+安装器会备份 `~/.claude/settings.json`、注入五个 hooks、注册 `cc-notifier` AppUserModelID 并写入默认配置。之后新建 Claude Code 会话即可生效。
 
 ### 安装(DeepSeek Harness)
 

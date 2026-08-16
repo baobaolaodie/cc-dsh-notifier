@@ -17,7 +17,7 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           pr-message: |-
-            👋 感谢你的首个 PR / Thanks for your first PR to cc-notifier!
+            👋 感谢你的首个 PR / Thanks for your first PR to cc-dsh-notifier!
 
             Before review, please make sure:
             - PR title follows Conventional Commits (e.g. `fix: ...`, `docs: ...`, `ci: ...`)

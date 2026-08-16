@@ -4,9 +4,9 @@
 
 </div>
 
-# 为 cc-notifier 贡献
+# 为 cc-dsh-notifier 贡献
 
-感谢你考虑为 cc-notifier 贡献代码。以下是参与开发的流程与约定。
+感谢你考虑为 cc-dsh-notifier 贡献代码。以下是参与开发的流程与约定。
 
 ## 开发环境
 
@@ -20,7 +20,7 @@
 ```bash
 npm test                    # 全部单元测试(全部断言通过,node:test)
 node --test test/events.test.mjs   # 单个测试文件
-node scripts/test.mjs <事件> # 经真实管线手动触发(permission-request|ask-user-question|tool-result|stop|session-start)
+node scripts/test.mjs <事件> # 经真实管线手动触发(permission-request|ask-user-question|stop|session-start)
 ```
 
 手动触发注意:需 daemon 运行(有活跃会话);当前窗口聚焦时不弹(聚焦静默),需切走窗口观察。

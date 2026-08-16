@@ -25,8 +25,8 @@ node scripts/install.mjs
 
 The installer performs four steps:
 
-1. **Hook injection** — backs up `~/.claude/settings.json` and adds six hooks (SessionStart, PermissionRequest, PreToolUse with the AskUserQuestion matcher, PostToolUse, Stop, SessionEnd). Idempotent: re-running is safe.
-2. **AUMID registration** — writes `HKCU\Software\Classes\AppUserModelId\cc-dsh-notifier` (DisplayName + IconUri). Required for Windows to display toasts from a non-packaged app.
+1. **Hook injection** — backs up `~/.claude/settings.json` and adds five hooks (SessionStart, PermissionRequest, PreToolUse with the AskUserQuestion matcher, Stop, SessionEnd). Idempotent: re-running is safe.
+2. **AUMID registration** — writes `HKCU\Software\Classes\AppUserModelId\cc-notifier` (DisplayName + IconUri). Required for Windows to display toasts from a non-packaged app.
 3. **Python detection** — resolves `python` to its absolute path and writes it as `pythonPath` in the config, then checks the winrt packages. The fixed path keeps toasts working regardless of the host's PATH. Warnings are printed but installation proceeds; toasts will fail silently if Python is missing.
 4. **Default config** — writes `~/.cc-notifier/config.json` if absent.
 
@@ -44,15 +44,16 @@ dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
 
 ```bash
 # one-time repair for the cross-drive junction defect
-rmdir %USERPROFILE%\.dsh\profiles\web\node_modules\dsh-notifier
-mklink /J %USERPROFILE%\.dsh\profiles\web\node_modules\dsh-notifier D:\path\to\repo\plugins\dsh-notifier
+rmdir %USERPROFILE%\.dsh\profiles\web\node_modules\@baobaolaodie\cc-dsh-notifier
+mkdir %USERPROFILE%\.dsh\profiles\web\node_modules\@baobaolaodie
+mklink /J %USERPROFILE%\.dsh\profiles\web\node_modules\@baobaolaodie\cc-dsh-notifier D:\path\to\repo\plugins\dsh-notifier
 dsh plugin --profile web list   # read-only pnpm command triggers the reconcile
 ```
 
 Verify the profile layer, then restart the profile:
 
 ```bash
-dsh --profile web --dump-config   # expect a "# == dsh-notifier" layer
+dsh --profile web --dump-config   # expect a "# == @baobaolaodie/cc-dsh-notifier" layer
 ```
 
 A packaged tarball (`pnpm pack`) or a registry release installs without the repair step.

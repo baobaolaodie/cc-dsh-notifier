@@ -18,4 +18,4 @@ labels: question
 - Windows 版本 / Windows version:
 - Node 版本 / Node version:
 - Python 版本 / Python version:
-- cc-notifier 版本 / cc-notifier version:
+- cc-dsh-notifier 版本 / cc-dsh-notifier version:

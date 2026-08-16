@@ -133,7 +133,7 @@ jobs:
             if (!/^(feat|fix|docs|chore|hotfix|ci|test)\//.test(pr.head.ref))
               P.push(`PR head branch must carry a feat/fix/docs/chore/hotfix/ci/test prefix, got ${pr.head.ref}`);
 
-            // PR template completeness: 4 bilingual sections + 9 checkboxes (deletion = fail)
+            // PR template completeness: 4 bilingual sections + 17 checkboxes (deletion = fail)
             const tmpl = fs.readFileSync('.github/PULL_REQUEST_TEMPLATE.md', 'utf8');
             const body = pr.body ?? '';
             const SECTION_PAIRS = [
@@ -179,7 +179,7 @@ jobs:
           args: --no-progress README.md README-zh.md CONTRIBUTING.md CONTRIBUTING-zh.md SECURITY.md SECURITY-zh.md CODE_OF_CONDUCT.md CODE_OF_CONDUCT-zh.md CHANGELOG.md CHANGELOG-zh.md docs/INSTALLATION.md docs/INSTALLATION-zh.md docs/USAGE.md docs/USAGE-zh.md docs/TROUBLESHOOTING.md docs/TROUBLESHOOTING-zh.md .github/
 
   # ── 汇总门禁:分支保护 required check "CI" 的落点 ──
-  # GitHub 不为此工作流产生名为 "CI" 的工作流级 check run(实测 check suite 仅 9 个 job 级),
+  # GitHub 不为此工作流产生名为 "CI" 的工作流级 check run(实测 check suite 仅 10 个 job 级),
   # 分支保护 required_checks=["CI"] 永远等待 → PR 卡 "CIExpected — Waiting for status to be reported"。
   # 本 job 产生同名 job 级 check run,全部检查通过后合并条件即满足。
   CI:

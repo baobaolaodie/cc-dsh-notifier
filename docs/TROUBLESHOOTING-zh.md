@@ -15,16 +15,16 @@
 3. **窗口是否失焦** — 会话窗口聚焦时静默(设计如此)。dsh web 的静默按前台浏览器活动 tab 的标题判定:任何显示 DeepSeek Harness 页面的 tab 静默,其他网站照常通知。
 4. **AUMID 是否注册** — 重跑 `node scripts/install.mjs`;验证:
    ```
-   reg query HKCU\Software\Classes\AppUserModelId\cc-dsh-notifier
+   reg query HKCU\Software\Classes\AppUserModelId\cc-notifier
    ```
 5. **Python + winrt 是否存在** — `python -c "import winrt.windows.ui.notifications"` 必须成功。若 daemon 的 Toast 以退出码 1 结束(`daemon.log` 中 `toast stderr ... No module named 'winrt'`),说明宿主解析到了别的解释器:把 `pythonPath` 设为装有 winrt 的解释器(重跑 `install.mjs` 会自动写入)。
 6. **daemon 是否运行** — `%LOCALAPPDATA%\cc-notifier\daemon.json` 存在且 pid 存活。查看 `daemon.log`。daemon 由任意通知事件唤醒,缺失通常是暂时的;持续缺失则检查宿主插件层。
-7. **dsh 插件是否加载** — `dsh --profile <name> --dump-config` 应出现 `# == dsh-notifier` 层;`daemon.log` 应出现 `event session-start ... surface=web|tui`。
+7. **dsh 插件是否加载** — `dsh --profile <name> --dump-config` 应出现 `# == @baobaolaodie/cc-dsh-notifier` 层;`daemon.log` 应出现 `event session-start ... surface=web|tui`。
 
 ## Toast 显示但点击不跳转
 
 - 通知时 daemon 不可用(降级 Toast,设计上无跳转)。查看 `notify-agent.log` 中的 `fallback toast`。
-- SessionStart 时窗口句柄绑定失败:终端标题不含项目名且进程工作目录不匹配。查看 `daemon.log` 中 `session-start 绑定窗口 hwnd=0`。
+- SessionStart 时窗口句柄绑定失败:终端标题不含项目名且进程工作目录不匹配。查看 `daemon.log` 中该会话的 `toast hwnd=0` 行(句柄从未绑定)。
 - 终端多标签时绑定了错误标签——`?` 前缀标签(Claude Code 动态标题)优先。
 
 ## 事件触发了但 Toast 从未出现
@@ -40,7 +40,7 @@
 
 ## dsh 插件已安装但无配置层
 
-- profile 的 `node_modules/dsh-notifier` junction 可能已损坏(pnpm workspace + 跨盘缺陷):链接目标形如 `...\profiles\web\D:\...`。修复后重新触发 reconcile —— 见 [INSTALLATION-zh.md](INSTALLATION-zh.md)。
+- profile 的 `node_modules/@baobaolaodie/cc-dsh-notifier` junction 可能已损坏(pnpm workspace + 跨盘缺陷):链接目标形如 `...\profiles\web\D:\...`。修复后重新触发 reconcile —— 见 [INSTALLATION-zh.md](INSTALLATION-zh.md)。
 - 使用打包 tarball 或 registry 安装可完全跳过修复步骤。
 
 ## 日志为空

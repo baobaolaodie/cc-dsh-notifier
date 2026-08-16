@@ -51,7 +51,7 @@ cc-dsh-notifier raises a native Windows toast with sound when an agent needs you
 node scripts/install.mjs
 ```
 
-The installer backs up `~/.claude/settings.json`, injects six hooks, registers the `cc-dsh-notifier` AppUserModelID, and writes the default config. Open a new Claude Code session afterwards.
+The installer backs up `~/.claude/settings.json`, injects five hooks, registers the `cc-notifier` AppUserModelID, and writes the default config. Open a new Claude Code session afterwards.
 
 ### Install (DeepSeek Harness)
 
@@ -78,7 +78,7 @@ npm test
 
 ### Claude Code
 
-Start a session and switch away. The system notifies when Claude requests a permission, asks a question, finishes a turn, :
+Start a session and switch away. The system notifies when Claude requests a permission, asks a question, or finishes a turn.
 
 ```bash
 claude
