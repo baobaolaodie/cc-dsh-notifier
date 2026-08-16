@@ -82,11 +82,12 @@ node scripts/uninstall.mjs  # 卸载
 
 ## dsh 适配(2026-08-16,DeepSeek Harness 通知)
 
-- **架构**:`plugins/dsh-notifier/` 插件(web/tui profile 通用,surface 按 argv 检测)→ cc-dsh-notifier daemon(复用 Toast/聚焦/跳转管线)。四类通知 + 会话生命周期。
-- **安装**:`dsh plugin --profile <web|dsh-tui> add ./plugins/dsh-notifier`(仓库根目录,相对路径)。Windows 跨盘 junction 缺陷兜底:修 junction + `dsh plugin --profile <name> list` 触发 reconcile。dump-config 验证 `# == dsh-notifier` 层。
-- **daemon 生命周期**:任何事件拉起 / 空闲 60s 退出 / hostPid 存活探测(~90s 清理)/ 代码变更 10s 自我重启 / 插件 resync 重注册会话。核心逻辑在 `scripts/lib/daemon-core.mjs`(可注入,17 项单测)。
-- **聚焦判定**:预编译 `foreground.exe`(~150ms)实时查询 + 浏览器兜底(白名单浏览器标题含 DeepSeek Harness → 静默)。绑定恢复靠 resync。
+- **架构**:`plugins/dsh-notifier/` 插件(web/tui profile 通用,surface 按 argv 检测)→ cc-dsh-notifier daemon(复用 Toast/聚焦/跳转管线)。**三类通知**(权限请求/提问/等待输入)——工具出错通知已移除(2026-08-16 用户决策:工具失败不会让 agent 停下,只徒增噪音)。
+- **安装**:`dsh plugin --profile <web|dsh-tui> add @baobaolaodie/cc-dsh-notifier`(GitHub Packages,profile/.npmrc 需配 `@baobaolaodie:registry=https://npm.pkg.github.com`);或 tarball `add ./baobaolaodie-cc-dsh-notifier-0.1.2.tgz`(零配置);或 git `add github:baobaolaodie/cc-dsh-notifier`。Windows 跨盘 junction 缺陷兜底(仅 link 安装):修 junction + `dsh plugin --profile <name> list`。dump-config 验证 `# == <包名>` 层。
+- **daemon 生命周期**:任何事件拉起 / 空闲 60s 退出 / hostPid 存活探测(~90s 清理)/ 代码变更 10s 自我重启 / 插件 resync 重注册会话。核心逻辑在 `scripts/lib/daemon-core.mjs`(可注入,25 项单测)。
+- **聚焦判定**:预编译 `foreground.exe`(~150ms)实时查询 + 浏览器兜底(白名单浏览器标题含 DeepSeek Harness → 静默,**仅 web 事件**)。绑定恢复靠 resync。
+- **CC 窗口绑定(2026-08-16 实测修复)**:CC 跑独立 Windows Terminal(无 -d、标题不含项目名)时靠 `?` 前缀动态标题绑定(全局匹配,仅 claude 事件;dsh-tui 会话 surface=tui 不匹配,防误绑);未重开 session-start 的既有会话走**懒绑定兜底**(toast 时从窗口枚举取 ? 标签窗口)。
 - **关键配置**(`~/.cc-notifier/config.json`):`dedupWindowMs`(默认 0 不去重)、`pythonPath`(toast 解释器绝对路径,install.mjs 写入——裸 python 依赖 PATH 会崩,2026-08-16 实测)、`windowWhitelist`。等待输入交互抑制已移除(聚焦判定负责静默,2026-08-16 用户决策)。
-- **测试**:109 项(新增 daemon-core/restart/forwarder/resync 等);`npm test` 显式清单。Python/PS 脚本无自动化测试(真实环境手动回归)。
-- **发布/收录(2026-08-16 完成)**:web/tui 生产 profile 已切换 tarball 安装(零手工);根 package.json 声明 `dsh.bundle` + `main` 供 git 安装与生态雷达识别;runtime 入库(prepare/pretest 幂等同步);git 安装端到端验证(包名 patch + 模块加载;坑:patch 相对路径按 profile 目录解析,必须用包名);awesome-dsh-plugins 收录 PR #185。
+- **测试**:102 项(移除工具出错相关 7 项后);`npm test` 显式清单。Python/PS 脚本无自动化测试(真实环境手动回归);? 标签绑定/懒绑定无单测(daemon.mjs 内,真实环境验证)。
+- **发布/收录(2026-08-16 完成)**:生产 profile 已切换 `@baobaolaodie/cc-dsh-notifier`(GitHub Packages 0.1.3 public,`npm publish --registry=https://npm.pkg.github.com --access public`);根 package.json 声明 `dsh.bundle` + `main` 供 git 安装与生态雷达识别;runtime 入库(prepare/pretest 幂等同步);git 安装端到端验证(坑 1:patch 相对路径按 profile 目录解析,必须用包名;坑 2:root patch 名必须 = 根 package.json name(git 安装依赖名),scoped 名只用于子包);awesome-dsh-plugins 收录 PR #185 **已合并**(条目 cc-dsh-notifier);WSL Linux 加载级 PASS(降级日志)。
 - **恢复**:daemon 被杀/异常 → 任何通知事件自动拉起;绑定丢失 → resync 自愈;改代码 → 自我重启,无需手动。

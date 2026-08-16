@@ -56,7 +56,12 @@ node scripts/install.mjs
 ### 安装(DeepSeek Harness)
 
 ```bash
-# 仓库根目录执行;务必使用相对路径
+# 已发布包(GitHub Packages;先在 profile 的 .npmrc 加一行:
+#   @baobaolaodie:registry=https://npm.pkg.github.com)
+dsh plugin --profile web add @baobaolaodie/cc-dsh-notifier
+dsh plugin --profile dsh-tui add @baobaolaodie/cc-dsh-notifier
+
+# 或仓库根目录执行(务必使用相对路径)
 dsh plugin --profile web add ./plugins/dsh-notifier
 dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
 ```

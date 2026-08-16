@@ -56,7 +56,12 @@ The installer backs up `~/.claude/settings.json`, injects six hooks, registers t
 ### Install (DeepSeek Harness)
 
 ```bash
-# from the repository root; relative paths only
+# published package (GitHub Packages; first add this line to the profile's .npmrc:
+#   @baobaolaodie:registry=https://npm.pkg.github.com)
+dsh plugin --profile web add @baobaolaodie/cc-dsh-notifier
+dsh plugin --profile dsh-tui add @baobaolaodie/cc-dsh-notifier
+
+# or from the repository root (relative paths only)
 dsh plugin --profile web add ./plugins/dsh-notifier
 dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
 ```
