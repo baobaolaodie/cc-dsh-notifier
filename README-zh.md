@@ -59,7 +59,7 @@ node scripts/install.mjs
 # 已发布包(GitHub Packages;先在 profile 的 .npmrc 加两行:
 #   @baobaolaodie:registry=https://npm.pkg.github.com
 #   //npm.pkg.github.com/:_authToken=<GitHub PAT,read:packages 权限>
-# GitHub Packages 的下载始终需要 token,即使包是 public)
+# 包当前为 private,下载需要 token;改为 public 后可匿名安装)
 dsh plugin --profile web add @baobaolaodie/cc-dsh-notifier
 dsh plugin --profile dsh-tui add @baobaolaodie/cc-dsh-notifier
 

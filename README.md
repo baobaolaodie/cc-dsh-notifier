@@ -59,7 +59,7 @@ The installer backs up `~/.claude/settings.json`, injects five hooks, registers 
 # published package (GitHub Packages; first add these lines to the profile's .npmrc:
 #   @baobaolaodie:registry=https://npm.pkg.github.com
 #   //npm.pkg.github.com/:_authToken=<GitHub PAT with read:packages>
-# downloads from GitHub Packages always require the token, even for public packages)
+# downloads from the package require the token while it stays private; if made public, no token is needed)
 dsh plugin --profile web add @baobaolaodie/cc-dsh-notifier
 dsh plugin --profile dsh-tui add @baobaolaodie/cc-dsh-notifier
 
