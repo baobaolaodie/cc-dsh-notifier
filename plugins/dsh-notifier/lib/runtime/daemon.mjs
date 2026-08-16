@@ -145,14 +145,23 @@ async function bindWindow(event) {
     && commandLineMatchesCwd(w.commandLine, eventCwd);
   const all = await freshEntries();
   const dirMatched = all.filter((w) => dirMatches(w));
-  const ccTag = dirMatched.find((w) => /^\?\s/.test(w.title || ''));
-  if (ccTag) return ccTag.hwnd;
+  // ? 前缀标签是 Claude Code 动态标题特征(如「? 策划 deepseek-harness-tui 视频介绍」),
+  // **仅对 Claude Code 会话**(无 surface 或 surface=claude)生效——dsh-tui 事件带
+  // surface=tui,窗口标题是「DeepSeek - 项目」,若也匹配 ? 标签会误绑到 CC 的窗口
+  // (2026-08-16 实测:全局 ? 匹配把 dsh-tui 会话绑到了 CC 的 Windows Terminal)。
+  // 2026-08-16 用户实测修复:CC 跑在 Windows Terminal 独立终端(无 -d、标题不含项目名),
+  // ? 标签匹配从 dirMatched 子集提升为全局(独立终端场景)。
+  const isClaude = !event.surface || event.surface === 'claude';
+  const ccTagDir = isClaude ? dirMatched.find((w) => /^\?\s/.test(w.title || '')) : undefined;
+  if (ccTagDir) return ccTagDir.hwnd;
+  const ccTagAny = isClaude ? all.find((w) => /^\?\s/.test(w.title || '')) : undefined;
+  if (ccTagAny) return ccTagAny.hwnd;
   if (dirMatched.length > 0) return dirMatched[0].hwnd;
   for (const w of all) {
     if (titleMatches(w)) return w.hwnd;
   }
   const fg = await freshForeground();
-  if (fg && fg[0] && (dirMatches(fg[0]) || titleMatches(fg[0]) || /^\?\s/.test(fg[0].title || ''))) {
+  if (fg && fg[0] && (dirMatches(fg[0]) || titleMatches(fg[0]) || (isClaude && /^\?\s/.test(fg[0].title || '')))) {
     return fg[0].hwnd;
   }
   return 0;
