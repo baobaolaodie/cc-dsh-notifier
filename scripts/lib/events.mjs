@@ -35,8 +35,20 @@ export function summarize(lang, kind, payload = {}) {
       return zh ? `${payload.toolName} 请求执行` : `${payload.toolName} requested to run`;
     case 'tool-error':
       return payload.errText || (zh ? '工具执行出错' : 'Tool execution failed');
+    // dsh 适配新增:approval/asked 事件自带 reason 文本(优于 Claude Code hook 的 tool_input)
+    case 'approval-ask':
+      if (payload.reason) {
+        return zh
+          ? `${payload.toolName} 请求权限:${truncate(payload.reason)}`
+          : `${payload.toolName} requests permission: ${truncate(payload.reason)}`;
+      }
+      return zh ? `${payload.toolName} 请求执行权限` : `${payload.toolName} requests permission`;
     case 'stop':
       return zh ? 'Claude 等待输入' : 'Claude is waiting for input';
+    // dsh 适配新增:agent 空闲(等待输入)文案,区别于 Claude Code 的 stop 模板;
+    // 内容带产品名「DeepSeek Harness」(用户要求:Toast 身份不该是项目名 cc-notifier)
+    case 'stop-dsh':
+      return zh ? 'DeepSeek Harness 等待输入' : 'DeepSeek Harness is waiting for input';
     default:
       return '';
   }

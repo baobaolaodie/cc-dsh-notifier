@@ -27,8 +27,35 @@ The installer performs four steps:
 
 1. **Hook injection** — backs up `~/.claude/settings.json` and adds six hooks (SessionStart, PermissionRequest, PreToolUse with the AskUserQuestion matcher, PostToolUse, Stop, SessionEnd). Idempotent: re-running is safe.
 2. **AUMID registration** — writes `HKCU\Software\Classes\AppUserModelId\cc-notifier` (DisplayName + IconUri). Required for Windows to display toasts from a non-packaged app.
-3. **Python detection** — checks that `python` and the winrt packages exist. Warnings are printed but installation proceeds; toasts will fail silently if Python is missing.
+3. **Python detection** — resolves `python` to its absolute path and writes it as `pythonPath` in the config, then checks the winrt packages. The fixed path keeps toasts working regardless of the host's PATH. Warnings are printed but installation proceeds; toasts will fail silently if Python is missing.
 4. **Default config** — writes `~/.cc-notifier/config.json` if absent.
+
+## Install for DeepSeek Harness (dsh)
+
+The dsh side installs independently of Claude Code: the plugin only touches the dsh profiles, the hooks install only touches `~/.claude/settings.json`.
+
+```bash
+# from the repository root; relative paths only
+dsh plugin --profile web add ./plugins/dsh-notifier
+dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
+```
+
+`dsh plugin add` reconciles the `dsh.bundle` declaration into `dsh.profile.bundles` automatically. On Windows with the profile on a different drive than the repository, the pnpm `link:` junction is created broken (workspace + cross-drive); repair it and re-trigger the reconcile:
+
+```bash
+# one-time repair for the cross-drive junction defect
+rmdir %USERPROFILE%\.dsh\profiles\web\node_modules\dsh-notifier
+mklink /J %USERPROFILE%\.dsh\profiles\web\node_modules\dsh-notifier D:\path\to\repo\plugins\dsh-notifier
+dsh plugin --profile web list   # read-only pnpm command triggers the reconcile
+```
+
+Verify the profile layer, then restart the profile:
+
+```bash
+dsh --profile web --dump-config   # expect a "# == dsh-notifier" layer
+```
+
+A packaged tarball (`pnpm pack`) or a registry release installs without the repair step.
 
 ## Verify
 

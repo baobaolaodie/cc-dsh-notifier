@@ -7,7 +7,17 @@ import { execFileSync } from 'node:child_process';
 export const GLOBAL_DIR = path.join(os.homedir(), '.cc-notifier');
 export const GLOBAL_CONFIG = path.join(GLOBAL_DIR, 'config.json');
 // language: 'auto'(按系统显示语言)| 'zh' | 'en';缺省 auto,未知语言回退 en
-export const DEFAULT_CONFIG = { enabled: true, dedupWindowMs: 10000, sound: true, language: 'auto' };
+// windowWhitelist:浏览器窗口白名单(dsh web surface 会话绑定/聚焦用,如 chrome.exe/msedge.exe);
+// 缺省空 = 无浏览器绑定(web 会话 hwnd=0,聚焦判定走窗口映射表 → 宁打扰勿漏)
+// pollIntervalMs:daemon 窗口轮询周期(ms),默认 10000;每次轮询 spawn PowerShell(1.6-1.8s),
+// dsh 常驻后该开销 7×24 存在,间隔越大后台占用越低(聚焦判定有缓存快路径兜底)
+// dedupWindowMs:通知去重窗口(ms),默认 0 = 不去重。前置前提是「失焦才通知」——
+// 聚焦时静默、失焦时每条都该通知(2026-08-16 用户决策:放开去重,多会话同类型不被吞;
+// 同日决策:移除等待输入交互抑制——由 daemon 聚焦判定负责「在看→静默,切走→弹」)
+// pythonPath:toast-agent 解释器绝对路径(install.mjs 检测时写入)。裸 `python` 依赖宿主 PATH,
+// 不同启动上下文可能解析到不同解释器(2026-08-16 实测:宿主重启后 PATH 变化,daemon 的
+// python 缺 winrt → Toast 启动即崩);固定绝对路径后与宿主 PATH 无关
+export const DEFAULT_CONFIG = { enabled: true, dedupWindowMs: 0, sound: true, language: 'auto', windowWhitelist: [], pollIntervalMs: 10000, pythonPath: '' };
 
 export function readJsonSafe(file) {
   try {

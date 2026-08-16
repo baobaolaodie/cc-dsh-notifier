@@ -12,12 +12,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ## Unreleased
 
+### Added
+
+- DeepSeek Harness (dsh) support: a `dsh-notifier` bundle plugin (web + tui profiles) forwards dsh session events into the existing cc-notifier pipeline — permission requests, questions, tool errors, and waiting-for-input all surface as Windows toasts with click-to-jump; daemon lifecycle is fully automatic (spawn on any event, idle/host-liveness exit, self-restart on code change, session re-registration on daemon restart).
+- Config fields `dedupWindowMs` (default `0` = no dedup), `pythonPath` (toast interpreter, written by the installer), `pollIntervalMs` (daemon window-poll period, default `10000`). Waiting-for-input suppression was removed: focus detection alone decides whether to notify.
+- Per-source toast icons: black whale (transparent) for dsh, official Claude Code starburst for Claude Code.
+- Precompiled helpers `foreground.exe` (real-time foreground query, ~150 ms) and `activate-tab.exe` (UIA tab activation) with source checked in.
+
 ### Fixed
 
 - Test command lists test files explicitly instead of a glob, fixing `npm test` on Node 18 Windows (`Could not find 'test/*.test.mjs'`).
 - Toast text follows the Windows display language (`auto`) or a new `language` config field (`zh`/`en`); English users now get English notifications.
 - PR template and docs no longer pin the test count (`npm test` → all pass); the PR template checkbox label no longer drifts out of sync with the actual test suite.
 - Comet artifacts (`.comet/`, `docs/openspec/`, `docs/superpowers/`) are no longer version-controlled; they remain on disk as local process artifacts.
+- Toasts no longer crash when the host environment resolves a different `python` (missing `winrt`): the installer records the interpreter's absolute path in `pythonPath`.
+- Focus detection uses a real-time foreground query instead of a stale poll cache, eliminating toasts suppressed while the user has already switched away (and the opposite race).
+- Windows Toast jump now activates a DeepSeek Harness browser tab via UIA (candidate matching: session title, then product name).
 
 ## [0.1.0] - 2026-08-14
 

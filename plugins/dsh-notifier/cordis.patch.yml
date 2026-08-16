@@ -1,0 +1,6 @@
+# dsh-notifier bundle patch: insert the notifier plugin row.
+# Applied after the profile's bundle layers; `dsh plugin add` reconciles
+# this package into dsh.profile.bundles automatically (dsh.bundle.patch).
+- insert:
+    - id: dsh-notifier
+      name: dsh-notifier

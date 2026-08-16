@@ -8,28 +8,36 @@
 
 ## What gets notified
 
-cc-notifier raises a toast (with sound) when Claude Code needs you and your session window is not focused:
+cc-notifier raises a toast (with sound) when Claude Code or DeepSeek Harness needs you and the session window is not focused:
 
-| Event | Hook | Toast title | Toast body |
+| Event | Source | Toast title | Toast body |
 |---|---|---|---|
-| Permission request | `PermissionRequest` | 权限请求 / Permission request | Tool + command/path (e.g. `Bash 请求执行:npm install` / `Bash requested to run: npm install`) |
-| Question | `PreToolUse` (AskUserQuestion) | 提问 / Question | The question text |
-| Tool error | `PostToolUse` | 工具出错 / Tool error | The error summary |
-| Waiting for input | `Stop` | 等待输入 / Waiting for input | `Claude 等待输入` / `Claude is waiting for input` |
+| Permission request | Claude: `PermissionRequest`; dsh: `approval/asked` | 权限请求 / Permission request | Tool + reason (e.g. `Bash 请求执行:npm install` / `Bash requested to run: npm install`) |
+| Question | Claude: `PreToolUse` (AskUserQuestion); dsh: `tool/call` | 提问 / Question | The question text |
+| Tool error | Claude: `PostToolUse`; dsh: `tool/result` (isError) | 工具出错 / Tool error | The error summary |
+| Waiting for input | Claude: `Stop`; dsh: `agent/status` idle | 等待输入 / Waiting for input | `Claude 等待输入` / `DeepSeek Harness 等待输入` |
 
 The toast language follows the Windows display language by default (`auto`) and can be overridden by the `language` config field (`zh`/`en`).
 
-While the session window is focused, notifications are suppressed.
+While the session window is focused, notifications are suppressed. Focus is checked at event arrival time (real-time foreground query), so switching away takes effect immediately.
 
 ## Clicking a toast
 
-Clicking a toast brings the session window back to the foreground. The window is resolved at SessionStart time by:
+Clicking a toast brings the session window back to the foreground.
 
-1. Process working directory (e.g. WindowsTerminal launched with `-d "<project path>"`)
-2. The `?`-prefixed tab title (Claude Code's dynamic title)
-3. Title containing the project name (fallback)
+- **Claude Code / dsh tui** — the terminal window bound at SessionStart, resolved by process working directory, the `?`-prefixed tab title, or the project name in the title.
+- **dsh web** — the browser window is brought forward and the DeepSeek Harness tab is activated via UIA (candidate match: session title, then product name).
 
 If the daemon is unavailable, notifications degrade to plain toasts without click-to-return.
+
+## DeepSeek Harness (dsh)
+
+The `dsh-notifier` plugin forwards dsh session events into the same pipeline. Both profiles share one install; the surface is detected from the profile name in the process arguments.
+
+- **web profile** — events bind to the browser window; toasts are silenced while any DeepSeek Harness tab is the active tab of the foreground browser window.
+- **dsh-tui profile** — events bind to the terminal window.
+
+The daemon lifecycle is automatic: any notification event wakes it, it exits 60 seconds after the last session closes, host exit is detected via `hostPid` within about 90 seconds, and sessions re-register automatically after a daemon restart. Editing the daemon code restarts it within 10 seconds.
 
 ## Manual triggering (testing)
 
@@ -60,12 +68,16 @@ Precedence: project config > global `~/.cc-notifier/config.json` > defaults.
 | Key | Default | Description |
 |---|---|---|
 | `enabled` | `true` | `false` disables notifications globally |
-| `dedupWindowMs` | `10000` | Deduplication window for same-type events while unfocused (ms) |
+| `dedupWindowMs` | `0` | Deduplication window (ms); `0` = no dedup; `>0` merges per session+type |
+| `pythonPath` | empty | Absolute path of the toast interpreter (written by the installer) |
+| `pollIntervalMs` | `10000` | Daemon window-poll period (ms) |
+| `windowWhitelist` | `[]` | Browser process whitelist for dsh web binding/focus |
 | `sound` | `true` | `false` mutes toast sound |
+| `language` | `auto` | Toast language: `auto`, `zh`, or `en` |
 
 ## Multi-session behavior
 
-Each session binds its own window handle at SessionStart. Toasts carry the project name, so notifications from parallel sessions are distinguishable. Same-type events from different sessions share a single 10-second dedup window.
+Each session binds its own window handle at SessionStart. Toasts carry the session identity, so notifications from parallel sessions are distinguishable. Deduplication is off by default — concurrent sessions never swallow each other's notifications; when enabled, merging is scoped per session and type.
 
 ## Notification history
 
