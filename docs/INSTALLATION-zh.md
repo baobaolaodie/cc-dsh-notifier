@@ -25,8 +25,8 @@ node scripts/install.mjs
 
 安装器执行四步:
 
-1. **注入 hooks** — 备份 `~/.claude/settings.json` 并添加六个 hooks(SessionStart、PermissionRequest、PreToolUse(AskUserQuestion matcher)、PostToolUse、Stop、SessionEnd)。幂等,重复执行安全。
-2. **注册 AUMID** — 写入 `HKCU\Software\Classes\AppUserModelId\cc-dsh-notifier`(DisplayName + IconUri)。非打包应用显示 Toast 的前提。
+1. **注入 hooks** — 备份 `~/.claude/settings.json` 并添加五个 hooks(SessionStart、PermissionRequest、PreToolUse(AskUserQuestion matcher)、Stop、SessionEnd)。幂等,重复执行安全。
+2. **注册 AUMID** — 写入 `HKCU\Software\Classes\AppUserModelId\cc-notifier`(DisplayName + IconUri)。非打包应用显示 Toast 的前提。
 3. **检测 Python** — 把 `python` 解析为绝对路径并写入配置 `pythonPath`,再检查 winrt 包。固定路径保证 Toast 不受宿主 PATH 变化影响。缺失时仅提示,安装继续;Python 缺失时 Toast 静默失败。
 4. **生成默认配置** — 若 `~/.cc-notifier/config.json` 不存在则写入。
 
@@ -44,18 +44,19 @@ dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
 
 ```bash
 # 跨盘 junction 缺陷的一次性修复
-rmdir %USERPROFILE%\.dsh\profiles\web\node_modules\dsh-notifier
-mklink /J %USERPROFILE%\.dsh\profiles\web\node_modules\dsh-notifier D:\path\to\repo\plugins\dsh-notifier
+rmdir %USERPROFILE%\.dsh\profiles\web\node_modules\@baobaolaodie\cc-dsh-notifier
+mkdir %USERPROFILE%\.dsh\profiles\web\node_modules\@baobaolaodie
+mklink /J %USERPROFILE%\.dsh\profiles\web\node_modules\@baobaolaodie\cc-dsh-notifier D:\path\to\repo\plugins\dsh-notifier
 dsh plugin --profile web list   # 只读 pnpm 命令触发 reconcile
 ```
 
 验证 profile 层后重启 profile:
 
 ```bash
-dsh --profile web --dump-config   # 应出现 "# == dsh-notifier" 层
+dsh --profile web --dump-config   # 应出现 "# == @baobaolaodie/cc-dsh-notifier" 层
 ```
 
-打包为 tarball(`pnpm pack`)或发布 registry 后安装无需修复步骤。
+打包为 tarball(`pnpm pack`)或发布 registry 后安装无需修复步骤。三种分发形态可选 —— **tarball**(单个文件,不 clone 仓库、无凭据,最方便)、**git 安装**(`dsh plugin add github:baobaolaodie/cc-dsh-notifier`,会 clone 整个仓库,零配置)、**GitHub Packages**(`dsh plugin add @baobaolaodie/cc-dsh-notifier`,即使包 public 也需在 profile 的 .npmrc 配 `read:packages` token)。详见插件 README。
 
 ## 验证
 

@@ -51,13 +51,15 @@ cc-dsh-notifier 在代理需要你介入、而你没有看着它的窗口时,弹
 node scripts/install.mjs
 ```
 
-安装器会备份 `~/.claude/settings.json`、注入六个 hooks、注册 `cc-dsh-notifier` AppUserModelID 并写入默认配置。之后新建 Claude Code 会话即可生效。
+安装器会备份 `~/.claude/settings.json`、注入五个 hooks、注册 `cc-notifier` AppUserModelID 并写入默认配置。之后新建 Claude Code 会话即可生效。
 
 ### 安装(DeepSeek Harness)
 
 ```bash
-# 已发布包(GitHub Packages;先在 profile 的 .npmrc 加一行:
-#   @baobaolaodie:registry=https://npm.pkg.github.com)
+# 已发布包(GitHub Packages;先在 profile 的 .npmrc 加两行:
+#   @baobaolaodie:registry=https://npm.pkg.github.com
+#   //npm.pkg.github.com/:_authToken=<GitHub PAT,read:packages 权限>
+# GitHub Packages 的下载始终需要 token,即使包是 public)
 dsh plugin --profile web add @baobaolaodie/cc-dsh-notifier
 dsh plugin --profile dsh-tui add @baobaolaodie/cc-dsh-notifier
 

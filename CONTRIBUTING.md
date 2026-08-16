@@ -4,9 +4,9 @@ English · [中文](CONTRIBUTING-zh.md)
 
 </div>
 
-# Contributing to cc-notifier
+# Contributing to cc-dsh-notifier
 
-Thank you for considering contributing to cc-notifier. This page describes the development workflow and conventions.
+Thank you for considering contributing to cc-dsh-notifier. This page describes the development workflow and conventions.
 
 ## Development environment
 
@@ -20,7 +20,7 @@ Thank you for considering contributing to cc-notifier. This page describes the d
 ```bash
 npm test                    # all unit tests (all assertions pass, node:test)
 node --test test/events.test.mjs   # single test file
-node scripts/test.mjs <event> # manual trigger through the real pipeline (permission-request|ask-user-question|tool-result|stop|session-start)
+node scripts/test.mjs <event> # manual trigger through the real pipeline (permission-request|ask-user-question|stop|session-start)
 ```
 
 Manual trigger notes: a running daemon is required (an active session); toasts are suppressed while the session window is focused (focus silence) — switch focus away to observe.

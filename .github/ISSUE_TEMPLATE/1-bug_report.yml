@@ -58,7 +58,7 @@ body:
         - Node 版本 / Node version:
         - Python 版本 / Python version:
         - Claude Code 版本 / Claude Code version:
-        - cc-notifier 版本 / cc-notifier version:
+        - cc-dsh-notifier 版本 / cc-dsh-notifier version:
         - 安装方式 / Install method(install.mjs / 手动):
         - 会话类型 / Session type(Windows Terminal / VS Code 集成终端):
   - type: textarea

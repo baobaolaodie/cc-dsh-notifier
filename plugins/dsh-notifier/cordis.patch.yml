@@ -1,7 +1,8 @@
 # @baobaolaodie/cc-dsh-notifier bundle patch: insert the notifier plugin row.
 # Applied after the profile's bundle layers; `dsh plugin add` reconciles
 # this package into dsh.profile.bundles automatically (dsh.bundle.patch).
-# name 必须是包名(@baobaolaodie/cc-dsh-notifier,tarball/registry 安装的依赖名)。
+# name 必须是包名且加引号:@ 是 YAML 保留指示符,裸 @ 开头会解析失败
+# (2026-08-16 实测 dump-config 报 bad indentation;0.1.4 修复)。
 - insert:
     - id: dsh-notifier
-      name: @baobaolaodie/cc-dsh-notifier
+      name: "@baobaolaodie/cc-dsh-notifier"

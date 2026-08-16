@@ -28,7 +28,7 @@
 - Claude Code 跑在独立 Windows Terminal(无 `-d` 参数、标题不含项目名)时,通过 `?` 前缀动态标题绑定 —— 全局匹配但仅对 Claude Code 事件生效(dsh-tui 会话不会被绑到 CC 窗口)。
 - 未重新触发 session-start 的既有 Claude Code 会话获得懒绑定兜底:无绑定的 claude 事件 toast 取最近 `?` 标签终端窗口为跳转目标,无需重开会话即可点击跳转。
 - 插件已发布到 GitHub Packages(`@baobaolaodie/cc-dsh-notifier`,public);tarball 与 git 安装不受影响(root patch 保持 `cc-dsh-notifier`,与 git 安装依赖名一致)。
-
+- bundle patch 条目名加引号(`"@baobaolaodie/cc-dsh-notifier"`):裸 `@` 前缀是 YAML 保留指示符,会破坏 profile 配置解析(0.1.3 受影响);0.1.4 修复。
 - test 命令改为显式列出测试文件(替代 glob),修复 Node 18 Windows 上 `npm test` 失败(`Could not find 'test/*.test.mjs'`)。
 - 通知文案按系统显示语言输出(`auto`),可由新配置项 `language`(`zh`/`en`)覆盖;英文系统用户收到英文通知。
 - PR 模板与文档不再写死测试数量(`npm test` → 全部通过);模板复选框 label 不再与实际测试数脱节。

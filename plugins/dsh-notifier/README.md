@@ -1,4 +1,4 @@
-# dsh-notifier
+# @baobaolaodie/cc-dsh-notifier
 
 DeepSeek Harness → cc-dsh-notifier 适配插件:订阅 dsh 会话事件,转发给 cc-dsh-notifier
 daemon,复用其 Windows Toast + 点击跳转管线。web 与 tui 两个 surface 共用同一插件。
@@ -29,19 +29,23 @@ dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
 
 - **Windows 跨盘 junction 缺陷**:`link:` 本地依赖在 pnpm workspace + 跨盘(C 盘 profile /
   D 盘仓库)时 junction 目标被拼接成死链 → reconcile 认不出 `dsh.bundle`。兜底两步:
-  1. 修复 junction:`rmdir <profile>/node_modules/dsh-notifier` + `New-Item -ItemType
-     Junction -Path <profile>/node_modules/dsh-notifier -Target <仓库>/plugins/dsh-notifier`
+  1. 修复 junction:`rmdir <profile>/node_modules/@baobaolaodie/cc-dsh-notifier` + `New-Item -ItemType
+     Junction -Path <profile>/node_modules/@baobaolaodie/cc-dsh-notifier -Target <仓库>/plugins/dsh-notifier`
   2. 触发 reconcile(只读 pnpm 命令,不重建死链):`dsh plugin --profile <name> list`
-- 验证:`dsh --profile <name> --dump-config` 出现 `# == dsh-notifier` 层
+- 验证:`dsh --profile <name> --dump-config` 出现 `# == @baobaolaodie/cc-dsh-notifier` 层
 - **零手工路径(推荐)**:打包自包含 tarball 后一条命令安装(从 store 提取,不走 junction,
-  无跨盘缺陷);或从 GitHub Packages 安装:
+  无跨盘缺陷)——最简单,不需要 clone 仓库,也不需要任何凭据;
+- **git 安装(公开可用,零配置)**:`dsh plugin add github:baobaolaodie/cc-dsh-notifier`(会 clone
+  整个仓库,依赖名取根 package.json 的 name);
+- **GitHub Packages(个人便捷渠道)**:`dsh plugin --profile <name> add @baobaolaodie/cc-dsh-notifier`
   ```bash
-  # profile 的 .npmrc 加一行(scope registry),然后:
-  dsh plugin --profile <name> add @baobaolaodie/cc-dsh-notifier
+  # profile 的 .npmrc 加两行(下载始终需要 token,即使包是 public):
+  @baobaolaodie:registry=https://npm.pkg.github.com
+  //npm.pkg.github.com/:_authToken=<GitHub PAT with read:packages>
   ```
 - **git 安装**:`dsh plugin add github:baobaolaodie/cc-dsh-notifier`(仓库根声明 `dsh.bundle`,
   插件行按包名 `cc-dsh-notifier` 解析,入口取根 package.json 的 `main`;已端到端验证)
-- 卸载:`dsh plugin --profile <name> remove dsh-notifier`
+- 卸载:`dsh plugin --profile <name> remove @baobaolaodie/cc-dsh-notifier`
 
 ## 发布打包
 
@@ -50,12 +54,12 @@ dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
 **入库**以支持 git 安装)。打包:
 
 ```bash
-cd plugins/dsh-notifier && pnpm pack    # → dsh-notifier-<version>.tgz(prepack 自动 vendor)
+cd plugins/dsh-notifier && pnpm pack    # → baobaolaodie-cc-dsh-notifier-<version>.tgz(prepack 自动 vendor)
 # 安装(零手工):
-dsh plugin --profile <web|dsh-tui> add ./dsh-notifier-0.1.0.tgz
+dsh plugin --profile <web|dsh-tui> add ./baobaolaodie-cc-dsh-notifier-<version>.tgz
 ```
 
-发布到 registry 后:`dsh plugin --profile <name> add dsh-notifier`。
+发布到 GitHub Packages 后:`dsh plugin --profile <name> add @baobaolaodie/cc-dsh-notifier`(profile/.npmrc 需配 `@baobaolaodie:registry=https://npm.pkg.github.com`)。
 
 ## 依赖
 
