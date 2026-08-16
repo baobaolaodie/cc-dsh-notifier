@@ -69,7 +69,7 @@ dsh plugin --profile web add github:baobaolaodie/cc-dsh-notifier
 dsh plugin --profile dsh-tui add github:baobaolaodie/cc-dsh-notifier
 ```
 
-> GitHub Packages(`@baobaolaodie/cc-dsh-notifier`)仅为维护者个人便捷渠道:包当前为 **private**,下载需在 profile 的 .npmrc 配 `read:packages` token。请优先使用 tarball 或 git 安装。
+> GitHub Packages(`@baobaolaodie/cc-dsh-notifier`)仅为维护者个人便捷渠道:GitHub Packages 的 npm registry **下载始终需要 `read:packages` token,即使包是 public**(已实证)。请优先使用 tarball 或 git 安装。
 
 已在 Windows 11 + dsh 0.1.0-rc.6 实测(2026-08-16):web 与 tui 双 profile、三类通知(权限/提问/等待输入)、聚焦感知静默、点击跳转、tarball 安装流程。
 

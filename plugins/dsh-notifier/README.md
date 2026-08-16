@@ -42,7 +42,7 @@ dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
   仓库;依赖名取根 package.json 的 name `cc-dsh-notifier`,root patch 按该名解析;已端到端验证)
 - **GitHub Packages(仅维护者个人渠道)**:`dsh plugin --profile <name> add @baobaolaodie/cc-dsh-notifier`
   ```bash
-  # profile 的 .npmrc 加两行(包当前为 private,下载需要 token;改为 public 后可匿名):
+  # profile 的 .npmrc 加两行(GitHub Packages npm registry 下载始终需要 token,即使 public):
   @baobaolaodie:registry=https://npm.pkg.github.com
   //npm.pkg.github.com/:_authToken=<GitHub PAT with read:packages>
   ```

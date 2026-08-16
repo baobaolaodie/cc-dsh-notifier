@@ -69,7 +69,7 @@ dsh plugin --profile web add github:baobaolaodie/cc-dsh-notifier
 dsh plugin --profile dsh-tui add github:baobaolaodie/cc-dsh-notifier
 ```
 
-> GitHub Packages (`@baobaolaodie/cc-dsh-notifier`) exists as a maintainer convenience channel only: the package is currently **private**, so downloads require a `read:packages` token in the profile's `.npmrc`. Use the tarball or git install instead.
+> GitHub Packages (`@baobaolaodie/cc-dsh-notifier`) exists as a maintainer convenience channel only: GitHub Packages' npm registry **always requires a `read:packages` token for downloads, even for public packages** (verified). Use the tarball or git install instead.
 
 Verified against dsh 0.1.0-rc.6 on Windows 11 (2026-08-16): web and tui profiles, permission/question/waiting-for-input notifications, focus-aware silence, click-to-return, and the tarball install flow.
 

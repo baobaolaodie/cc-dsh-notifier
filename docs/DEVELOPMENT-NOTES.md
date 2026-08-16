@@ -83,7 +83,7 @@ node scripts/uninstall.mjs  # 卸载
 ## dsh 适配(2026-08-16,DeepSeek Harness 通知)
 
 - **架构**:`plugins/dsh-notifier/` 插件(web/tui profile 通用,surface 按 argv 检测)→ cc-dsh-notifier daemon(复用 Toast/聚焦/跳转管线)。**三类通知**(权限请求/提问/等待输入)——工具出错通知已移除(2026-08-16 用户决策:工具失败不会让 agent 停下,只徒增噪音)。
-- **安装(三种方式)**:①tarball `add ./baobaolaodie-cc-dsh-notifier-0.1.4.tgz`(零配置、不 clone 仓库、**最方便**,生产采用);②git `add github:baobaolaodie/cc-dsh-notifier`(公开零配置,但会 clone 整个仓库);③GitHub Packages `add @baobaolaodie/cc-dsh-notifier`(个人便捷渠道,包当前为 **private 需 token**:profile/.npmrc 配 `@baobaolaodie:registry=https://npm.pkg.github.com` + `//npm.pkg.github.com/:_authToken=<PAT read:packages>`;改为 public 后可匿名)。Windows 跨盘 junction 缺陷兜底(仅 link 安装):修 junction + `dsh plugin --profile <name> list`。dump-config 验证 `# == <包名>` 层。
+- **安装(三种方式)**:①tarball `add ./baobaolaodie-cc-dsh-notifier-0.1.4.tgz`(零配置、不 clone 仓库、**最方便**,生产采用);②git `add github:baobaolaodie/cc-dsh-notifier`(公开零配置,但会 clone 整个仓库);③GitHub Packages `add @baobaolaodie/cc-dsh-notifier`(仅维护者渠道:**npm registry 下载始终需 token 即使 public**(2026-08-16 实证:public 后匿名仍 401);profile/.npmrc 配 `@baobaolaodie:registry=https://npm.pkg.github.com` + `//npm.pkg.github.com/:_authToken=<PAT read:packages>`)。Windows 跨盘 junction 缺陷兜底(仅 link 安装):修 junction + `dsh plugin --profile <name> list`。dump-config 验证 `# == <包名>` 层。
 - **daemon 生命周期**:任何事件拉起 / 空闲 60s 退出 / hostPid 存活探测(~90s 清理)/ 代码变更 10s 自我重启 / 插件 resync 重注册会话。核心逻辑在 `scripts/lib/daemon-core.mjs`(可注入,25 项单测)。
 - **聚焦判定**:预编译 `foreground.exe`(~150ms)实时查询 + 浏览器兜底(白名单浏览器标题含 DeepSeek Harness → 静默,**仅 web 事件**)。绑定恢复靠 resync。
 - **CC 窗口绑定(2026-08-16 实测修复)**:CC 跑独立 Windows Terminal(无 -d、标题不含项目名)时靠 `?` 前缀动态标题绑定(全局匹配,仅 claude 事件;dsh-tui 会话 surface=tui 不匹配,防误绑);未重开 session-start 的既有会话走**懒绑定兜底**(toast 时从窗口枚举取 ? 标签窗口)。
