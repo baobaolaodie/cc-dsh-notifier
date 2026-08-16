@@ -3,7 +3,7 @@
 // web 与 tui profile 共用同一 host 核心,本插件装进任一 profile 即覆盖该 surface。
 // 失败隔离:所有处理 try/catch + logger,绝不抛出到 dsh host。
 import { loadConfig, resolveLanguage } from '../../../scripts/lib/config.mjs';
-import { mapSessionEvent, toSessionStart, toSessionEnd, toStop, QUESTION_TOOL, NOTIFY_SESSION_EVENT_TYPES } from './payload.mjs';
+import { mapSessionEvent, toSessionStart, toSessionEnd, toStop, NOTIFY_SESSION_EVENT_TYPES } from './payload.mjs';
 import { forward, readState, isPidAlive } from './forwarder.mjs';
 import { createDaemonResync } from './resync.mjs';
 
@@ -96,7 +96,6 @@ export function apply(ctx) {
     try {
       logger.info('session-end', session.id);
       if (session) {
-        lastUserInteraction.delete(session.id);
         sessionTitles.delete(session.id);
         registeredSessions.delete(session.id);
       }
@@ -113,7 +112,6 @@ export function apply(ctx) {
   ctx.on('session/event', (session, event) => {
     try {
       if (!event) return;
-      observeUserInteraction(session, event);
       observeSessionTitle(session, event);
       if (!NOTIFY_SESSION_EVENT_TYPES.has(event.type)) return;
       resync(); // daemon 重启检测:仅通知事件执行(低频;读状态文件是同步 I/O,不进热路径)
@@ -139,32 +137,10 @@ export function apply(ctx) {
     }
   };
 
-  // 用户交互观察(纯内存,低频):用于「等待输入」抑制规则——
-  // 用户刚交互过(发消息/审批应答/回答问题)后 stopSuppressMs 内(默认 15s,可配
-  // ~/.cc-notifier/config.json),代理进入等待输入不弹 Toast(用户几乎肯定还在屏幕前);
-  // 窗口后跑完照常通知(2026-08-16 用户反馈:60s 过长,短会话收不到「完成」通知)
-  const lastUserInteraction = new Map(); // sessionId → ts(随 session 销毁清理)
-  const questionCallIds = new Map();     // callId → true(提问工具调用进行中,随结果清理)
-  const touchInteraction = (session) => {
-    if (session) lastUserInteraction.set(session.id, Date.now());
-  };
-  const observeUserInteraction = (session, event) => {
-    const data = event.data || {};
-    if (event.type === 'user/message' || event.type === 'approval/decided') {
-      touchInteraction(session); // 用户发言 / 审批应答
-    } else if (event.type === 'tool/call') {
-      if (data.name === QUESTION_TOOL) questionCallIds.set(data.callId, true);
-    } else if (event.type === 'tool/result') {
-      if (questionCallIds.delete(data.callId)) touchInteraction(session); // 用户回答了提问
-    }
-  };
-  const isStopSuppressed = (session, windowMs) => {
-    const at = lastUserInteraction.get(session && session.id);
-    return Boolean(at) && Date.now() - at < windowMs;
-  };
-
   // 等待输入:agent/status running→idle 沿(权威信号,turn/end 后仍可能续跑)。
   // 每 agent 一个订阅(dsh-schedule 同款模式);状态为纯内存记录,频率极低(phase 切换)。
+  // 注意:不再有「交互后抑制」——2026-08-16 用户决策去掉(发消息/审批后 15s 内不弹的
+  // 规则会在用户切走时吞掉想收的通知;聚焦静默由 daemon 判定负责,插件只负责转发)
   const agentStatus = new Map(); // agentId → 'running' | 'idle'
   ctx.on('agent/created', ({ agent }) => {
     try {
@@ -180,13 +156,7 @@ export function apply(ctx) {
           const cwd = (session.header && session.header.cwd) || '';
           const { cfg, lang } = gate(cwd);
           if (cfg.enabled === false) return;
-          // 交互后抑制:stopSuppressMs 窗口内(默认 15s,可配)刚交互过 → 不打扰;
-          // 窗口后跑完照常通知(短会话的「完成」信号不丢,2026-08-16 用户反馈)
-          const suppressMs = Number(cfg.stopSuppressMs) || 15000;
-          if (isStopSuppressed(session, suppressMs)) {
-            logger.info('stop 抑制(交互后 ' + suppressMs + 'ms 内)', agent.id);
-            return;
-          }
+          // 无交互抑制:聚焦静默由 daemon 判定(在看→静默,切走→弹),插件只转发
           logger.info('stop(等待输入)', agent.id);
           void forward(toStop(session, lang, surface, sessionTitles.get(session.id) || ''));
         } catch (err) {

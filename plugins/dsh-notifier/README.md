@@ -17,7 +17,7 @@ daemon,复用其 Windows Toast + 点击跳转管线。web 与 tui 两个 surface
   ~90s 内清理;代码变更自动自我重启
 - **daemon 重启自愈(resync)**:检测状态文件 pid 变化 → 自动重发全部已注册会话的
   session-start(绑定/聚焦恢复)
-- **等待输入抑制**:用户交互后 `stopSuppressMs` 内(默认 15s,可配)不弹;按会话记录
+- **聚焦静默由 daemon 判定**:在看 → 静默,切走 → 弹;无插件侧交互抑制
 - **性能红线**:session/event 热路径先纯内存过滤(Set.has)再读配置/语言;`gate()` 按 cwd
   缓存(有界 64);resync 仅在通知事件路径执行
 
@@ -41,6 +41,6 @@ dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
 ## 依赖
 
 - cc-notifier 仓库(相对路径引用 `scripts/lib/{events,config}.mjs` 等)
-- `~/.cc-notifier/config.json`:`enabled` / `language` / `dedupWindowMs` / `stopSuppressMs` /
+- `~/.cc-notifier/config.json`:`enabled` / `language` / `dedupWindowMs` /
   `pollIntervalMs` / `pythonPath`(toast 解释器绝对路径,install.mjs 检测时写入)/
   `windowWhitelist`(浏览器窗口白名单,web surface 绑定/聚焦用)

@@ -69,7 +69,6 @@ node scripts/test.mjs session-start
 |---|---|---|
 | `enabled` | `true` | `false` 全局关闭通知 |
 | `dedupWindowMs` | `0` | 去重窗口(毫秒);`0` = 不去重;`>0` 时按「会话+类型」合并 |
-| `stopSuppressMs` | `15000` | 用户交互后代理进入等待输入不弹 Toast 的窗口 |
 | `pythonPath` | 空 | Toast 解释器绝对路径(安装时写入) |
 | `pollIntervalMs` | `10000` | daemon 窗口轮询周期(毫秒) |
 | `windowWhitelist` | `[]` | 浏览器进程白名单(dsh web 绑定/聚焦用) |

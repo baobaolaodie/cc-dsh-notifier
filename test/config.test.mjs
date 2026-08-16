@@ -18,7 +18,7 @@ test('默认配置', () => {
 test('无任何配置文件时返回默认值', () => {
   const dir = tmpDir();
   const cfg = loadConfig(path.join(dir, 'proj'), { globalConfig: path.join(dir, 'missing.json') });
-  assert.deepEqual(cfg, { enabled: true, dedupWindowMs: 0, sound: true, language: 'auto', windowWhitelist: [], pollIntervalMs: 10000, stopSuppressMs: 15000, pythonPath: '' });
+  assert.deepEqual(cfg, { enabled: true, dedupWindowMs: 0, sound: true, language: 'auto', windowWhitelist: [], pollIntervalMs: 10000, pythonPath: '' });
 });
 
 test('normalizeLanguage:只认 zh/en,其余回退 auto', () => {

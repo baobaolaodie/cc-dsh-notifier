@@ -103,7 +103,6 @@ Edit `~/.cc-notifier/config.json` (created on install):
 |---|---|---|
 | `enabled` | `true` | Set to `false` to disable notifications globally |
 | `dedupWindowMs` | `0` | Deduplication window (ms); `0` = no dedup; `>0` merges per session+type |
-| `stopSuppressMs` | `15000` | Window after a user interaction during which entering waiting-for-input stays silent |
 | `pythonPath` | empty | Absolute path of the toast interpreter (written by the installer); empty = `python` from PATH |
 | `pollIntervalMs` | `10000` | Daemon window-poll period (ms) |
 | `windowWhitelist` | `[]` | Browser process whitelist for dsh web binding/focus (e.g. `chrome.exe`/`msedge.exe`) |

@@ -86,7 +86,7 @@ node scripts/uninstall.mjs  # 卸载
 - **安装**:`dsh plugin --profile <web|dsh-tui> add ./plugins/dsh-notifier`(仓库根目录,相对路径)。Windows 跨盘 junction 缺陷兜底:修 junction + `dsh plugin --profile <name> list` 触发 reconcile。dump-config 验证 `# == dsh-notifier` 层。
 - **daemon 生命周期**:任何事件拉起 / 空闲 60s 退出 / hostPid 存活探测(~90s 清理)/ 代码变更 10s 自我重启 / 插件 resync 重注册会话。核心逻辑在 `scripts/lib/daemon-core.mjs`(可注入,17 项单测)。
 - **聚焦判定**:预编译 `foreground.exe`(~150ms)实时查询 + 浏览器兜底(白名单浏览器标题含 DeepSeek Harness → 静默)。绑定恢复靠 resync。
-- **关键配置**(`~/.cc-notifier/config.json`):`dedupWindowMs`(默认 0 不去重)、`stopSuppressMs`(默认 15000)、`pythonPath`(toast 解释器绝对路径,install.mjs 写入——裸 python 依赖 PATH 会崩,2026-08-16 实测)、`windowWhitelist`。
-- **测试**:99 项(新增 daemon-core/restart/forwarder/resync 等);`npm test` 显式清单。Python/PS 脚本无自动化测试(真实环境手动回归)。
-- **未完成**:P1 tui 实测(插件已装);发布打包(vendor + files + tarball/registry);主 README/CHANGELOG 的 dsh 条目随发布同步。
+- **关键配置**(`~/.cc-notifier/config.json`):`dedupWindowMs`(默认 0 不去重)、`pythonPath`(toast 解释器绝对路径,install.mjs 写入——裸 python 依赖 PATH 会崩,2026-08-16 实测)、`windowWhitelist`。等待输入交互抑制已移除(聚焦判定负责静默,2026-08-16 用户决策)。
+- **测试**:102 项(新增 daemon-core/restart/forwarder/resync 等);`npm test` 显式清单。Python/PS 脚本无自动化测试(真实环境手动回归)。
+- **未完成**:P1 tui 实测(插件已装,进行中);发布打包(vendor + files + tarball/registry);主 README/CHANGELOG 的 dsh 条目随发布同步。
 - **恢复**:daemon 被杀/异常 → 任何通知事件自动拉起;绑定丢失 → resync 自愈;改代码 → 自我重启,无需手动。

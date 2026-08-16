@@ -69,7 +69,6 @@ Precedence: project config > global `~/.cc-notifier/config.json` > defaults.
 |---|---|---|
 | `enabled` | `true` | `false` disables notifications globally |
 | `dedupWindowMs` | `0` | Deduplication window (ms); `0` = no dedup; `>0` merges per session+type |
-| `stopSuppressMs` | `15000` | Window after a user interaction during which entering waiting-for-input stays silent |
 | `pythonPath` | empty | Absolute path of the toast interpreter (written by the installer) |
 | `pollIntervalMs` | `10000` | Daemon window-poll period (ms) |
 | `windowWhitelist` | `[]` | Browser process whitelist for dsh web binding/focus |
