@@ -46,10 +46,15 @@ export function toApprovalAsked(session, event, lang, surface = 'tui', sessionTi
 }
 
 // tool/call(ask_user_question) → ask-user-question;
-// 问题文本取 arguments.questions[0].question(与 cc-notifier 的 parseEvent 兼容字段)
+// 问题文本取 arguments.questions[0].question。
+// 注意:实测(2026-08-16 tui)dsh 持久化事件的 arguments 是 **JSON 字符串** 而非对象
+// (LLM 原始参数序列化),必须先解析;web 侧同一提取逻辑,同样受影响
 export function toAskUserQuestion(session, event, lang, surface = 'tui', sessionTitle = '') {
   const cwd = cwdOf(session);
-  const args = (event && event.data && event.data.arguments) || {};
+  let args = (event && event.data && event.data.arguments) || {};
+  if (typeof args === 'string') {
+    try { args = JSON.parse(args); } catch { args = {}; }
+  }
   const qs = Array.isArray(args.questions) ? args.questions : [];
   const prompt = qs.length > 0 && qs[0] ? String(qs[0].question || qs[0].prompt || '') : '';
   return {
@@ -59,13 +64,33 @@ export function toAskUserQuestion(session, event, lang, surface = 'tui', session
   };
 }
 
-// tool/result(isError) → tool-result;错误文本取自 message.content / error.info
+// tool/result(isError)→ tool-result;错误文本取自 message.content / error.info。
+// dsh 实测(2026-08-16 tui):命令失败时 message.isError 为 **false**(命令失败被当作
+// 正常结果),错误信息在文本里,格式为 `[stderr]\n...\n[exit code: N]`(N≠0)。
+// 因此错误识别 = isError 为真 **或** 文本含 `[stderr]` / `[exit code: 非零]`。
+export function extractText(content) {
+  if (typeof content === 'string') return content;
+  if (Array.isArray(content)) return content.map(extractText).filter(Boolean).join(' ');
+  if (content && typeof content === 'object') {
+    if (typeof content.text === 'string') return content.text;
+    if (content.content !== undefined) return extractText(content.content);
+  }
+  return '';
+}
+
+export function isErrorResult(event) {
+  const data = (event && event.data) || {};
+  if (data.message && data.message.isError === true) return true;
+  const text = extractText(data.message && data.message.content);
+  return /\[exit code: [1-9]\d*\]/.test(text) || /\[stderr\]/.test(text);
+}
+
 export function toToolResult(session, event, lang, surface = 'tui', sessionTitle = '') {
   const cwd = cwdOf(session);
   const data = (event && event.data) || {};
   const message = data.message || {};
   const errText = (data.error && (data.error.message || (data.error.info && data.error.info.name)))
-    || (Array.isArray(message.content) ? message.content.map((c) => (c && c.text) || '').join(' ').trim() : String(message.content || ''));
+    || extractText(message.content);
   return {
     type: 'tool-result', ts: Date.now(), sessionId: session.id, cwd,
     projectName: projectName(cwd), toolName: data.name || '',
@@ -103,7 +128,7 @@ export function mapSessionEvent(session, event, lang, surface = 'tui', sessionTi
     case 'tool/call':
       return data.name === QUESTION_TOOL ? toAskUserQuestion(session, event, lang, surface, sessionTitle) : null;
     case 'tool/result':
-      return data.message && data.message.isError === true ? toToolResult(session, event, lang, surface, sessionTitle) : null;
+      return isErrorResult(event) ? toToolResult(session, event, lang, surface, sessionTitle) : null;
     default:
       return null;
   }

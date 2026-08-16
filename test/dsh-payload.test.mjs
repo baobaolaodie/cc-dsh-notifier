@@ -88,6 +88,27 @@ test('toAskUserQuestion:tool/call ask_user_question → 提问,摘要取问题�
   assert.equal(e.summary, '继续执行还是放弃?');
 });
 
+test('toAskUserQuestion:arguments 为 JSON 字符串(实测 dsh 持久化形态)→ 解析后提取问题文本', () => {
+  // 2026-08-16 tui 实测:tool/call 事件的 arguments 是 JSON 字符串而非对象,
+  // 未解析时 questions 为 undefined → 正文空;此测试为回归防护
+  const raw = JSON.stringify({ questions: [{ id: 'q1', question: '接下来想让我做什么?', header: '下一步' }] });
+  const e = toAskUserQuestion(
+    session,
+    { type: 'tool/call', data: { name: 'ask_user_question', arguments: raw } },
+    'zh',
+  );
+  assert.equal(e.summary, '接下来想让我做什么?');
+});
+
+test('toAskUserQuestion:arguments 为损坏 JSON 字符串 → 摘要为空不抛错', () => {
+  const e = toAskUserQuestion(
+    session,
+    { type: 'tool/call', data: { name: 'ask_user_question', arguments: '{oops' } },
+    'zh',
+  );
+  assert.equal(e.summary, '');
+});
+
 test('toAskUserQuestion:无 questions 时摘要为空不抛错', () => {
   const e = toAskUserQuestion(session, { type: 'tool/call', data: { name: 'ask_user_question', arguments: {} } }, 'zh');
   assert.equal(e.summary, '');
@@ -102,6 +123,44 @@ test('toToolResult:isError → 工具报错,摘要含错误文本', () => {
   assert.equal(e.type, 'tool-result');
   assert.equal(e.toolName, 'Pwsh');
   assert.match(e.summary, /Access denied/);
+});
+
+test('命令失败识别:dsh 的 isError=false 但文本含 [stderr] + [exit code: 非零] → 触发报错', () => {
+  // 2026-08-16 tui 实测:dsh 把命令失败当正常结果(isError=false),
+  // 错误在文本里,格式 `[stderr]\n...\n[exit code: 1]`;按文本特征识别
+  const raw = {
+    type: 'tool/result',
+    data: {
+      name: 'Pwsh',
+      message: {
+        isError: false,
+        content: [{ type: 'tool-result', toolCallId: 'c1', content: [{ type: 'text', text: '[stderr]\nasdfgh12345 : not recognized\n[exit code: 1]' }] }],
+      },
+    },
+  };
+  assert.equal(mapSessionEvent(session, raw, 'zh').type, 'tool-result');
+  assert.match(mapSessionEvent(session, raw, 'zh').summary, /not recognized/);
+});
+
+test('命令成功识别:exit code 0 / 无错误标记 → 不触发', () => {
+  const ok = { type: 'tool/result', data: { name: 'Pwsh', message: { isError: false, content: [{ type: 'text', text: 'hello [exit code: 0]' }] } } };
+  assert.equal(mapSessionEvent(session, ok, 'zh'), null);
+  const plain = { type: 'tool/result', data: { name: 'Pwsh', message: { isError: false, content: 'done' } } };
+  assert.equal(mapSessionEvent(session, plain, 'zh'), null);
+});
+
+test('嵌套 content 结构文本提取(实测 dsh tool/result 形态)', () => {
+  const raw = {
+    type: 'tool/result',
+    data: {
+      name: 'Pwsh',
+      message: {
+        content: [{ type: 'tool-result', toolCallId: 'c1', content: [{ type: 'text', text: '[stderr]\nfailed\n[exit code: 2]' }] }],
+      },
+    },
+  };
+  const e = toToolResult(session, raw, 'zh');
+  assert.match(e.summary, /failed/);
 });
 
 test('toStop:dsh 等待输入文案(区别于 Claude Code 的 stop,带产品名)', () => {
