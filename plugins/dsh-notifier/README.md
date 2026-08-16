@@ -34,7 +34,11 @@ dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
   2. 触发 reconcile(只读 pnpm 命令,不重建死链):`dsh plugin --profile <name> list`
 - 验证:`dsh --profile <name> --dump-config` 出现 `# == dsh-notifier` 层
 - **零手工路径(推荐)**:打包自包含 tarball 后一条命令安装(从 store 提取,不走 junction,
-  无跨盘缺陷);或发布 registry 后 `dsh plugin add dsh-notifier`
+  无跨盘缺陷);或从 GitHub Packages 安装:
+  ```bash
+  # profile 的 .npmrc 加一行(scope registry),然后:
+  dsh plugin --profile <name> add @baobaolaodie/cc-dsh-notifier
+  ```
 - **git 安装**:`dsh plugin add github:baobaolaodie/cc-dsh-notifier`(仓库根声明 `dsh.bundle`,
   插件行按包名 `cc-dsh-notifier` 解析,入口取根 package.json 的 `main`;已端到端验证)
 - 卸载:`dsh plugin --profile <name> remove dsh-notifier`
