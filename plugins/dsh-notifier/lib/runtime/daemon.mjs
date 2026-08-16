@@ -182,6 +182,13 @@ async function showToast(event) {
       && /deepseek harness/i.test(w.title || ''));
     if (hit) hwnd = hit.hwnd;
   }
+  // Claude Code 懒绑定兜底(2026-08-16):现有 CC 会话未重新 session-start 时无绑定,
+  // 从最近枚举找 ? 标签窗口(CC 动态标题特征)作为跳转目标——无需重开会话即可跳转
+  if (!hwnd && surface === 'claude') {
+    const hit = lastEntries.find((w) => isWhitelistedProcess(w.processName, TERMINAL_WHITELIST)
+      && /^\?\s/.test(w.title || ''));
+    if (hit) hwnd = hit.hwnd;
+  }
   if (!hwnd) {
     for (const [h, c] of windowMap) {
       if (normalizeCwd(c) === target) { hwnd = Number(h); break; }

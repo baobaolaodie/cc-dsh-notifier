@@ -1,6 +1,6 @@
 {
   "name": "cc-dsh-notifier",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "cc-dsh-notifier dsh plugin: forwards dsh session events to the shared daemon for Windows toast notifications (web + tui profiles; Claude Code side installs via the repository installer)",
   "type": "module",
   "main": "lib/index.js",
