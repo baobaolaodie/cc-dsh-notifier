@@ -1,6 +1,6 @@
 # dsh-notifier
 
-DeepSeek Harness → cc-notifier 适配插件:订阅 dsh 会话事件,转发给 cc-notifier
+DeepSeek Harness → cc-dsh-notifier 适配插件:订阅 dsh 会话事件,转发给 cc-dsh-notifier
 daemon,复用其 Windows Toast + 点击跳转管线。web 与 tui 两个 surface 共用同一插件。
 
 - **事件映射**:`session/created` → session-start;`approval/asked` → permission-request;
@@ -8,7 +8,7 @@ daemon,复用其 Windows Toast + 点击跳转管线。web 与 tui 两个 surface
   `agent/status` running→idle → stop(等待输入);`session/disposed` → session-end
 - **surface 检测**:argv 含 `--profile web` → web(浏览器绑定);其余(dsh-tui 等)→ tui(终端绑定);
   `CCN_SURFACE` 可强制覆盖
-- **与 cc-notifier 共享库经相对路径引用**(插件随仓库分发);daemon/toast 路径可用
+- **与 cc-dsh-notifier 共享库经相对路径引用**(插件随仓库分发);daemon/toast 路径可用
   `CCN_STATE_FILE` / `CCN_DAEMON_PATH` / `CCN_TOAST_PATH` 覆盖
 
 ## 关键机制
@@ -36,8 +36,8 @@ dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
 - 验证:`dsh --profile <name> --dump-config` 出现 `# == dsh-notifier` 层
 - **零手工路径(推荐)**:打包自包含 tarball 后一条命令安装(从 store 提取,不走 junction,
   无跨盘缺陷);或发布 registry 后 `dsh plugin add dsh-notifier`
-- **git 安装**:`dsh plugin add github:baobaolaodie/cc-notifier`(仓库根声明 `dsh.bundle`,
-  插件行按包名 `cc-notifier` 解析,入口取根 package.json 的 `main`;已端到端验证)
+- **git 安装**:`dsh plugin add github:baobaolaodie/cc-dsh-notifier`(仓库根声明 `dsh.bundle`,
+  插件行按包名 `cc-dsh-notifier` 解析,入口取根 package.json 的 `main`;已端到端验证)
 - 卸载:`dsh plugin --profile <name> remove dsh-notifier`
 
 ## 发布打包
@@ -56,7 +56,7 @@ dsh plugin --profile <web|dsh-tui> add ./dsh-notifier-0.1.0.tgz
 
 ## 依赖
 
-- cc-notifier 仓库(相对路径引用 `scripts/lib/{events,config}.mjs` 等)
+- cc-dsh-notifier 仓库(相对路径引用 `scripts/lib/{events,config}.mjs` 等)
 - `~/.cc-notifier/config.json`:`enabled` / `language` / `dedupWindowMs` /
   `pollIntervalMs` / `pythonPath`(toast 解释器绝对路径,install.mjs 检测时写入)/
   `windowWhitelist`(浏览器窗口白名单,web surface 绑定/聚焦用)

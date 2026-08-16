@@ -6,7 +6,7 @@
 
 # Installation
 
-cc-notifier runs as Claude Code hooks plus a resident daemon. There are no third-party npm dependencies; the only runtime requirements are Node.js and Python with the winrt packages.
+cc-dsh-notifier runs as Claude Code hooks plus a resident daemon. There are no third-party npm dependencies; the only runtime requirements are Node.js and Python with the winrt packages.
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ node scripts/install.mjs
 The installer performs four steps:
 
 1. **Hook injection** — backs up `~/.claude/settings.json` and adds six hooks (SessionStart, PermissionRequest, PreToolUse with the AskUserQuestion matcher, PostToolUse, Stop, SessionEnd). Idempotent: re-running is safe.
-2. **AUMID registration** — writes `HKCU\Software\Classes\AppUserModelId\cc-notifier` (DisplayName + IconUri). Required for Windows to display toasts from a non-packaged app.
+2. **AUMID registration** — writes `HKCU\Software\Classes\AppUserModelId\cc-dsh-notifier` (DisplayName + IconUri). Required for Windows to display toasts from a non-packaged app.
 3. **Python detection** — resolves `python` to its absolute path and writes it as `pythonPath` in the config, then checks the winrt packages. The fixed path keeps toasts working regardless of the host's PATH. Warnings are printed but installation proceeds; toasts will fail silently if Python is missing.
 4. **Default config** — writes `~/.cc-notifier/config.json` if absent.
 

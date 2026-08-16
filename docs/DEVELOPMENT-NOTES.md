@@ -1,11 +1,11 @@
-# cc-notifier 交接与恢复笔记
+# cc-dsh-notifier 交接与恢复笔记
 
 > 2026-08-13 会话结束交接。记录项目状态、已知问题与恢复方法。
 > **2026-08-13(第二次修订)**:依据会话 jsonl + 子代理 transcript 逐字节回放,恢复被误判为不可恢复的真实历史版本;本文件同步更新。
 
 ## 项目状态(2026-08-13,真实历史版)
 
-- **Change 已归档**:cc-notifier 完成 Comet Classic 全流程(open→design→build→verify→archive),产物在 `docs/openspec/changes/archive/2026-08-13-cc-notifier/`,主 spec 已合并到 `docs/openspec/specs/cc-notifier/spec.md`
+- **Change 已归档**:cc-dsh-notifier 完成 Comet Classic 全流程(open→design→build→verify→archive),产物在 `docs/openspec/changes/archive/2026-08-13-cc-notifier/`,主 spec 已合并到 `docs/openspec/specs/cc-notifier/spec.md`
 - **git 历史已重建(真实版)**:2026-08-13 误用 `git filter-repo --path`(白名单语义)导致项目从历史丢失。恢复过程第一次凭记忆重建(有偏差),第二次从会话 jsonl + 20 个子代理 transcript 逐字节回放真实 Write/Edit,得到真实历史最终态,已验证:
   - **39/39 测试通过**(与 verify 报告一致;第一次记忆重建仅 38/38,因 window-title 测试断言被删减)
   - 9 个文件与记忆版有差异,其中 4 个含真实功能回归(toast-agent.py 的 -nosound 静音、daemon.mjs 的 clearState 所有权检查、install.mjs 的 AUMID 失败提示、uninstall.mjs 的 GBK 解码),已全部恢复为真实版
@@ -31,9 +31,9 @@
 
 ### 两套通知系统并存(2026-08-13 发现,用户已自行处理)
 
-- 全局 `~/.claude/settings.json` 存在 **VS Code 扩展 `singularityinc.claude-notifier-3.6.1`** 的 hooks(PermissionRequest/PreToolUse/Stop/SubagentStop/UserPromptSubmit,PowerShell 同步播放声音,也阻塞 hook),与 cc-notifier 在 PermissionRequest/提问/Stop 三者**双挂** → 双弹 + 双阻塞
+- 全局 `~/.claude/settings.json` 存在 **VS Code 扩展 `singularityinc.claude-notifier-3.6.1`** 的 hooks(PermissionRequest/PreToolUse/Stop/SubagentStop/UserPromptSubmit,PowerShell 同步播放声音,也阻塞 hook),与 cc-dsh-notifier 在 PermissionRequest/提问/Stop 三者**双挂** → 双弹 + 双阻塞
 - **用户已删除该扩展,重启后生效**;`~/.claude/hooks/claude-notifier-*` 残留文件待清理
-- cc-notifier 的 install.mjs 幂等检测只认 `notify-agent.mjs` 字符串,与旧工具不冲突
+- cc-dsh-notifier 的 install.mjs 幂等检测只认 `notify-agent.mjs` 字符串,与旧工具不冲突
 
 ### 其他已知限制(用户已确认接受)
 
@@ -82,7 +82,7 @@ node scripts/uninstall.mjs  # 卸载
 
 ## dsh 适配(2026-08-16,DeepSeek Harness 通知)
 
-- **架构**:`plugins/dsh-notifier/` 插件(web/tui profile 通用,surface 按 argv 检测)→ cc-notifier daemon(复用 Toast/聚焦/跳转管线)。四类通知 + 会话生命周期。
+- **架构**:`plugins/dsh-notifier/` 插件(web/tui profile 通用,surface 按 argv 检测)→ cc-dsh-notifier daemon(复用 Toast/聚焦/跳转管线)。四类通知 + 会话生命周期。
 - **安装**:`dsh plugin --profile <web|dsh-tui> add ./plugins/dsh-notifier`(仓库根目录,相对路径)。Windows 跨盘 junction 缺陷兜底:修 junction + `dsh plugin --profile <name> list` 触发 reconcile。dump-config 验证 `# == dsh-notifier` 层。
 - **daemon 生命周期**:任何事件拉起 / 空闲 60s 退出 / hostPid 存活探测(~90s 清理)/ 代码变更 10s 自我重启 / 插件 resync 重注册会话。核心逻辑在 `scripts/lib/daemon-core.mjs`(可注入,17 项单测)。
 - **聚焦判定**:预编译 `foreground.exe`(~150ms)实时查询 + 浏览器兜底(白名单浏览器标题含 DeepSeek Harness → 静默)。绑定恢复靠 resync。

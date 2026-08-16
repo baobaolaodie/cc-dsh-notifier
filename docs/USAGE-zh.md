@@ -8,7 +8,7 @@
 
 ## 什么会被通知
 
-Claude Code 或 DeepSeek Harness 需要你介入、且会话窗口未聚焦时,cc-notifier 弹出带声音的 Toast:
+Claude Code 或 DeepSeek Harness 需要你介入、且会话窗口未聚焦时,cc-dsh-notifier 弹出带声音的 Toast:
 
 | 事件 | 来源 | Toast 标题 | Toast 正文 |
 |---|---|---|---|

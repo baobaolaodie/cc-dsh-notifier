@@ -15,7 +15,7 @@ Check in order:
 3. **Window is unfocused** — notifications are suppressed while the session window is focused (by design). For dsh web, suppression is decided by the foreground browser tab's title: any tab showing a DeepSeek Harness page silences, any other site notifies.
 4. **AUMID registered** — re-run `node scripts/install.mjs`; verify with:
    ```
-   reg query HKCU\Software\Classes\AppUserModelId\cc-notifier
+   reg query HKCU\Software\Classes\AppUserModelId\cc-dsh-notifier
    ```
 5. **Python + winrt present** — `python -c "import winrt.windows.ui.notifications"` must succeed. If the daemon's toast exits with code 1 (`toast stderr ... No module named 'winrt'` in `daemon.log`), the host resolved a different interpreter: set `pythonPath` to the interpreter that has winrt installed (re-run `install.mjs` to write it automatically).
 6. **Daemon running** — `%LOCALAPPDATA%\cc-notifier\daemon.json` exists and the pid is alive. Check `daemon.log`. The daemon wakes on any notification event, so a missing daemon is usually transient; if it stays absent, check the host's plugin layer.

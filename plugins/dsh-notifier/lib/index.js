@@ -28,6 +28,14 @@ export function apply(ctx) {
     try { return ctx.logger('dsh-notifier'); } catch { return console; }
   })();
 
+  // 平台降级(2026-08-16,生态雷达 Linux 容器实测友好):
+  // 插件在非 Windows 平台加载不崩、不干预 agent 会话(仅订阅事件转发);
+  // Toast 依赖 Windows(winrt/PowerShell/UIA),不可用时转发链路自然静默失败。
+  // 参考 dsh-tray 的 headless 降级做法;日志让雷达与排障可见平台状态。
+  if (process.platform !== 'win32') {
+    logger.info('Windows-only plugin: degraded mode (toasts unavailable on ' + process.platform + ')');
+  }
+
   // 语言与全局开关:与 notify-agent 一致——仅通知事件解析语言(省 reg 开销);
   // enabled 来自 ~/.cc-notifier/config.json(loadConfig 含项目级覆盖)。
   // gateCache:按 cwd 缓存解析结果——resolveLanguage 会同步 spawn reg 子进程

@@ -14,11 +14,11 @@
 
 ### 新增
 
-- DeepSeek Harness(dsh)支持:`dsh-notifier` 组合包插件(web + tui profile)把 dsh 会话事件接入现有 cc-notifier 管线 —— 权限请求、提问、工具报错、等待输入全部以 Windows Toast 呈现并支持点击跳转;daemon 生命周期全自动(任何事件拉起、空闲/宿主存活退出、代码变更自我重启、daemon 重启后会话重注册)。
+- DeepSeek Harness(dsh)支持:`dsh-notifier` 组合包插件(web + tui profile)把 dsh 会话事件接入现有 cc-dsh-notifier 管线 —— 权限请求、提问、工具报错、等待输入全部以 Windows Toast 呈现并支持点击跳转;daemon 生命周期全自动(任何事件拉起、空闲/宿主存活退出、代码变更自我重启、daemon 重启后会话重注册)。
 - 新配置项 `dedupWindowMs`(默认 `0` = 不去重)、`pythonPath`(Toast 解释器,安装时写入)、`pollIntervalMs`(daemon 窗口轮询周期,默认 `10000`)。移除等待输入交互抑制:是否通知完全由聚焦判定决定。
 - 按来源区分的 Toast 图标:dsh 用黑鲸鱼(透明底),Claude Code 用官方星形 logo。
 - 预编译助手 `foreground.exe`(实时前台查询,~150ms)与 `activate-tab.exe`(UIA tab 激活),源码入库。
-- dsh 生态发现:仓库根声明 `dsh.bundle` patch 与 `main` 入口,git 安装(`dsh plugin add github:baobaolaodie/cc-notifier`)与 awesome-dsh-plugins 雷达可识别;vendor runtime 入库并由 `prepare`/`pretest` 保持同步;git 安装已端到端验证(包名 patch 解析、模块加载)。
+- dsh 生态发现:仓库根声明 `dsh.bundle` patch 与 `main` 入口,git 安装(`dsh plugin add github:baobaolaodie/cc-dsh-notifier`)与 awesome-dsh-plugins 雷达可识别;vendor runtime 入库并由 `prepare`/`pretest` 保持同步;git 安装已端到端验证(包名 patch 解析、模块加载)。
 
 ### 修复
 

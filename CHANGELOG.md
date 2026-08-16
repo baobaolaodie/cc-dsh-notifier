@@ -14,11 +14,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Added
 
-- DeepSeek Harness (dsh) support: a `dsh-notifier` bundle plugin (web + tui profiles) forwards dsh session events into the existing cc-notifier pipeline — permission requests, questions, tool errors, and waiting-for-input all surface as Windows toasts with click-to-jump; daemon lifecycle is fully automatic (spawn on any event, idle/host-liveness exit, self-restart on code change, session re-registration on daemon restart).
+- DeepSeek Harness (dsh) support: a `dsh-notifier` bundle plugin (web + tui profiles) forwards dsh session events into the existing cc-dsh-notifier pipeline — permission requests, questions, tool errors, and waiting-for-input all surface as Windows toasts with click-to-jump; daemon lifecycle is fully automatic (spawn on any event, idle/host-liveness exit, self-restart on code change, session re-registration on daemon restart).
 - Config fields `dedupWindowMs` (default `0` = no dedup), `pythonPath` (toast interpreter, written by the installer), `pollIntervalMs` (daemon window-poll period, default `10000`). Waiting-for-input suppression was removed: focus detection alone decides whether to notify.
 - Per-source toast icons: black whale (transparent) for dsh, official Claude Code starburst for Claude Code.
 - Precompiled helpers `foreground.exe` (real-time foreground query, ~150 ms) and `activate-tab.exe` (UIA tab activation) with source checked in.
-- dsh ecosystem discovery: the repository root declares a `dsh.bundle` patch and `main` entry, so git installs (`dsh plugin add github:baobaolaodie/cc-notifier`) and the awesome-dsh-plugins radar recognize it; the vendored runtime is tracked in git and kept in sync by the `prepare`/`pretest` vendor script; git installs verified end to end (package-name patch resolution, module load).
+- dsh ecosystem discovery: the repository root declares a `dsh.bundle` patch and `main` entry, so git installs (`dsh plugin add github:baobaolaodie/cc-dsh-notifier`) and the awesome-dsh-plugins radar recognize it; the vendored runtime is tracked in git and kept in sync by the `prepare`/`pretest` vendor script; git installs verified end to end (package-name patch resolution, module load).
 
 ### Fixed
 

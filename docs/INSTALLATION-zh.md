@@ -6,7 +6,7 @@
 
 # 安装
 
-cc-notifier 以 Claude Code hooks + 常驻 daemon 形式运行。零第三方 npm 依赖;运行时仅需 Node.js 与带 winrt 包的 Python。
+cc-dsh-notifier 以 Claude Code hooks + 常驻 daemon 形式运行。零第三方 npm 依赖;运行时仅需 Node.js 与带 winrt 包的 Python。
 
 ## 安装前提
 
@@ -26,7 +26,7 @@ node scripts/install.mjs
 安装器执行四步:
 
 1. **注入 hooks** — 备份 `~/.claude/settings.json` 并添加六个 hooks(SessionStart、PermissionRequest、PreToolUse(AskUserQuestion matcher)、PostToolUse、Stop、SessionEnd)。幂等,重复执行安全。
-2. **注册 AUMID** — 写入 `HKCU\Software\Classes\AppUserModelId\cc-notifier`(DisplayName + IconUri)。非打包应用显示 Toast 的前提。
+2. **注册 AUMID** — 写入 `HKCU\Software\Classes\AppUserModelId\cc-dsh-notifier`(DisplayName + IconUri)。非打包应用显示 Toast 的前提。
 3. **检测 Python** — 把 `python` 解析为绝对路径并写入配置 `pythonPath`,再检查 winrt 包。固定路径保证 Toast 不受宿主 PATH 变化影响。缺失时仅提示,安装继续;Python 缺失时 Toast 静默失败。
 4. **生成默认配置** — 若 `~/.cc-notifier/config.json` 不存在则写入。
 

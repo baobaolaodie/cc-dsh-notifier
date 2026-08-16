@@ -8,7 +8,7 @@
 
 ## What gets notified
 
-cc-notifier raises a toast (with sound) when Claude Code or DeepSeek Harness needs you and the session window is not focused:
+cc-dsh-notifier raises a toast (with sound) when Claude Code or DeepSeek Harness needs you and the session window is not focused:
 
 | Event | Source | Toast title | Toast body |
 |---|---|---|---|

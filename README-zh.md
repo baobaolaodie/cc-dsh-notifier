@@ -1,4 +1,4 @@
-<h1 align="center">cc-notifier</h1>
+<h1 align="center">cc-dsh-notifier</h1>
 
 <p align="center">
   <strong>Claude Code 与 DeepSeek Harness 会话的 Windows 桌面通知系统</strong>
@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/baobaolaodie/cc-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.0-4CAF50?style=flat" alt="version 0.1.0" /></a>
+  <a href="https://github.com/baobaolaodie/cc-dsh-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.0-4CAF50?style=flat" alt="version 0.1.0" /></a>
   <a href="https://docs.anthropic.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude_Code-D97757?style=flat&logo=claude&logoColor=white" alt="Claude Code" /></a>
   <img src="https://img.shields.io/badge/DeepSeek_Harness-4D6BFE?style=flat&logo=deepseek&logoColor=white" alt="DeepSeek Harness" />
   <img src="https://img.shields.io/badge/Windows_10%2F11-0078D6?style=flat&logo=windows&logoColor=white" alt="Windows 10/11" />
@@ -24,7 +24,7 @@
   <a href="README.md">English</a> · 中文
 </p>
 
-cc-notifier 在代理需要你介入、而你没有看着它的窗口时,弹出带声音的原生 Windows Toast。它通过 hook 体系服务 Claude Code,通过一个小型组合包插件服务 DeepSeek Harness,两者共用同一条 daemon 管线。点击 Toast 即可回到会话窗口。零第三方 npm 依赖。
+cc-dsh-notifier 在代理需要你介入、而你没有看着它的窗口时,弹出带声音的原生 Windows Toast。它通过 hook 体系服务 Claude Code,通过一个小型组合包插件服务 DeepSeek Harness,两者共用同一条 daemon 管线。点击 Toast 即可回到会话窗口。零第三方 npm 依赖。
 
 ## 功能特性
 
@@ -51,7 +51,7 @@ cc-notifier 在代理需要你介入、而你没有看着它的窗口时,弹出�
 node scripts/install.mjs
 ```
 
-安装器会备份 `~/.claude/settings.json`、注入六个 hooks、注册 `cc-notifier` AppUserModelID 并写入默认配置。之后新建 Claude Code 会话即可生效。
+安装器会备份 `~/.claude/settings.json`、注入六个 hooks、注册 `cc-dsh-notifier` AppUserModelID 并写入默认配置。之后新建 Claude Code 会话即可生效。
 
 ### 安装(DeepSeek Harness)
 

@@ -15,7 +15,7 @@
 3. **窗口是否失焦** — 会话窗口聚焦时静默(设计如此)。dsh web 的静默按前台浏览器活动 tab 的标题判定:任何显示 DeepSeek Harness 页面的 tab 静默,其他网站照常通知。
 4. **AUMID 是否注册** — 重跑 `node scripts/install.mjs`;验证:
    ```
-   reg query HKCU\Software\Classes\AppUserModelId\cc-notifier
+   reg query HKCU\Software\Classes\AppUserModelId\cc-dsh-notifier
    ```
 5. **Python + winrt 是否存在** — `python -c "import winrt.windows.ui.notifications"` 必须成功。若 daemon 的 Toast 以退出码 1 结束(`daemon.log` 中 `toast stderr ... No module named 'winrt'`),说明宿主解析到了别的解释器:把 `pythonPath` 设为装有 winrt 的解释器(重跑 `install.mjs` 会自动写入)。
 6. **daemon 是否运行** — `%LOCALAPPDATA%\cc-notifier\daemon.json` 存在且 pid 存活。查看 `daemon.log`。daemon 由任意通知事件唤醒,缺失通常是暂时的;持续缺失则检查宿主插件层。

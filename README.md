@@ -1,4 +1,4 @@
-<h1 align="center">cc-notifier</h1>
+<h1 align="center">cc-dsh-notifier</h1>
 
 <p align="center">
   <strong>Windows desktop notifications for Claude Code and DeepSeek Harness sessions</strong>
@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/baobaolaodie/cc-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.0-4CAF50?style=flat" alt="version 0.1.0" /></a>
+  <a href="https://github.com/baobaolaodie/cc-dsh-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.0-4CAF50?style=flat" alt="version 0.1.0" /></a>
   <a href="https://docs.anthropic.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude_Code-D97757?style=flat&logo=claude&logoColor=white" alt="Claude Code" /></a>
   <img src="https://img.shields.io/badge/DeepSeek_Harness-4D6BFE?style=flat&logo=deepseek&logoColor=white" alt="DeepSeek Harness" />
   <img src="https://img.shields.io/badge/Windows_10%2F11-0078D6?style=flat&logo=windows&logoColor=white" alt="Windows 10/11" />
@@ -24,7 +24,7 @@
   English · <a href="README-zh.md">中文</a>
 </p>
 
-cc-notifier raises a native Windows toast with sound when an agent needs your attention and you are not looking at its window. It serves Claude Code through its hook system and DeepSeek Harness through a small bundle plugin, sharing one daemon pipeline. Clicking a toast returns you to the session window. Zero third-party npm dependencies.
+cc-dsh-notifier raises a native Windows toast with sound when an agent needs your attention and you are not looking at its window. It serves Claude Code through its hook system and DeepSeek Harness through a small bundle plugin, sharing one daemon pipeline. Clicking a toast returns you to the session window. Zero third-party npm dependencies.
 
 ## Features
 
@@ -51,7 +51,7 @@ cc-notifier raises a native Windows toast with sound when an agent needs your at
 node scripts/install.mjs
 ```
 
-The installer backs up `~/.claude/settings.json`, injects six hooks, registers the `cc-notifier` AppUserModelID, and writes the default config. Open a new Claude Code session afterwards.
+The installer backs up `~/.claude/settings.json`, injects six hooks, registers the `cc-dsh-notifier` AppUserModelID, and writes the default config. Open a new Claude Code session afterwards.
 
 ### Install (DeepSeek Harness)
 
