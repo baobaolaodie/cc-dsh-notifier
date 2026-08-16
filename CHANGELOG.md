@@ -25,6 +25,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 ### Fixed
 
 - Tool-error notifications removed (user decision): a failed tool call does not stop the agent, so notifying on it only added noise. `tool-result` dropped from the notify types (Claude Code PostToolUse hook no longer injected; dsh `tool/result` no longer mapped).
+- Claude Code sessions in a standalone Windows Terminal (no `-d` argument, title without project name) now bind via the `?`-prefixed dynamic title — matched globally but scoped to Claude Code events so dsh-tui sessions cannot be bound to a Claude Code window.
+- Existing Claude Code sessions that never re-fire `session-start` get a lazy binding fallback: unbound claude-surface toasts pick the latest `?`-tagged terminal window as the jump target, so click-to-return works without restarting the session.
+- Plugin published to GitHub Packages as `@baobaolaodie/cc-dsh-notifier` (public); tarball and git installs keep working (root patch stays `cc-dsh-notifier`, matching the git-install dependency name).
 
 - Test command lists test files explicitly instead of a glob, fixing `npm test` on Node 18 Windows (`Could not find 'test/*.test.mjs'`).
 - Toast text follows the Windows display language (`auto`) or a new `language` config field (`zh`/`en`); English users now get English notifications.
