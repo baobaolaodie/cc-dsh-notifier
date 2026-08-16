@@ -1,10 +1,15 @@
 node_modules/
+__pycache__/
 *.log
 
 # Spike 实验脚本与恢复工具(历史痕迹保留在磁盘,不入库)
 scripts/spikes/
 recover.py
 test-fixture-*.json
+
+# UIA tab 激活器/前台查询器编译产物(源码 .cs 入库,运行时可现场 csc 编译)
+scripts/lib/activate-tab.exe
+scripts/lib/foreground.exe
 
 # Comet 产物与状态不入库(磁盘保留):change 产物、归档、spec、报告、运行时状态
 .comet/

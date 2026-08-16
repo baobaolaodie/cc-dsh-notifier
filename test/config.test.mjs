@@ -9,7 +9,7 @@ function tmpDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'ccn-config-'))
 
 test('默认配置', () => {
   assert.equal(DEFAULT_CONFIG.enabled, true);
-  assert.equal(DEFAULT_CONFIG.dedupWindowMs, 10000);
+  assert.equal(DEFAULT_CONFIG.dedupWindowMs, 0); // 用户决策:不去重(失焦即通知)
   assert.equal(DEFAULT_CONFIG.sound, true);
   assert.equal(DEFAULT_CONFIG.language, 'auto');
   assert.equal(GLOBAL_CONFIG, path.join(GLOBAL_DIR, 'config.json'));
@@ -18,7 +18,7 @@ test('默认配置', () => {
 test('无任何配置文件时返回默认值', () => {
   const dir = tmpDir();
   const cfg = loadConfig(path.join(dir, 'proj'), { globalConfig: path.join(dir, 'missing.json') });
-  assert.deepEqual(cfg, { enabled: true, dedupWindowMs: 10000, sound: true, language: 'auto' });
+  assert.deepEqual(cfg, { enabled: true, dedupWindowMs: 0, sound: true, language: 'auto', windowWhitelist: [], pollIntervalMs: 10000, stopSuppressMs: 15000, pythonPath: '' });
 });
 
 test('normalizeLanguage:只认 zh/en,其余回退 auto', () => {

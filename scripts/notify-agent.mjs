@@ -58,7 +58,18 @@ async function main() {
     process.exit(0);
   }
 
+  // 其余通知事件:同样先尝试拉起 daemon 再转发(保持跳转能力),拉起失败才降级
+  // fallback(2026-08-16 用户反馈"daemon 启动不智能":此前 daemon 死后仅 session-start 能拉起)
   if (NOTIFY_TYPES.has(eventType)) {
+    const child = spawn(process.execPath, [DAEMON], { detached: true, stdio: 'ignore', windowsHide: true });
+    child.unref();
+    log('notify-agent', 'spawn daemon pid=' + child.pid, eventType);
+    const port = await waitDaemonReady();
+    if (port) {
+      const ok = await postEvent(port, event);
+      if (ok) process.exit(0);
+      log('notify-agent', '重发失败,降级 fallback', eventType);
+    }
     await showBasicToast(cfg, event); // fallback:基础 Toast(无窗口句柄 → 无跳转)
     log('notify-agent', 'fallback toast', eventType);
   }
@@ -135,7 +146,10 @@ function showBasicToast(cfg, event) {
   if (cfg.sound === false) args.push('-nosound'); // 统一参数名(toast-agent.py 小写比较解析)
   // detached:true:notify-agent 退出后 toast-agent.py 不被宿主 Job Object 连带杀掉。
   // (实测:不 detached 时 hook 退出即杀子进程,Toast 不显示——fallback 静默丢失)
-  const child = spawn('python', args, { detached: true, windowsHide: true, stdio: 'ignore' });
+  // 解释器固定用配置的绝对路径(2026-08-16:裸 python 依赖宿主 PATH,可能解析到无 winrt
+  // 的解释器 → Toast 启动即崩;pythonPath 为空时回退裸 python 保持兼容)
+  const py = cfg.pythonPath || 'python';
+  const child = spawn(py, args, { detached: true, windowsHide: true, stdio: 'ignore' });
   child.on('error', () => {}); // 吞掉 spawn 失败(如 Python 缺失),hook 不受影响
   child.unref(); // 父进程退出不等待子进程
   return Promise.resolve();

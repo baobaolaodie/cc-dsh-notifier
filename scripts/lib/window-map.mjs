@@ -6,10 +6,11 @@ export const PROCESS_WHITELIST = new Set([
 ]);
 
 // 真实进程名不带 .exe(如 WindowsTerminal),这里补全后与白名单比较
-export function isWhitelistedProcess(processName) {
+// whitelist 参数:daemon 可传入配置扩展白名单(windowWhitelist),缺省仅内置终端白名单
+export function isWhitelistedProcess(processName, whitelist = PROCESS_WHITELIST) {
   if (!processName) return false;
   const key = processName.toLowerCase().endsWith('.exe') ? processName : `${processName}.exe`;
-  return PROCESS_WHITELIST.has(key);
+  return whitelist.has(key);
 }
 
 const WIN_PATH_RE = /[A-Za-z]:[\\/][^\s|,;'"`()]+/g;
@@ -41,10 +42,10 @@ export function titleToCwd(title, knownCwds = []) {
   return null;
 }
 
-export function buildWindowMap(entries, knownCwds = []) {
+export function buildWindowMap(entries, knownCwds = [], whitelist = PROCESS_WHITELIST) {
   const map = new Map();
   for (const e of entries) {
-    if (!isWhitelistedProcess(e.processName)) continue;
+    if (!isWhitelistedProcess(e.processName, whitelist)) continue;
     const cwd = titleToCwd(e.title, knownCwds);
     if (cwd) map.set(String(e.hwnd), cwd);
   }

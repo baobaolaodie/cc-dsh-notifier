@@ -30,24 +30,50 @@ function commandFor(event) {
   return `node ${JSON.stringify(AGENT)} ${event}`;
 }
 
-// Python + winrt 包检测(toast-agent.py 的运行时依赖;不自动安装,仅提示)
-// 只认 python 命令:notify-agent.mjs/daemon.mjs 固定 spawn('python'),检测与运行时保持一致,避免「检测通过但运行时失败」
+// Python + winrt 包检测(toast-agent.py 的运行时依赖;不自动安装,仅提示)。
+// 检测与运行时保持一致:把解析出的解释器绝对路径写入全局配置 pythonPath,
+// daemon/notify-agent 固定用它 spawn —— 裸 `python` 依赖宿主 PATH,不同启动上下文
+// 会解析到不同解释器(2026-08-16 实测:宿主重启后 PATH 变化,daemon 的 python 缺 winrt,
+// Toast 启动即崩);绝对路径与宿主 PATH 无关。
 function checkPython() {
   // 探测模块与 toast-agent.py 实际 import 一致(winrt.windows.ui.notifications + winrt.windows.data.xml.dom)
   const winrtProbe = 'import winrt.windows.ui.notifications, winrt.windows.data.xml.dom';
+  let pythonPath = 'python';
   try {
     execFileSync('python', ['--version'], { stdio: 'ignore' });
+    // Windows 用 where 解析绝对路径(首个命中);失败则保持裸 python
+    try {
+      const resolved = execFileSync('where', ['python'], { encoding: 'utf8' })
+        .split(/\r?\n/).map((s) => s.trim()).find(Boolean);
+      if (resolved) pythonPath = resolved;
+    } catch { /* 保持裸 python */ }
   } catch (err) {
     console.warn('未检测到 Python:Toast 通知依赖 Python 3 + winrt 包(scripts/toast-agent.py)。 / Python not detected: toasts require Python 3 + the winrt packages (scripts/toast-agent.py).');
     console.warn('请先安装 Python 3(https://www.python.org)后再使用通知功能;未安装不影响 Claude Code 会话本身。 / Install Python 3 first; Claude Code sessions work regardless.');
     return;
   }
   try {
-    execFileSync('python', ['-c', winrtProbe], { stdio: 'ignore' });
-    console.log('Python 与 winrt 包可用(python)。 / Python and the winrt packages are available (python).');
+    execFileSync(pythonPath, ['-c', winrtProbe], { stdio: 'ignore' });
+    writePythonPath(pythonPath);
+    console.log('Python 与 winrt 包可用(' + pythonPath + ')。 / Python and the winrt packages are available (' + pythonPath + ').');
   } catch (err) {
     console.warn('检测到 Python,但缺少 winrt 包。请手动安装: / Python found, but the winrt packages are missing. Install manually:');
     console.warn('  pip install winrt-runtime winrt-Windows.UI.Notifications winrt-Windows.Data.Xml.Dom winrt-Windows.Foundation');
+  }
+}
+
+// 把 pythonPath 合并进全局配置(保留既有键;不破坏未知键)
+function writePythonPath(pythonPath) {
+  try {
+    fs.mkdirSync(GLOBAL_DIR, { recursive: true });
+    let cfg = {};
+    if (fs.existsSync(GLOBAL_CONFIG)) {
+      try { cfg = JSON.parse(fs.readFileSync(GLOBAL_CONFIG, 'utf8')); } catch { cfg = {}; }
+    }
+    cfg.pythonPath = pythonPath;
+    fs.writeFileSync(GLOBAL_CONFIG, JSON.stringify(cfg, null, 2) + '\n', 'utf8');
+  } catch (err) {
+    console.warn('写入 pythonPath 到配置失败:', err.message, '/ failed to write pythonPath to config:', err.message);
   }
 }
 
