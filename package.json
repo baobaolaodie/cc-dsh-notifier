@@ -4,10 +4,16 @@
   "private": true,
   "description": "Claude Code Windows 通知系统:Toast + 点击跳转",
   "type": "module",
+  "main": "plugins/dsh-notifier/lib/index.js",
   "scripts": {
     "pretest": "node scripts/vendor-dsh-plugin.mjs",
     "test": "node --test test/config.test.mjs test/daemon-core.test.mjs test/daemon-restart.test.mjs test/dedup.test.mjs test/dsh-forwarder.test.mjs test/dsh-payload.test.mjs test/dsh-resync.test.mjs test/events.test.mjs test/focus.test.mjs test/window-title.test.mjs",
     "prepack": "node scripts/vendor-dsh-plugin.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "plugins/dsh-notifier/cordis-root.patch.yml"
+    }
   },
   "engines": {
     "node": ">=18.0.0"

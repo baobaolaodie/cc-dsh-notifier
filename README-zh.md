@@ -61,6 +61,8 @@ dsh plugin --profile web add ./plugins/dsh-notifier
 dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
 ```
 
+已在 Windows 11 + dsh 0.1.0-rc.6 实测(2026-08-16):web 与 tui 双 profile、四类通知、聚焦感知静默、点击跳转、tarball 安装流程。
+
 ### 验证
 
 ```bash

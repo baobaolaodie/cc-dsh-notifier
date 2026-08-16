@@ -61,6 +61,8 @@ dsh plugin --profile web add ./plugins/dsh-notifier
 dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
 ```
 
+Verified against dsh 0.1.0-rc.6 on Windows 11 (2026-08-16): web and tui profiles, all four notification types, focus-aware silence, click-to-return, and the tarball install flow.
+
 ### Verify
 
 ```bash
