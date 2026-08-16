@@ -36,13 +36,15 @@ dsh plugin --profile dsh-tui add ./plugins/dsh-notifier
 - 验证:`dsh --profile <name> --dump-config` 出现 `# == dsh-notifier` 层
 - **零手工路径(推荐)**:打包自包含 tarball 后一条命令安装(从 store 提取,不走 junction,
   无跨盘缺陷);或发布 registry 后 `dsh plugin add dsh-notifier`
+- **git 安装**:`dsh plugin add github:baobaolaodie/cc-notifier`(仓库根声明 `dsh.bundle`,
+  插件行按包名 `cc-notifier` 解析,入口取根 package.json 的 `main`;已端到端验证)
 - 卸载:`dsh plugin --profile <name> remove dsh-notifier`
 
 ## 发布打包
 
 运行时(daemon/toast-agent/win32 桥/共享库/图标)由 `scripts/vendor-dsh-plugin.mjs`
-同步进本包的 `lib/runtime/`(`npm test` 与 `pnpm pack` 自动执行,幂等;runtime 为
-生成物,不入库)。打包:
+同步进本包的 `lib/runtime/`(`prepare`/`pretest`/`prepack` 自动执行,幂等;runtime
+**入库**以支持 git 安装)。打包:
 
 ```bash
 cd plugins/dsh-notifier && pnpm pack    # → dsh-notifier-<version>.tgz(prepack 自动 vendor)

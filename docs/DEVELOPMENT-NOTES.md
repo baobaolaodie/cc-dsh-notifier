@@ -87,6 +87,6 @@ node scripts/uninstall.mjs  # 卸载
 - **daemon 生命周期**:任何事件拉起 / 空闲 60s 退出 / hostPid 存活探测(~90s 清理)/ 代码变更 10s 自我重启 / 插件 resync 重注册会话。核心逻辑在 `scripts/lib/daemon-core.mjs`(可注入,17 项单测)。
 - **聚焦判定**:预编译 `foreground.exe`(~150ms)实时查询 + 浏览器兜底(白名单浏览器标题含 DeepSeek Harness → 静默)。绑定恢复靠 resync。
 - **关键配置**(`~/.cc-notifier/config.json`):`dedupWindowMs`(默认 0 不去重)、`pythonPath`(toast 解释器绝对路径,install.mjs 写入——裸 python 依赖 PATH 会崩,2026-08-16 实测)、`windowWhitelist`。等待输入交互抑制已移除(聚焦判定负责静默,2026-08-16 用户决策)。
-- **测试**:102 项(新增 daemon-core/restart/forwarder/resync 等);`npm test` 显式清单。Python/PS 脚本无自动化测试(真实环境手动回归)。
-- **未完成**:P1 tui 实测(插件已装,进行中);发布打包(vendor + files + tarball/registry);主 README/CHANGELOG 的 dsh 条目随发布同步。
+- **测试**:109 项(新增 daemon-core/restart/forwarder/resync 等);`npm test` 显式清单。Python/PS 脚本无自动化测试(真实环境手动回归)。
+- **发布/收录(2026-08-16 完成)**:web/tui 生产 profile 已切换 tarball 安装(零手工);根 package.json 声明 `dsh.bundle` + `main` 供 git 安装与生态雷达识别;runtime 入库(prepare/pretest 幂等同步);git 安装端到端验证(包名 patch + 模块加载;坑:patch 相对路径按 profile 目录解析,必须用包名);awesome-dsh-plugins 收录 PR #185。
 - **恢复**:daemon 被杀/异常 → 任何通知事件自动拉起;绑定丢失 → resync 自愈;改代码 → 自我重启,无需手动。

@@ -18,6 +18,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 - Config fields `dedupWindowMs` (default `0` = no dedup), `pythonPath` (toast interpreter, written by the installer), `pollIntervalMs` (daemon window-poll period, default `10000`). Waiting-for-input suppression was removed: focus detection alone decides whether to notify.
 - Per-source toast icons: black whale (transparent) for dsh, official Claude Code starburst for Claude Code.
 - Precompiled helpers `foreground.exe` (real-time foreground query, ~150 ms) and `activate-tab.exe` (UIA tab activation) with source checked in.
+- dsh ecosystem discovery: the repository root declares a `dsh.bundle` patch and `main` entry, so git installs (`dsh plugin add github:baobaolaodie/cc-notifier`) and the awesome-dsh-plugins radar recognize it; the vendored runtime is tracked in git and kept in sync by the `prepare`/`pretest` vendor script; git installs verified end to end (package-name patch resolution, module load).
 
 ### Fixed
 
