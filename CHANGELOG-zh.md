@@ -12,12 +12,22 @@
 
 ## Unreleased
 
+### 新增
+
+- DeepSeek Harness(dsh)支持:`dsh-notifier` 组合包插件(web + tui profile)把 dsh 会话事件接入现有 cc-notifier 管线 —— 权限请求、提问、工具报错、等待输入全部以 Windows Toast 呈现并支持点击跳转;daemon 生命周期全自动(任何事件拉起、空闲/宿主存活退出、代码变更自我重启、daemon 重启后会话重注册)。
+- 新配置项 `dedupWindowMs`(默认 `0` = 不去重)、`stopSuppressMs`(等待输入抑制窗口,默认 `15000`)、`pythonPath`(Toast 解释器,安装时写入)、`pollIntervalMs`(daemon 窗口轮询周期,默认 `10000`)。
+- 按来源区分的 Toast 图标:dsh 用黑鲸鱼(透明底),Claude Code 用官方星形 logo。
+- 预编译助手 `foreground.exe`(实时前台查询,~150ms)与 `activate-tab.exe`(UIA tab 激活),源码入库。
+
 ### 修复
 
 - test 命令改为显式列出测试文件(替代 glob),修复 Node 18 Windows 上 `npm test` 失败(`Could not find 'test/*.test.mjs'`)。
 - 通知文案按系统显示语言输出(`auto`),可由新配置项 `language`(`zh`/`en`)覆盖;英文系统用户收到英文通知。
 - PR 模板与文档不再写死测试数量(`npm test` → 全部通过);模板复选框 label 不再与实际测试数脱节。
 - Comet 产物(`.comet/`、`docs/openspec/`、`docs/superpowers/`)不再纳入版本控制;磁盘保留,作为本地过程产物。
+- 宿主环境解析到不同 `python`(缺 winrt)时 Toast 不再崩溃:安装器把解释器绝对路径写入 `pythonPath`。
+- 聚焦判定改用实时前台查询(替代陈旧轮询缓存),消除"已切走仍被静默"的假静默(及反向竞态)。
+- Windows Toast 点击跳转现在通过 UIA 激活 DeepSeek Harness 浏览器 tab(候选匹配:会话标题 → 产品名)。
 
 ## [0.1.0] - 2026-08-14
 

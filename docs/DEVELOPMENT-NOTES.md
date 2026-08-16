@@ -79,3 +79,14 @@ node scripts/uninstall.mjs  # 卸载
 ```
 
 依赖:Node.js ≥ 18、Python 3 + winrt 包(winrt-runtime/winrt-Windows.UI.Notifications/winrt-Windows.Data.Xml.Dom)、PowerShell 5.1+(系统自带,窗口桥接)
+
+## dsh 适配(2026-08-16,DeepSeek Harness 通知)
+
+- **架构**:`plugins/dsh-notifier/` 插件(web/tui profile 通用,surface 按 argv 检测)→ cc-notifier daemon(复用 Toast/聚焦/跳转管线)。四类通知 + 会话生命周期。
+- **安装**:`dsh plugin --profile <web|dsh-tui> add ./plugins/dsh-notifier`(仓库根目录,相对路径)。Windows 跨盘 junction 缺陷兜底:修 junction + `dsh plugin --profile <name> list` 触发 reconcile。dump-config 验证 `# == dsh-notifier` 层。
+- **daemon 生命周期**:任何事件拉起 / 空闲 60s 退出 / hostPid 存活探测(~90s 清理)/ 代码变更 10s 自我重启 / 插件 resync 重注册会话。核心逻辑在 `scripts/lib/daemon-core.mjs`(可注入,17 项单测)。
+- **聚焦判定**:预编译 `foreground.exe`(~150ms)实时查询 + 浏览器兜底(白名单浏览器标题含 DeepSeek Harness → 静默)。绑定恢复靠 resync。
+- **关键配置**(`~/.cc-notifier/config.json`):`dedupWindowMs`(默认 0 不去重)、`stopSuppressMs`(默认 15000)、`pythonPath`(toast 解释器绝对路径,install.mjs 写入——裸 python 依赖 PATH 会崩,2026-08-16 实测)、`windowWhitelist`。
+- **测试**:99 项(新增 daemon-core/restart/forwarder/resync 等);`npm test` 显式清单。Python/PS 脚本无自动化测试(真实环境手动回归)。
+- **未完成**:P1 tui 实测(插件已装);发布打包(vendor + files + tarball/registry);主 README/CHANGELOG 的 dsh 条目随发布同步。
+- **恢复**:daemon 被杀/异常 → 任何通知事件自动拉起;绑定丢失 → resync 自愈;改代码 → 自我重启,无需手动。
