@@ -33,9 +33,6 @@ async function main() {
   const event = parseEvent(eventType, hookJson, lang);
   if (!event) process.exit(0); // 未知类型(含已移除的 tool-result)
   if (cfg.enabled === false) process.exit(0);
-  // 精确窗口绑定:把 Claude Code 宿主进程 pid 带给 daemon,daemon 可像 dsh-tui 一样
-  // 用 AttachConsole 解析真实终端/伪终端窗口,避免全局 `?` 标签猜测(2026-08-18)
-  event.hostPid = process.ppid;
 
   const state = readState();
   if (state && isPidAlive(state.pid)) {

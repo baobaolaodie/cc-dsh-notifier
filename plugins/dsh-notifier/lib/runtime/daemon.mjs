@@ -142,10 +142,10 @@ async function bindWindow(event) {
     getCdpPort().catch(() => {}); // 预取 CDP 端口(后台)
     return 0;
   }
-  // dsh-tui / Claude Code 独立终端:优先用 hostPid 精确定位控制台/标签窗口;
-  // VSCode 集成终端返回不可见 PseudoConsoleWindow → pickConsoleTarget 返回 0,
-  // 继续向下走目录/标题匹配(Claude Code 不再依赖全局 `?` 猜测,2026-08-18)
-  if (event.surface !== 'web' && event.hostPid) {
+  // dsh-tui 独立终端:优先用 hostPid(由 dsh 插件提供,可靠)精确定位控制台/标签窗口;
+  // 仅对 dsh 事件生效。Claude Code hook 拿不到可靠 hostPid(process.ppid 会误指到
+  // 共享/其他终端标签),继续走标题/`?` 匹配(2026-08-18 回归:终端 Claude 跳到 dsh-tui)。
+  if (event.surface === 'tui' && event.hostPid) {
     const target = await consoleTargetForPid(event.hostPid);
     if (target) return target;
   }
@@ -201,8 +201,9 @@ async function showToast(event) {
     if (hit) hwnd = hit.hwnd;
   }
   // 懒绑定兜底(2026-08-18):SessionStart 绑定失败或 daemon 重启后会话表已丢失时,
-  // 用会话/事件自带的 hostPid 精确定位控制台/标签窗口,恢复 Toast 点击跳转(dsh-tui 与 Claude Code)
-  if (!hwnd && surface !== 'web') {
+  // 用 dsh 会话自带的 hostPid 精确定位控制台/标签窗口,恢复 Toast 点击跳转。
+  // 仅 dsh(表面 tui)适用;Claude Code hook 无可靠 hostPid,靠下方窗口映射/`?` 兜底。
+  if (!hwnd && surface === 'tui') {
     const hostPid = (sess && sess.hostPid) || event.hostPid;
     if (hostPid) hwnd = await consoleTargetForPid(hostPid);
   }
