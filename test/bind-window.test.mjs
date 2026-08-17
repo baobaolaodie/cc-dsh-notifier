@@ -48,7 +48,7 @@ test('独立终端 dsh-tui:可见控制台 → resolveConsole 返回该标签窗
   assert.equal(hwnd, 3481656);
 });
 
-test('VSCode 里的 Claude Code:不可见伪控制台 → 项目名标题匹配 → 绑到 Code 窗口(不误绑 ? 标签)', async () => {
+test('VSCode 里的 Claude Code:项目名标题匹配优先于全局 ? → 绑回 Code 窗口(2026-08-18 修复误绑)', async () => {
   const hwnd = await bindWindow(
     { cwd: 'D:\\LongYinHaHa\\VSCode\\flow-comet' }, // 无 surface = Claude
     {
@@ -58,11 +58,9 @@ test('VSCode 里的 Claude Code:不可见伪控制台 → 项目名标题匹配 
       resolveConsole: async () => 0,
     },
   );
-  // 本项目无 hostPid(Claude 不用 console-hwnd);ccTagDir 无 → ccTagDir 无(不在 dirMatched);
-  // ccTagAny 是全局 ? 能匹配 22156782 —— 但 VSCode 的 Code 窗口标题含 flow-comet,走到 titleMatches
-  // 前 ccTagAny 先命中全局 ?。这是一个基线语义:全局 ? 优先于标题匹配。
-  // 注意:这里若用户同时有独立 Claude 标签,会先被 ? 抢走 —— 见下方“多 ? 并存”用例,它标记为基线缺陷。
-  assert.equal(hwnd, WT_CLAUDE_TAG.hwnd);
+  // 本项目无 hostPid(Claude 不用 console-hwnd);titleMatches 先命中含 flow-comet 的 Code 窗口,
+  // 不再被全局 ? 标签(22156782)抢走 —— 这是本次修复的核心。
+  assert.equal(hwnd, VSCODE_FLOWCOMET.hwnd);
 });
 
 test('独立终端 Claude Code:`?` 动态标签 → ccTagAny 命中该标签', async () => {
@@ -91,14 +89,24 @@ test('多个 dsh-tui 独立终端:各自 hostPid resolveConsole 到各自标签,
   assert.equal(hwndB, 12130330);
 });
 
-test('多 `?` Claude 标签并存:全局 ccTagAny 固定取第一个 → 基线缺陷被本用例固住(待修)', async () => {
+test('多 `?` Claude 标签并存:优先前台 `?` 标签(当前活跃会话所在标签)', async () => {
+  const tag1 = { hwnd: 1, processName: 'WindowsTerminal', title: '? 任务甲', commandLine: '' };
+  const tag2 = { hwnd: 2, processName: 'WindowsTerminal', title: '? 任务乙', commandLine: '' };
+  const hwnd = await bindWindow(
+    { cwd: 'D:\\w\\proj' },
+    { entries: [tag1, tag2], foreground: [tag2], terminalWhitelist, resolveConsole: async () => 0 },
+  );
+  // 前台是 tag2 → 优先绑 tag2,而非固定取第一个(2026-08-18 增强)
+  assert.equal(hwnd, 2);
+});
+
+test('独立终端 Claude:多 `?` 且无前台区分 → 取第一个 `?`(无更多信号可精确区分)', async () => {
   const tag1 = { hwnd: 1, processName: 'WindowsTerminal', title: '? 任务甲', commandLine: '' };
   const tag2 = { hwnd: 2, processName: 'WindowsTerminal', title: '? 任务乙', commandLine: '' };
   const hwnd = await bindWindow(
     { cwd: 'D:\\w\\proj' },
     { entries: [tag1, tag2], foreground: [], terminalWhitelist, resolveConsole: async () => 0 },
   );
-  // 基线语义:取第一个 ?(无 cwd 区分)→ 无法精确区分是哪条会话
   assert.equal(hwnd, 1);
 });
 

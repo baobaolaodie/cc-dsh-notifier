@@ -56,12 +56,20 @@ export async function bindWindow(event, deps) {
   const isClaude = !event.surface || event.surface === 'claude';
   const ccTagDir = isClaude ? dirMatched.find((w) => /^\?\s/.test(w.title || '')) : undefined;
   if (ccTagDir) return ccTagDir.hwnd;
-  const ccTagAny = isClaude ? entries.find((w) => /^\?\s/.test(w.title || '')) : undefined;
-  if (ccTagAny) return ccTagAny.hwnd;
-  if (dirMatched.length > 0) return dirMatched[0].hwnd;
+  // 关键顺序(2026-08-18 修复「VSCode Claude 被全局 ? 抢走」):
+  // 1) 先标题含项目名精确命中(VSCode 的 Code 窗口标题必含项目名)→ 绑回 VSCode;
+  // 2) 再全局 `?`(独立终端 Claude 标签,标题通常不含项目名时兜底);
+  // 这样 VSCode 里的 Claude 不再被别的独立 `?` 标签抢走。
   for (const w of entries) {
     if (titleMatches(w)) return w.hwnd;
   }
+  // 多 `?` 并存:优先前台 `?` 标签(通常是当前活跃会话所在标签),再回退第一个。
+  const ccTags = isClaude ? entries.filter((w) => /^\?\s/.test(w.title || '')) : [];
+  if (ccTags.length > 0) {
+    const fgTag = foreground[0] && /^\?\s/.test(foreground[0].title || '') ? foreground[0] : null;
+    return (fgTag || ccTags[0]).hwnd;
+  }
+  if (dirMatched.length > 0) return dirMatched[0].hwnd;
   const fg = foreground[0];
   if (fg && (dirMatches(fg) || titleMatches(fg) || (isClaude && /^\?\s/.test(fg.title || '')))) {
     return fg.hwnd;
