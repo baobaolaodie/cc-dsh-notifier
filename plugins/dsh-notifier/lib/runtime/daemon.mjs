@@ -169,15 +169,12 @@ async function bindWindow(event) {
   const isClaude = !event.surface || event.surface === 'claude';
   const ccTagDir = isClaude ? dirMatched.find((w) => /^\?\s/.test(w.title || '')) : undefined;
   if (ccTagDir) return ccTagDir.hwnd;
-  // 先按标题含项目名精确命中(VSCode 等窗口标题可靠包含项目名);
-  // 再退到全局 ? 前缀(独立 Windows Terminal 的 Claude Code 动态标题),
-  // 避免 VSCode 里的 Claude Code 被全局 ? 误绑到其他终端标签(2026-08-18 回归)
-  for (const w of all) {
-    if (titleMatches(w)) return w.hwnd;
-  }
   const ccTagAny = isClaude ? all.find((w) => /^\?\s/.test(w.title || '')) : undefined;
   if (ccTagAny) return ccTagAny.hwnd;
   if (dirMatched.length > 0) return dirMatched[0].hwnd;
+  for (const w of all) {
+    if (titleMatches(w)) return w.hwnd;
+  }
   const fg = await freshForeground();
   if (fg && fg[0] && (dirMatches(fg[0]) || titleMatches(fg[0]) || (isClaude && /^\?\s/.test(fg[0].title || '')))) {
     return fg[0].hwnd;
@@ -207,17 +204,15 @@ async function showToast(event) {
     const hostPid = (sess && sess.hostPid) || event.hostPid;
     if (hostPid) hwnd = await consoleTargetForPid(hostPid);
   }
-  // 懒绑定优先用窗口映射(cwd 精确匹配,覆盖 VSCode 窗口标题);再退到 Claude Code
-  // 的 ? 动态标签(独立 Windows Terminal 场景),避免 VSCode CC 被全局 ? 误绑(2026-08-18 回归)
-  if (!hwnd) {
-    for (const [h, c] of windowMap) {
-      if (normalizeCwd(c) === target) { hwnd = Number(h); break; }
-    }
-  }
   if (!hwnd && surface === 'claude') {
     const hit = lastEntries.find((w) => isWhitelistedProcess(w.processName, TERMINAL_WHITELIST)
       && /^\?\s/.test(w.title || ''));
     if (hit) hwnd = hit.hwnd;
+  }
+  if (!hwnd) {
+    for (const [h, c] of windowMap) {
+      if (normalizeCwd(c) === target) { hwnd = Number(h); break; }
+    }
   }
   const args = [TOAST, '-Title', title, '-Body', body];
   if (event.lang) args.push('-Lang', event.lang);
