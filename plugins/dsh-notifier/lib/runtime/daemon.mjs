@@ -142,9 +142,10 @@ async function bindWindow(event) {
     getCdpPort().catch(() => {}); // 预取 CDP 端口(后台)
     return 0;
   }
-  // dsh-tui 独立终端:优先用 hostPid 精确定位控制台/标签窗口;
-  // 不可见或失败时继续向下走目录/标题匹配(VSCode 集成终端、Claude Code 不受影响)
-  if (event.surface === 'tui' && event.hostPid) {
+  // dsh-tui / Claude Code 独立终端:优先用 hostPid 精确定位控制台/标签窗口;
+  // VSCode 集成终端返回不可见 PseudoConsoleWindow → pickConsoleTarget 返回 0,
+  // 继续向下走目录/标题匹配(Claude Code 不再依赖全局 `?` 猜测,2026-08-18)
+  if (event.surface !== 'web' && event.hostPid) {
     const target = await consoleTargetForPid(event.hostPid);
     if (target) return target;
   }
@@ -199,9 +200,9 @@ async function showToast(event) {
       && /deepseek harness/i.test(w.title || ''));
     if (hit) hwnd = hit.hwnd;
   }
-  // dsh-tui 懒绑定兜底(2026-08-18):SessionStart 绑定失败或 daemon 重启后会话表
-  // 已丢失时,用会话/事件自带的 hostPid 精确定位控制台窗口,恢复 Toast 点击跳转
-  if (!hwnd && surface === 'tui') {
+  // 懒绑定兜底(2026-08-18):SessionStart 绑定失败或 daemon 重启后会话表已丢失时,
+  // 用会话/事件自带的 hostPid 精确定位控制台/标签窗口,恢复 Toast 点击跳转(dsh-tui 与 Claude Code)
+  if (!hwnd && surface !== 'web') {
     const hostPid = (sess && sess.hostPid) || event.hostPid;
     if (hostPid) hwnd = await consoleTargetForPid(hostPid);
   }
