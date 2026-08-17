@@ -241,7 +241,11 @@ def main():
         # 时序:先瞬时置前窗口(用户感知零延迟),后台线程做精确 tab 激活
         # (CDP → UIA exe ~0.7s;仅 web surface 执行,Claude Code/tui 点击路径保持原样)
         if hwnd:
-            ctypes.windll.user32.ShowWindow(ctypes.c_void_p(hwnd), 9)
+            # 最小化窗口必须 SW_RESTORE(SetForegroundWindow 无法激活最小化窗口);
+            # 最大化/正常窗口跳过 ShowWindow——SW_RESTORE 会把最大化还原为正常尺寸
+            # (2026-08-17 修复:VS Code 集成终端实测最大化窗口被还原)
+            if ctypes.windll.user32.IsIconic(hwnd):
+                ctypes.windll.user32.ShowWindow(ctypes.c_void_p(hwnd), 9)
             ok = ctypes.windll.user32.SetForegroundWindow(ctypes.c_void_p(hwnd))
             log(f"SetForegroundWindow({hwnd}) ret={ok}")
         if opts.get('surface') == 'web':
