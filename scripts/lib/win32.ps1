@@ -5,12 +5,15 @@
 # -ExtraProcs 追加查询命令行的进程名(dsh 适配:浏览器进程,用于 CDP 端口发现);
 # -Action activate-tab:经 UIA 在指定浏览器窗口内激活标题匹配 -Match 的标签页
 # (dsh 适配:toast 点击时精确跳转到 DeepSeek Harness 页面,无需浏览器调试端口)
+# -Action console-hwnd:按 -TargetPid 的宿主进程解析其所在控制台窗口
+# (dsh 适配:独立终端 dsh-tui 的 PseudoConsoleWindow / 原生控制台窗口跳转)
 param(
-  [ValidateSet('enumerate', 'foreground', 'activate-tab', 'poll')]
+  [ValidateSet('enumerate', 'foreground', 'activate-tab', 'poll', 'console-hwnd')]
   [string]$Action = 'enumerate',
   [string]$ExtraProcs = '',
   [long]$Hwnd = 0,
-  [string]$Match = ''
+  [string]$Match = '',
+  [long]$TargetPid = 0
 )
 Add-Type @'
 using System;
@@ -26,6 +29,10 @@ public static class Win32Bridge {
   [DllImport("user32.dll")] public static extern int GetWindowTextLength(IntPtr hWnd);
   [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint pid);
   [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+[DllImport("user32.dll")] public static extern IntPtr GetAncestor(IntPtr hWnd, uint gaFlags);
+  [DllImport("kernel32.dll")] public static extern bool AttachConsole(uint pid);
+  [DllImport("kernel32.dll")] public static extern bool FreeConsole();
+  [DllImport("kernel32.dll")] public static extern IntPtr GetConsoleWindow();
   static string ProcName(uint pid) {
     try { return Process.GetProcessById((int)pid).ProcessName; }
     catch { return ""; }
@@ -82,6 +89,40 @@ if ($Action -eq 'activate-tab') {
       $names = @(); foreach ($t in $tabs) { $names += $t.Current.Name }
       @{ ok = $false; count = $tabs.Count; names = ($names -join ' | ') } | ConvertTo-Json -Compress
     }
+  } catch {
+    @{ ok = $false; error = $_.Exception.Message } | ConvertTo-Json -Compress
+  }
+  exit
+}
+if ($Action -eq 'console-hwnd') {
+  # 按宿主 pid 定位其控制台窗口:先 FreeConsole 再 AttachConsole 目标进程,
+  # GetConsoleWindow 返回该会话的控制台窗口(Windows Terminal 为 PseudoConsoleWindow,
+  # 原生控制台为 ConsoleWindowClass);ownerHwnd 取 GA_ROOTOWNER —— Windows Terminal
+  # 的 PseudoConsoleWindow owner 就是可置前的标签顶层窗口,不可见时由上层放弃。
+  try {
+    $attached = $false
+    [Win32Bridge]::FreeConsole() | Out-Null
+    if ($TargetPid -gt 0) { $attached = [Win32Bridge]::AttachConsole([uint32]$TargetPid) }
+    $consoleHwnd = [IntPtr]::Zero
+    if ($attached) {
+      $consoleHwnd = [Win32Bridge]::GetConsoleWindow()
+      [Win32Bridge]::FreeConsole() | Out-Null
+    }
+    $ownerHwnd = [IntPtr]::Zero
+    $visible = $false
+    $ownerVisible = $false
+    if ($consoleHwnd -ne [IntPtr]::Zero) {
+      $ownerHwnd = [Win32Bridge]::GetAncestor($consoleHwnd, 3)
+      $visible = [Win32Bridge]::IsWindowVisible($consoleHwnd)
+      $ownerVisible = $ownerHwnd -ne [IntPtr]::Zero -and [Win32Bridge]::IsWindowVisible($ownerHwnd)
+    }
+    @{
+      ok = $attached
+      hwnd = if ($consoleHwnd -ne [IntPtr]::Zero) { $consoleHwnd.ToInt64() } else { 0 }
+      ownerHwnd = if ($ownerHwnd -ne [IntPtr]::Zero) { $ownerHwnd.ToInt64() } else { 0 }
+      visible = $visible
+      ownerVisible = $ownerVisible
+    } | ConvertTo-Json -Compress
   } catch {
     @{ ok = $false; error = $_.Exception.Message } | ConvertTo-Json -Compress
   }

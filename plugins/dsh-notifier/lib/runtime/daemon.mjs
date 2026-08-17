@@ -10,7 +10,7 @@ import { toastContent, normalizeCwd, projectName } from './lib/events.mjs';
 import { loadConfig } from './lib/config.mjs';
 import { readState, writeState, clearState, isPidAlive } from './lib/state.mjs';
 import { log } from './lib/logger.mjs';
-import { runWin32 } from './lib/win32.mjs';
+import { runWin32, pickConsoleTarget } from './lib/win32.mjs';
 import { buildWindowMap, isWhitelistedProcess, PROCESS_WHITELIST } from './lib/window-map.mjs';
 import { commandLineMatchesCwd } from './lib/proc-dir.mjs';
 import { createDaemonCore } from './lib/daemon-core.mjs';
@@ -118,6 +118,14 @@ async function doPoll() {
   }
   log('daemon', '窗口映射', 'entries=' + entries.length, 'mapped=' + windowMap.size);
 }
+// dsh-tui 独立终端精确绑定:按 dsh host 进程 pid 找出其所在控制台窗口
+// (Windows Terminal 的 PseudoConsoleWindow 可见且 owner 是标签窗口;VSCode 集成终端
+// 的 PseudoConsoleWindow 不可见 → pickConsoleTarget 返回 0,继续走原有标题/目录绑定)
+async function consoleTargetForPid(pid) {
+  if (!pid) return 0;
+  const data = await runWin32('console-hwnd', 10000, '', ['-TargetPid', String(pid)]);
+  return pickConsoleTarget(Array.isArray(data) ? data[0] : data);
+}
 
 // 会话启动窗口绑定(web:浏览器窗口;tui/Claude Code:终端窗口)
 async function bindWindow(event) {
@@ -133,6 +141,12 @@ async function bindWindow(event) {
     if (fg && fg[0] && isBrowser(fg[0])) return fg[0].hwnd;
     getCdpPort().catch(() => {}); // 预取 CDP 端口(后台)
     return 0;
+  }
+// dsh-tui 独立终端:优先用 hostPid 精确定位控制台/标签窗口;
+  // 不可见或失败时继续向下走目录/标题匹配(VSCode 集成终端、Claude Code 不受影响)
+  if (event.surface === 'tui' && event.hostPid) {
+    const target = await consoleTargetForPid(event.hostPid);
+    if (target) return target;
   }
   // tui surface / Claude Code(无 surface 字段):终端窗口绑定。
   // 1) 优先:进程目录匹配(WindowsTerminal -d "<cwd>" 是可靠信号)
@@ -181,6 +195,12 @@ async function showToast(event) {
     const hit = lastEntries.find((w) => isWhitelistedProcess(w.processName, BROWSER_WHITELIST)
       && /deepseek harness/i.test(w.title || ''));
     if (hit) hwnd = hit.hwnd;
+  }
+// dsh-tui 懒绑定兜底(2026-08-18):SessionStart 绑定失败或 daemon 重启后会话表
+  // 已丢失时,用会话/事件自带的 hostPid 精确定位控制台窗口,恢复 Toast 点击跳转
+  if (!hwnd && surface === 'tui') {
+    const hostPid = (sess && sess.hostPid) || event.hostPid;
+    if (hostPid) hwnd = await consoleTargetForPid(hostPid);
   }
   // Claude Code 懒绑定兜底(2026-08-16):现有 CC 会话未重新 session-start 时无绑定,
   // 从最近枚举找 ? 标签窗口(CC 动态标题特征)作为跳转目标——无需重开会话即可跳转
