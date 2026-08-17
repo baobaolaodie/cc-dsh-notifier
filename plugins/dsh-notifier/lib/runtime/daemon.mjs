@@ -6,13 +6,13 @@ import fs from 'node:fs';
 import { spawn, execFile } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { toastContent, normalizeCwd, projectName } from './lib/events.mjs';
+import { toastContent, normalizeCwd } from './lib/events.mjs';
 import { loadConfig } from './lib/config.mjs';
 import { readState, writeState, clearState, isPidAlive } from './lib/state.mjs';
 import { log } from './lib/logger.mjs';
 import { runWin32, pickConsoleTarget } from './lib/win32.mjs';
 import { buildWindowMap, isWhitelistedProcess, PROCESS_WHITELIST } from './lib/window-map.mjs';
-import { commandLineMatchesCwd } from './lib/proc-dir.mjs';
+import { bindWindow as decideBindWindow } from './lib/bind-window.mjs';
 import { createDaemonCore } from './lib/daemon-core.mjs';
 
 const TOAST = fileURLToPath(new URL('./toast-agent.py', import.meta.url));
@@ -129,57 +129,19 @@ async function consoleTargetForPid(pid) {
 
 // 会话启动窗口绑定(web:浏览器窗口;tui/Claude Code:终端窗口)
 async function bindWindow(event) {
-  const eventCwd = event.cwd || '';
-  if (event.surface === 'web') {
-    // web surface(dsh 浏览器 UI):绑定浏览器窗口。
-    // dsh 页面标题恒含 "DeepSeek Harness";兜底:前台窗口若是浏览器直接采用
-    const all = await freshEntries();
-    const isBrowser = (w) => isWhitelistedProcess(w.processName, BROWSER_WHITELIST);
-    const hit = all.find((w) => isBrowser(w) && /deepseek harness/i.test(w.title || ''));
-    if (hit) return hit.hwnd;
-    const fg = await freshForeground();
-    if (fg && fg[0] && isBrowser(fg[0])) return fg[0].hwnd;
-    getCdpPort().catch(() => {}); // 预取 CDP 端口(后台)
-    return 0;
-  }
-  // dsh-tui 独立终端:优先用 hostPid(由 dsh 插件提供,可靠)精确定位控制台/标签窗口;
-  // 仅对 dsh 事件生效。Claude Code hook 拿不到可靠 hostPid(process.ppid 会误指到
-  // 共享/其他终端标签),继续走标题/`?` 匹配(2026-08-18 回归:终端 Claude 跳到 dsh-tui)。
-  if (event.surface === 'tui' && event.hostPid) {
-    const target = await consoleTargetForPid(event.hostPid);
-    if (target) return target;
-  }
-  // tui surface / Claude Code(无 surface 字段):终端窗口绑定。
-  // 1) 优先:进程目录匹配(WindowsTerminal -d "<cwd>" 是可靠信号)
-  // 2) 次之:标题含 cwd 目录名(白名单进程过滤)
-  // 3) 兜底:前台窗口同样规则
-  const base = projectName(eventCwd).toLowerCase();
-  const titleMatches = (w) => base && isWhitelistedProcess(w.processName, TERMINAL_WHITELIST)
-    && String(w.title || '').toLowerCase().includes(base);
-  const dirMatches = (w) => isWhitelistedProcess(w.processName, TERMINAL_WHITELIST)
-    && commandLineMatchesCwd(w.commandLine, eventCwd);
-  const all = await freshEntries();
-  const dirMatched = all.filter((w) => dirMatches(w));
-  // ? 前缀标签是 Claude Code 动态标题特征(如「? 策划 deepseek-harness-tui 视频介绍」),
-  // **仅对 Claude Code 会话**(无 surface 或 surface=claude)生效——dsh-tui 事件带
-  // surface=tui,窗口标题是「DeepSeek - 项目」,若也匹配 ? 标签会误绑到 CC 的窗口
-  // (2026-08-16 实测:全局 ? 匹配把 dsh-tui 会话绑到了 CC 的 Windows Terminal)。
-  // 2026-08-16 用户实测修复:CC 跑在 Windows Terminal 独立终端(无 -d、标题不含项目名),
-  // ? 标签匹配从 dirMatched 子集提升为全局(独立终端场景)。
-  const isClaude = !event.surface || event.surface === 'claude';
-  const ccTagDir = isClaude ? dirMatched.find((w) => /^\?\s/.test(w.title || '')) : undefined;
-  if (ccTagDir) return ccTagDir.hwnd;
-  const ccTagAny = isClaude ? all.find((w) => /^\?\s/.test(w.title || '')) : undefined;
-  if (ccTagAny) return ccTagAny.hwnd;
-  if (dirMatched.length > 0) return dirMatched[0].hwnd;
-  for (const w of all) {
-    if (titleMatches(w)) return w.hwnd;
-  }
-  const fg = await freshForeground();
-  if (fg && fg[0] && (dirMatches(fg[0]) || titleMatches(fg[0]) || (isClaude && /^\?\s/.test(fg[0].title || '')))) {
-    return fg[0].hwnd;
-  }
-  return 0;
+  // 窗口绑定决策已抽到 lib/bind-window.mjs(纯函数,可注入,有真实场景矩阵测试)。
+  // 这里只负责注入 daemon 的真实依赖;行为与抽取前逐字一致(2026-08-18 测试工程)。
+  const entries = await freshEntries();
+  const foreground = await freshForeground();
+  const hwnd = await decideBindWindow(event, {
+    entries,
+    foreground,
+    terminalWhitelist: TERMINAL_WHITELIST,
+    browserWhitelist: BROWSER_WHITELIST,
+    resolveConsole: consoleTargetForPid, // dsh 用 hostPid 精确定位控制台窗口
+  });
+  if (hwnd === 0 && event.surface === 'web') getCdpPort().catch(() => {}); // 预取 CDP 端口(后台)
+  return hwnd;
 }
 
 async function showToast(event) {
