@@ -10,16 +10,14 @@
 
 格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/);版本遵循 [语义化版本](https://semver.org/lang/zh-CN/)。版本记录于 git 标签与本文件。
 
-## Unreleased
+## [0.1.2] - 2026-08-18
 
 ### 修复
 
-- 点击 Toast 跳回会话窗口时不再把最大化窗口还原为正常尺寸:`SW_RESTORE` 现仅对最小化窗口生效(`Isonic` 判定),最大化窗口点击 Toast 后保持最大化(VS Code 集成终端可见)。
 - dsh-tui 运行于独立终端时现按 dsh 宿主进程 pid(`console-hwnd`)解析其窗口,点击 Toast 会跳回正确的终端标签,而非 `hwnd=0`。Claude Code 窗口绑定保持原有启发式:含项目名的标题现在优先于全局 `?` 标签,避免 VSCode 内的 Claude 会话被误绑到其它 `?` 标签;多个 `?` 标签并存时优先前台那个。
+- 点击 Toast 跳回会话窗口时不再把最大化窗口还原为正常尺寸:`SW_RESTORE` 现仅对最小化窗口生效(`IsIconic` 判定),最大化窗口点击 Toast 后保持最大化(VS Code 集成终端可见)。
 
 ## [0.1.1] - 2026-08-16
-
-
 
 ### 新增
 

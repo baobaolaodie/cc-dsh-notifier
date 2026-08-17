@@ -24,7 +24,7 @@ Check in order:
 ## Toast shows but click does not return to the session
 
 - The daemon was unavailable at notification time (degraded toast, no click-to-return by design). Check `notify-agent.log` for `fallback toast`.
-- The window handle could not be bound at SessionStart: the terminal title carries no project name and the process working directory did not match. Check `daemon.log` for a `toast hwnd=0` line for that session (the handle was never bound).
+- The window handle could not be bound at SessionStart: the terminal title carries no project name, the process working directory did not match, and (for a standalone dsh-tui) the host PID could not resolve a console window. Check `daemon.log` for a `toast hwnd=0` line for that session (the handle was never bound).
 - The terminal has multiple tabs and the wrong tab was bound — the `?`-prefixed tab (Claude Code's dynamic title) is preferred.
 
 ## Toast never appears even though the event fires

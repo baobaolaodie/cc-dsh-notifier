@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/baobaolaodie/cc-dsh-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.1-4CAF50?style=flat" alt="version 0.1.1" /></a>
+  <a href="https://github.com/baobaolaodie/cc-dsh-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.2-4CAF50?style=flat" alt="version 0.1.2" /></a>
   <a href="https://docs.anthropic.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude_Code-D97757?style=flat&logo=claude&logoColor=white" alt="Claude Code" /></a>
   <img src="https://img.shields.io/badge/DeepSeek_Harness-4D6BFE?style=flat&logo=deepseek&logoColor=white" alt="DeepSeek Harness" />
   <img src="https://img.shields.io/badge/Windows_10%2F11-0078D6?style=flat&logo=windows&logoColor=white" alt="Windows 10/11" />
@@ -58,8 +58,8 @@ The installer backs up `~/.claude/settings.json`, injects five hooks, registers 
 **Recommended — download the tarball from the [latest release](https://github.com/baobaolaodie/cc-dsh-notifier/releases) and install it** (no repository clone, no credentials):
 
 ```bash
-dsh plugin --profile web add ./cc-dsh-notifier-0.1.4.tgz
-dsh plugin --profile dsh-tui add ./cc-dsh-notifier-0.1.4.tgz
+dsh plugin --profile web add ./cc-dsh-notifier-0.1.5.tgz
+dsh plugin --profile dsh-tui add ./cc-dsh-notifier-0.1.5.tgz
 ```
 
 **Alternative — git install** (clones the whole repository, zero config):

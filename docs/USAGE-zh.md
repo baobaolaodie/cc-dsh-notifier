@@ -24,7 +24,7 @@ Toast 文案默认跟随系统显示语言(`auto`),可由配置项 `language`(`z
 
 点击 Toast 将会话窗口带回前台。
 
-- **Claude Code / dsh tui** — SessionStart 绑定的终端窗口,按进程工作目录、`?` 前缀标签标题、标题含项目名依次解析。
+- **Claude Code / dsh tui** — SessionStart 绑定的终端窗口。Claude Code 按 `?` 前缀标签标题、标题含项目名解析;独立终端的 dsh-tui 按 dsh 宿主进程 pid 精确解析其终端标签,点击即跳回该标签。
 - **dsh web** — 置前浏览器窗口并经 UIA 激活 DeepSeek Harness tab(候选匹配:会话标题 → 产品名)。
 
 daemon 不可用时,通知降级为无点击跳转的基础 Toast。

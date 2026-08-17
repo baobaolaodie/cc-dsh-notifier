@@ -10,16 +10,14 @@ All notable changes to this project are documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/). Versions are recorded in git tags and this document.
 
-## Unreleased
+## [0.1.2] - 2026-08-18
 
 ### Fixed
 
-- Toast click-to-return no longer restores a maximized session window to normal size: `SW_RESTORE` is now applied only to minimized windows (`IsIconic`), so maximized windows stay maximized when a toast is clicked (visible in VS Code integrated terminal).
 - dsh-tui running in a standalone terminal now resolves its window via the dsh host PID (`console-hwnd`), so clicking its toast returns to the correct terminal tab instead of `hwnd=0`. Claude Code window binding keeps its baseline heuristics: a project-named title now takes priority over a global `?` tab so a VS Code Claude session is not mis-bound to another `?` tab, and among multiple `?` tabs the foreground one is preferred.
+- Toast click-to-return no longer restores a maximized session window to normal size: `SW_RESTORE` is now applied only to minimized windows (`IsIconic`), so maximized windows stay maximized when a toast is clicked (visible in VS Code integrated terminal).
 
 ## [0.1.1] - 2026-08-16
-
-## Unreleased
 
 ### Added
 
