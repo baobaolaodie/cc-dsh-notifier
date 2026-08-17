@@ -43,7 +43,7 @@ jobs:
         if: matrix.node-version == 22
         shell: bash
         run: |
-          COV=$(node --test --experimental-test-coverage test/config.test.mjs test/dedup.test.mjs test/events.test.mjs test/focus.test.mjs test/window-title.test.mjs 2>&1)
+          COV=$(node --test --experimental-test-coverage test/config.test.mjs test/dedup.test.mjs test/events.test.mjs test/focus.test.mjs test/window-title.test.mjs test/bind-window.test.mjs 2>&1)
           LINE=$(echo "$COV" | awk -F'|' '/all files/{gsub(/ /,"",$2); print $2}')
           BRANCH=$(echo "$COV" | awk -F'|' '/all files/{gsub(/ /,"",$3); print $3}')
           echo "line=${LINE}% branch=${BRANCH}%"

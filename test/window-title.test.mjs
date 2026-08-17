@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { titleToCwd, buildWindowMap, PROCESS_WHITELIST, isWhitelistedProcess } from '../scripts/lib/window-map.mjs';
+import { pickConsoleTarget } from '../scripts/lib/win32.mjs';
 
 const CWD = 'D:\\dev\\cc-notifier';
 
@@ -62,4 +63,22 @@ test('Spike ② 定稿:真实进程名不带 .exe 也通过白名单', () => {
   // buildWindowMap 对不带 .exe 的进程名同样过滤/命中
   const map = buildWindowMap([{ hwnd: 9, pid: 9, title: CWD, processName: 'WindowsTerminal' }], [CWD]);
   assert.equal(map.get('9'), CWD);
+});
+
+test('pickConsoleTarget:独立 Windows Terminal 返回可见 owner 标签窗口', () => {
+  assert.equal(pickConsoleTarget({
+    ok: true, hwnd: 111, ownerHwnd: 222, visible: true, ownerVisible: true,
+  }), 222);
+});
+
+test('pickConsoleTarget:原生控制台无 owner 时返回可见 console 窗口', () => {
+  assert.equal(pickConsoleTarget({
+    ok: true, hwnd: 333, ownerHwnd: 0, visible: true, ownerVisible: false,
+  }), 333);
+});
+
+test('pickConsoleTarget:不可见/无句柄返回 0', () => {
+  assert.equal(pickConsoleTarget({ ok: true, hwnd: 444, ownerHwnd: 444, visible: false, ownerVisible: false }), 0);
+  assert.equal(pickConsoleTarget(null), 0);
+  assert.equal(pickConsoleTarget({ ok: true }), 0);
 });

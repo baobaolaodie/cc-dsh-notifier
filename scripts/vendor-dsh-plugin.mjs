@@ -17,6 +17,7 @@ const RUNTIME = path.join(ROOT, 'plugins', 'dsh-notifier', 'lib', 'runtime');
 const LIB_FILES = [
   'events.mjs', 'config.mjs', 'dedup.mjs', 'focus.mjs', 'window-map.mjs',
   'state.mjs', 'logger.mjs', 'win32.mjs', 'proc-dir.mjs', 'daemon-core.mjs',
+  'bind-window.mjs',
   'win32.ps1',
   'foreground.cs', 'activate-tab.cs',
   'notifier-icon.png', 'claude-icon.png',
