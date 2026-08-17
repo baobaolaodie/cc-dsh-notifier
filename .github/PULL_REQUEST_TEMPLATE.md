@@ -30,7 +30,7 @@
 - [ ] 零第三方 npm 依赖约束保持 / Zero third-party npm dependencies maintained
 - [ ] hook JSON 扁平格式兼容未破坏 / Flat hook JSON format compatibility intact
 - [ ] win32.ps1 UTF-8 BOM 保持 / UTF-8 BOM preserved in win32.ps1
-- [ ] 行为变化已记入 CHANGELOG(Unreleased)/ Behavior changes recorded in CHANGELOG (Unreleased)
+- [ ] 行为变化已记入 CHANGELOG/ Behavior changes recorded in CHANGELOG
 - [ ] 无无关文件或本地伪影 / No unrelated files or local artifacts
 
 ## 基于版本 / Based on

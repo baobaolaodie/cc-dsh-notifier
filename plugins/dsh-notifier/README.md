@@ -13,7 +13,7 @@ daemon,复用其 Windows Toast + 点击跳转管线。web 与 tui 两个 surface
 ## 关键机制
 
 - **daemon 生命周期**:任何通知事件都能拉起 daemon;空闲 60s 退出;宿主退出(hostPid 探测)
-  ~90s 内清理;代码变更自动自我重启
+  ~30s 内清理;代码变更自动自我重启
 - **daemon 重启自愈(resync)**:检测状态文件 pid 变化 → 自动重发全部已注册会话的
   session-start(绑定/聚焦恢复)
 - **聚焦静默由 daemon 判定**:在看 → 静默,切走 → 弹;无插件侧交互抑制

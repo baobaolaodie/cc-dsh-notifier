@@ -11,7 +11,7 @@
   - 9 个文件与记忆版有差异,其中 4 个含真实功能回归(toast-agent.py 的 -nosound 静音、daemon.mjs 的 clearState 所有权检查、install.mjs 的 AUMID 失败提示、uninstall.mjs 的 GBK 解码),已全部恢复为真实版
   - **历史中无工具目录(.codex/.claude/.agents/CLAUDE.md/AGENTS.md)、无 node_modules、无 .comet 运行时、无 spikes 实验脚本**
 - **恢复源**:主会话 `<session-id>.jsonl`(4988 行,9.3M)+ 子代理 `<项目对应 projects 目录>/<session-id>/subagents/*.jsonl`(20 个,全部非空)。**注意:子代理记录在 `subagents/` 目录而非 `%TEMP%\tasks\*.output`(后者会被清理且当时为 0 字节)**
-- **spikes 实验脚本**:`scripts/spikes/`(21 个文件,含 AUMID/激活器/lnk/协议/COM 五条路径调试记录)恢复在磁盘但**不入库**(.gitignore 已排除);`recover.py`、`test-fixture-*.json` 同样恢复不入库
+- **spikes 实验脚本**:`scripts/spikes/`(23 个文件,含 AUMID/激活器/lnk/协议/COM 五条路径调试记录)恢复在磁盘但**不入库**(.gitignore 已排除);`recover.py`、`test-fixture-*.json` 同样恢复不入库
 
 ## 已知问题(遗留,需修复)
 
@@ -84,7 +84,7 @@ node scripts/uninstall.mjs  # 卸载
 
 - **架构**:`plugins/dsh-notifier/` 插件(web/tui profile 通用,surface 按 argv 检测)→ cc-dsh-notifier daemon(复用 Toast/聚焦/跳转管线)。**三类通知**(权限请求/提问/等待输入)——工具出错通知已移除(2026-08-16 用户决策:工具失败不会让 agent 停下,只徒增噪音)。
 - **安装(三种方式)**:①tarball `add ./baobaolaodie-cc-dsh-notifier-0.1.5.tgz`(零配置、不 clone 仓库、**最方便**,生产采用);②git `add github:baobaolaodie/cc-dsh-notifier`(公开零配置,但会 clone 整个仓库);③GitHub Packages `add @baobaolaodie/cc-dsh-notifier`(仅维护者渠道:**npm registry 下载始终需 token 即使 public**(2026-08-16 实证:public 后匿名仍 401);profile/.npmrc 配 `@baobaolaodie:registry=https://npm.pkg.github.com` + `//npm.pkg.github.com/:_authToken=<PAT read:packages>`)。Windows 跨盘 junction 缺陷兜底(仅 link 安装):修 junction + `dsh plugin --profile <name> list`。dump-config 验证 `# == <包名>` 层。
-- **daemon 生命周期**:任何事件拉起 / 空闲 60s 退出 / hostPid 存活探测(~90s 清理)/ 代码变更 10s 自我重启 / 插件 resync 重注册会话。核心逻辑在 `scripts/lib/daemon-core.mjs`(可注入,25 项单测)。
+- **daemon 生命周期**:任何事件拉起 / 空闲 60s 退出 / hostPid 存活探测(~30s 清理)/ 代码变更 10s 自我重启 / 插件 resync 重注册会话。核心逻辑在 `scripts/lib/daemon-core.mjs`(可注入,25 项单测)。
 - **聚焦判定**:预编译 `foreground.exe`(~150ms)实时查询 + 浏览器兜底(白名单浏览器标题含 DeepSeek Harness → 静默,**仅 web 事件**)。绑定恢复靠 resync。
 - **CC 窗口绑定(2026-08-16 实测修复)**:CC 跑独立 Windows Terminal(无 -d、标题不含项目名)时靠 `?` 前缀动态标题绑定(全局匹配,仅 claude 事件;dsh-tui 会话 surface=tui 不匹配,防误绑);未重开 session-start 的既有会话走**懒绑定兜底**(toast 时从窗口枚举取 ? 标签窗口)。
 - **dsh-tui 独立终端绑定(2026-08-18)**:dsh 插件带真实 hostPid,`console-hwnd`(=AttachConsole + GetConsoleWindow + GA_ROOTOWNER)精确解析所在终端标签,点击 Toast 跳回正确标签(修好独立终端 `hwnd=0` 不跳)。仅对 `surface=tui` 生效;VSCode 内伪控制台不可见 → 返回 0 走回调标题绑定。Claude Code 绑定顺序:项目名标题 → 全局 `?`(多 `?` 优先前台)。<br> 注意 2026-08-18 反复回归教训:Claude hook 的 `process.ppid` **不可靠**(会指到共享/其它终端),不能当 hostPid 用——精确绑定只给 dsh,Claude 保留标题启发式。

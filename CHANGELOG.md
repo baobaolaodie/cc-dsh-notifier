@@ -42,7 +42,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 - Comet artifacts (`.comet/`, `docs/openspec/`, `docs/superpowers/`) are no longer version-controlled; they remain on disk as local process artifacts.
 - Toasts no longer crash when the host environment resolves a different `python` (missing `winrt`): the installer records the interpreter's absolute path in `pythonPath`.
 - Focus detection uses a real-time foreground query instead of a stale poll cache, eliminating toasts suppressed while the user has already switched away (and the opposite race).
-- Windows Toast jump now activates a DeepSeek Harness browser tab via UIA (candidate matching: session title, then product name).
+- Windows Toast jump now activates a DeepSeek Harness browser tab via CDP when a debugging port is available, with a UIA fallback (candidate matching: session title, then product name).
 
 ## [0.1.0] - 2026-08-14
 

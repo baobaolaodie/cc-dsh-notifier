@@ -42,7 +42,7 @@
 - Comet 产物(`.comet/`、`docs/openspec/`、`docs/superpowers/`)不再纳入版本控制;磁盘保留,作为本地过程产物。
 - 宿主环境解析到不同 `python`(缺 winrt)时 Toast 不再崩溃:安装器把解释器绝对路径写入 `pythonPath`。
 - 聚焦判定改用实时前台查询(替代陈旧轮询缓存),消除"已切走仍被静默"的假静默(及反向竞态)。
-- Windows Toast 点击跳转现在通过 UIA 激活 DeepSeek Harness 浏览器 tab(候选匹配:会话标题 → 产品名)。
+- Windows Toast 点击跳转现在可经 CDP 精确激活 DeepSeek Harness 浏览器 tab(有调试端口时),无端口则回退 UIA(候选匹配:会话标题 → 产品名)。
 
 ## [0.1.0] - 2026-08-14
 
@@ -50,7 +50,7 @@
 
 ### 新增
 
-- 三类中断事件通知:权限请求、AskUserQuestion 提问、Stop(等待输入)
+- 四类中断事件通知:权限请求、AskUserQuestion 提问、工具报错、Stop(等待输入)
 - 聚焦感知:会话窗口聚焦时静默,失焦时才通知
 - 原生 Windows Toast + 声音(Python winrt);点击跳转走进程内 `Activated` 回调与 `SetForegroundWindow`
 - 多会话支持:每会话独立窗口绑定,Toast 携带项目名
