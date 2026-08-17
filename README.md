@@ -62,6 +62,7 @@ dsh plugin --profile web add ./cc-dsh-notifier-0.1.5.tgz
 dsh plugin --profile dsh-tui add ./cc-dsh-notifier-0.1.5.tgz
 ```
 
+> **版本说明 / Version note**: 顶部徽章 `0.1.2` 是 root 包版本;上方 tarball 名 `0.1.5` 是 dsh 插件包版本,两者是两个独立发布单元(en: top badge = root package, tarball = dsh plugin; independent release units).
 **Alternative — git install** (clones the whole repository, zero config):
 
 ```bash
