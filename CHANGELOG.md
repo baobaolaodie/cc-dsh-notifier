@@ -12,6 +12,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ## Unreleased
 
+### Fixed
+
+- Toast click-to-return no longer restores a maximized session window to normal size: `SW_RESTORE` is now applied only to minimized windows (`IsIconic`), so maximized windows stay maximized when a toast is clicked (visible in VS Code integrated terminal).
+
 ## [0.1.1] - 2026-08-16
 
 ## Unreleased
