@@ -24,7 +24,7 @@ While the session window is focused, notifications are suppressed. Focus is chec
 
 Clicking a toast brings the session window back to the foreground.
 
-- **Claude Code / dsh tui** — the terminal window bound at SessionStart, resolved by process working directory, the `?`-prefixed tab title, or the project name in the title.
+- **Claude Code / dsh tui** — the terminal window bound at SessionStart. Claude Code resolves by the `?`-prefixed tab title or the project name in the window title; a standalone dsh-tui resolves its terminal tab via the dsh host PID (`console-hwnd`), so clicking returns to the exact tab.
 - **dsh web** — the browser window is brought forward and the DeepSeek Harness tab is activated via UIA (candidate match: session title, then product name).
 
 If the daemon is unavailable, notifications degrade to plain toasts without click-to-return.
