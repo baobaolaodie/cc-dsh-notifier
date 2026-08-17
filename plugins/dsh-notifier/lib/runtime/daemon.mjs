@@ -142,7 +142,7 @@ async function bindWindow(event) {
     getCdpPort().catch(() => {}); // 预取 CDP 端口(后台)
     return 0;
   }
-// dsh-tui 独立终端:优先用 hostPid 精确定位控制台/标签窗口;
+  // dsh-tui 独立终端:优先用 hostPid 精确定位控制台/标签窗口;
   // 不可见或失败时继续向下走目录/标题匹配(VSCode 集成终端、Claude Code 不受影响)
   if (event.surface === 'tui' && event.hostPid) {
     const target = await consoleTargetForPid(event.hostPid);
@@ -168,12 +168,15 @@ async function bindWindow(event) {
   const isClaude = !event.surface || event.surface === 'claude';
   const ccTagDir = isClaude ? dirMatched.find((w) => /^\?\s/.test(w.title || '')) : undefined;
   if (ccTagDir) return ccTagDir.hwnd;
-  const ccTagAny = isClaude ? all.find((w) => /^\?\s/.test(w.title || '')) : undefined;
-  if (ccTagAny) return ccTagAny.hwnd;
-  if (dirMatched.length > 0) return dirMatched[0].hwnd;
+  // 先按标题含项目名精确命中(VSCode 等窗口标题可靠包含项目名);
+  // 再退到全局 ? 前缀(独立 Windows Terminal 的 Claude Code 动态标题),
+  // 避免 VSCode 里的 Claude Code 被全局 ? 误绑到其他终端标签(2026-08-18 回归)
   for (const w of all) {
     if (titleMatches(w)) return w.hwnd;
   }
+  const ccTagAny = isClaude ? all.find((w) => /^\?\s/.test(w.title || '')) : undefined;
+  if (ccTagAny) return ccTagAny.hwnd;
+  if (dirMatched.length > 0) return dirMatched[0].hwnd;
   const fg = await freshForeground();
   if (fg && fg[0] && (dirMatches(fg[0]) || titleMatches(fg[0]) || (isClaude && /^\?\s/.test(fg[0].title || '')))) {
     return fg[0].hwnd;
@@ -196,23 +199,23 @@ async function showToast(event) {
       && /deepseek harness/i.test(w.title || ''));
     if (hit) hwnd = hit.hwnd;
   }
-// dsh-tui 懒绑定兜底(2026-08-18):SessionStart 绑定失败或 daemon 重启后会话表
+  // dsh-tui 懒绑定兜底(2026-08-18):SessionStart 绑定失败或 daemon 重启后会话表
   // 已丢失时,用会话/事件自带的 hostPid 精确定位控制台窗口,恢复 Toast 点击跳转
   if (!hwnd && surface === 'tui') {
     const hostPid = (sess && sess.hostPid) || event.hostPid;
     if (hostPid) hwnd = await consoleTargetForPid(hostPid);
   }
-  // Claude Code 懒绑定兜底(2026-08-16):现有 CC 会话未重新 session-start 时无绑定,
-  // 从最近枚举找 ? 标签窗口(CC 动态标题特征)作为跳转目标——无需重开会话即可跳转
-  if (!hwnd && surface === 'claude') {
-    const hit = lastEntries.find((w) => isWhitelistedProcess(w.processName, TERMINAL_WHITELIST)
-      && /^\?\s/.test(w.title || ''));
-    if (hit) hwnd = hit.hwnd;
-  }
+  // 懒绑定优先用窗口映射(cwd 精确匹配,覆盖 VSCode 窗口标题);再退到 Claude Code
+  // 的 ? 动态标签(独立 Windows Terminal 场景),避免 VSCode CC 被全局 ? 误绑(2026-08-18 回归)
   if (!hwnd) {
     for (const [h, c] of windowMap) {
       if (normalizeCwd(c) === target) { hwnd = Number(h); break; }
     }
+  }
+  if (!hwnd && surface === 'claude') {
+    const hit = lastEntries.find((w) => isWhitelistedProcess(w.processName, TERMINAL_WHITELIST)
+      && /^\?\s/.test(w.title || ''));
+    if (hit) hwnd = hit.hwnd;
   }
   const args = [TOAST, '-Title', title, '-Body', body];
   if (event.lang) args.push('-Lang', event.lang);
