@@ -130,7 +130,7 @@ jobs:
             const P = [];
 
             // Branch prefix (feature branches carry a conventional prefix)
-            if (!/^(feat|fix|docs|chore|hotfix|ci|test)\//.test(pr.head.ref))
+            if (!/^(feat|fix|docs|chore|hotfix|ci|test|release)\//.test(pr.head.ref))
               P.push(`PR head branch must carry a feat/fix/docs/chore/hotfix/ci/test prefix, got ${pr.head.ref}`);
 
             // PR template completeness: 4 bilingual sections + 17 checkboxes (deletion = fail)
@@ -152,11 +152,11 @@ jobs:
             }
 
             // PR title must follow Conventional Commits
-            const titleConv = /^(feat|fix|docs|chore|test|ci|refactor|perf|build|revert)(\([^)]+\))?: .+/;
+            const titleConv = /^(feat|fix|docs|chore|test|ci|refactor|perf|build|revert|release)(\([^)]+\))?: .+/;
             if (!titleConv.test(pr.title)) P.push(`PR title not Conventional Commits: "${pr.title}"`);
 
             // Commit messages must follow Conventional Commits
-            const conv = /^(feat|fix|docs|chore|test|ci|refactor|perf|build|revert)(\([^)]+\))?: .+/;
+            const conv = /^(feat|fix|docs|chore|test|ci|refactor|perf|build|revert|release)(\([^)]+\))?: .+/;
             const commits = await github.rest.pulls.listCommits({
               owner: context.repo.owner, repo: context.repo.repo, pull_number: pr.number,
             });
