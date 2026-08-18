@@ -47,6 +47,7 @@ jobs:
           LINE=$(echo "$COV" | awk -F'|' '/all files/{gsub(/ /,"",$2); print $2}')
           BRANCH=$(echo "$COV" | awk -F'|' '/all files/{gsub(/ /,"",$3); print $3}')
           echo "line=${LINE}% branch=${BRANCH}%"
+          # shellcheck disable=SC2016
           node -e '
             const line = parseFloat(process.argv[1]);
             const branch = parseFloat(process.argv[2]);
