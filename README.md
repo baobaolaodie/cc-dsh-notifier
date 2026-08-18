@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/baobaolaodie/cc-dsh-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.1-4CAF50?style=flat" alt="version 0.1.1" /></a>
+  <a href="https://github.com/baobaolaodie/cc-dsh-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.2-4CAF50?style=flat" alt="version 0.1.2" /></a>
   <a href="https://docs.anthropic.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude_Code-D97757?style=flat&logo=claude&logoColor=white" alt="Claude Code" /></a>
   <img src="https://img.shields.io/badge/DeepSeek_Harness-4D6BFE?style=flat&logo=deepseek&logoColor=white" alt="DeepSeek Harness" />
   <img src="https://img.shields.io/badge/Windows_10%2F11-0078D6?style=flat&logo=windows&logoColor=white" alt="Windows 10/11" />
@@ -32,7 +32,7 @@ cc-dsh-notifier raises a native Windows toast with sound when an agent needs you
 |---|---|
 | Interruption events | Notifies on permission requests, questions, and waiting for input |
 | Focus awareness | Suppresses notifications while the session window is focused; notifies only when it is not |
-| Click-to-return | `SetForegroundWindow` targets the session window; browser tabs activate via UIA |
+| Click-to-return | `SetForegroundWindow` targets the session window; browser tabs activate via CDP, with a UIA fallback |
 | Multi-session | Each session binds its own window handle; toasts carry the session identity |
 | Localized notifications | Toast text follows the Windows display language (`auto`) or a `language` setting (`zh`/`en`) |
 | DeepSeek Harness | The `dsh-notifier` plugin covers web and tui profiles with one install |
@@ -58,10 +58,11 @@ The installer backs up `~/.claude/settings.json`, injects five hooks, registers 
 **Recommended — download the tarball from the [latest release](https://github.com/baobaolaodie/cc-dsh-notifier/releases) and install it** (no repository clone, no credentials):
 
 ```bash
-dsh plugin --profile web add ./cc-dsh-notifier-0.1.4.tgz
-dsh plugin --profile dsh-tui add ./cc-dsh-notifier-0.1.4.tgz
+dsh plugin --profile web add ./baobaolaodie-cc-dsh-notifier-0.1.5.tgz
+dsh plugin --profile dsh-tui add ./baobaolaodie-cc-dsh-notifier-0.1.5.tgz
 ```
 
+> **版本说明 / Version note**: 顶部徽章 `0.1.2` 是 root 包版本;上方 tarball 名 `0.1.5` 是 dsh 插件包版本,两者是两个独立的发布单元(en: top badge = root package, tarball = dsh plugin; independent release units).
 **Alternative — git install** (clones the whole repository, zero config):
 
 ```bash
@@ -132,7 +133,7 @@ flowchart LR
     DSH["dsh-notifier<br/>plugin · web/tui"] --> NA
     NA -->|"HTTP · localhost"| DM["daemon.mjs<br/>sessions · focus · lifecycle"]
     DM --> TA["toast-agent.py<br/>winrt toast"]
-    TA -->|"click"| WIN["session window<br/>SetForegroundWindow · UIA tab"]
+    TA -->|"click"| WIN["session window<br/>SetForegroundWindow · CDP/UIA tab"]
     DM --> ST[("state · logs<br/>%LOCALAPPDATA%")]
 
     classDef client fill:#3B82F6,stroke:#2563EB,color:#fff,stroke-width:2px
@@ -153,7 +154,7 @@ The daemon is single-instance: it wakes on demand, exits after 60 seconds of no 
 │   ├── notify-agent.mjs   # Hook forwarder (Claude Code)
 │   ├── daemon.mjs         # Resident process: sessions, focus, dedup
 │   ├── toast-agent.py     # Python winrt toast + click handling
-│   └── lib/               # Shared modules, win32 bridge, UIA helpers
+│   └── lib/               # Shared modules, win32 bridge, CDP/UIA helpers
 ├── plugins/
 │   └── dsh-notifier/      # dsh bundle plugin (web + tui profiles)
 ├── test/                  # node:test suite (explicit file list)
@@ -167,7 +168,7 @@ The daemon is single-instance: it wakes on demand, exits after 60 seconds of no 
 |---|---|---|
 | Runtime | Node.js 18+ (ESM) | Forwarder, daemon, plugin |
 | Notifications | Python 3 + winrt | Windows toast rendering and activation |
-| Window bridge | PowerShell 5.1 + C# helpers | Window enumeration, foreground query, UIA tab activation |
+| Window bridge | PowerShell 5.1 + C# helpers | Window enumeration, foreground query, CDP/UIA tab activation |
 | Testing | node:test | Unit + integration tests |
 
 ## Deployment

@@ -4,7 +4,8 @@
 // win32 桥/共享库/图标 复制到 plugins/dsh-notifier/lib/runtime/。
 // - daemon.mjs 与 toast-agent.py 内部全部使用相对引用,复制后自动适配
 // - 幂等:每次全量复制;pretest(prepack 前置)保证测试与打包前 runtime 最新
-// - runtime/ 为生成物(gitignore),不入库
+// - runtime/ 必须入库(git 追踪):git install 渠道克隆仓库后插件需自包含运行;
+//   仅 .tgz 打包产物被 gitignore。修改根项目共享库后必须重跑本脚本并提交 runtime 新快照。
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

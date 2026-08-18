@@ -24,8 +24,8 @@ Toast 文案默认跟随系统显示语言(`auto`),可由配置项 `language`(`z
 
 点击 Toast 将会话窗口带回前台。
 
-- **Claude Code / dsh tui** — SessionStart 绑定的终端窗口,按进程工作目录、`?` 前缀标签标题、标题含项目名依次解析。
-- **dsh web** — 置前浏览器窗口并经 UIA 激活 DeepSeek Harness tab(候选匹配:会话标题 → 产品名)。
+- **Claude Code / dsh tui** — SessionStart 绑定的终端窗口。Claude Code 按 `?` 前缀标签标题、标题含项目名解析;独立终端的 dsh-tui 按 dsh 宿主进程 pid 精确解析其终端标签,点击即跳回该标签。
+- **dsh web** — 置前浏览器窗口;有调试端口时经 CDP 精确激活 DeepSeek Harness tab,否则回退 UIA(候选匹配:会话标题 → 产品名)。
 
 daemon 不可用时,通知降级为无点击跳转的基础 Toast。
 
@@ -36,7 +36,7 @@ daemon 不可用时,通知降级为无点击跳转的基础 Toast。
 - **web profile** — 事件绑定浏览器窗口;前台浏览器窗口的活动 tab 是任意 DeepSeek Harness 页面时静默。
 - **dsh-tui profile** — 事件绑定终端窗口。
 
-daemon 生命周期全自动:任意通知事件唤醒;最后一个会话结束后 60 秒退出;宿主退出经 `hostPid` 探测约 90 秒内清理;daemon 重启后会话自动重注册;修改 daemon 代码 10 秒内自动重启。
+daemon 生命周期全自动:任意通知事件唤醒;最后一个会话结束后 60 秒退出;宿主退出经 `hostPid` 探测约 30 秒内清理;daemon 重启后会话自动重注册;修改 daemon 代码 10 秒内自动重启。
 
 ## 手动触发(测试)
 

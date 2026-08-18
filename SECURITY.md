@@ -25,5 +25,5 @@ Project maintainers respond within 48 hours.
 
 - Zero third-party npm dependencies; the attack surface is limited to the local machine
 - No failure in the notification pipeline blocks the Claude Code session
-- Runtime data (logs, history) is stored only in `%LOCALAPPDATA%\cc-notifier\`, never transmitted across processes or network
+- Runtime data (logs, history) is stored only in `%LOCALAPPDATA%\cc-notifier\`; event forwarding stays on loopback (`127.0.0.1`) and never leaves the machine
 - The local HTTP IPC listens only on 127.0.0.1 on a random port, not reachable externally

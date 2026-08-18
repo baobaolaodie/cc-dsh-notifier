@@ -10,16 +10,14 @@
 
 格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/);版本遵循 [语义化版本](https://semver.org/lang/zh-CN/)。版本记录于 git 标签与本文件。
 
-## Unreleased
+## [0.1.2] - 2026-08-18
 
 ### 修复
 
-- 点击 Toast 跳回会话窗口时不再把最大化窗口还原为正常尺寸:`SW_RESTORE` 现仅对最小化窗口生效(`Isonic` 判定),最大化窗口点击 Toast 后保持最大化(VS Code 集成终端可见)。
 - dsh-tui 运行于独立终端时现按 dsh 宿主进程 pid(`console-hwnd`)解析其窗口,点击 Toast 会跳回正确的终端标签,而非 `hwnd=0`。Claude Code 窗口绑定保持原有启发式:含项目名的标题现在优先于全局 `?` 标签,避免 VSCode 内的 Claude 会话被误绑到其它 `?` 标签;多个 `?` 标签并存时优先前台那个。
+- 点击 Toast 跳回会话窗口时不再把最大化窗口还原为正常尺寸:`SW_RESTORE` 现仅对最小化窗口生效(`IsIconic` 判定),最大化窗口点击 Toast 后保持最大化(VS Code 集成终端可见)。
 
 ## [0.1.1] - 2026-08-16
-
-
 
 ### 新增
 
@@ -44,7 +42,7 @@
 - Comet 产物(`.comet/`、`docs/openspec/`、`docs/superpowers/`)不再纳入版本控制;磁盘保留,作为本地过程产物。
 - 宿主环境解析到不同 `python`(缺 winrt)时 Toast 不再崩溃:安装器把解释器绝对路径写入 `pythonPath`。
 - 聚焦判定改用实时前台查询(替代陈旧轮询缓存),消除"已切走仍被静默"的假静默(及反向竞态)。
-- Windows Toast 点击跳转现在通过 UIA 激活 DeepSeek Harness 浏览器 tab(候选匹配:会话标题 → 产品名)。
+- Windows Toast 点击跳转现在可经 CDP 精确激活 DeepSeek Harness 浏览器 tab(有调试端口时),无端口则回退 UIA(候选匹配:会话标题 → 产品名)。
 
 ## [0.1.0] - 2026-08-14
 
@@ -52,7 +50,7 @@
 
 ### 新增
 
-- 三类中断事件通知:权限请求、AskUserQuestion 提问、Stop(等待输入)
+- 四类中断事件通知:权限请求、AskUserQuestion 提问、工具报错、Stop(等待输入)
 - 聚焦感知:会话窗口聚焦时静默,失焦时才通知
 - 原生 Windows Toast + 声音(Python winrt);点击跳转走进程内 `Activated` 回调与 `SetForegroundWindow`
 - 多会话支持:每会话独立窗口绑定,Toast 携带项目名

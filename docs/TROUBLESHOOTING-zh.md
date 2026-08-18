@@ -24,7 +24,7 @@
 ## Toast 显示但点击不跳转
 
 - 通知时 daemon 不可用(降级 Toast,设计上无跳转)。查看 `notify-agent.log` 中的 `fallback toast`。
-- SessionStart 时窗口句柄绑定失败:终端标题不含项目名且进程工作目录不匹配。查看 `daemon.log` 中该会话的 `toast hwnd=0` 行(句柄从未绑定)。
+- SessionStart 时窗口句柄绑定失败:终端标题不含项目名、进程工作目录不匹配,且(独立终端的 dsh-tui)宿主进程 pid 无法解析到控制台窗口。查看 `daemon.log` 中该会话的 `toast hwnd=0` 行(句柄从未绑定)。
 - 终端多标签时绑定了错误标签——`?` 前缀标签(Claude Code 动态标题)优先。
 
 ## 事件触发了但 Toast 从未出现

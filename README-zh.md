@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/baobaolaodie/cc-dsh-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.1-4CAF50?style=flat" alt="version 0.1.1" /></a>
+  <a href="https://github.com/baobaolaodie/cc-dsh-notifier/releases"><img src="https://img.shields.io/badge/version-0.1.2-4CAF50?style=flat" alt="version 0.1.2" /></a>
   <a href="https://docs.anthropic.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude_Code-D97757?style=flat&logo=claude&logoColor=white" alt="Claude Code" /></a>
   <img src="https://img.shields.io/badge/DeepSeek_Harness-4D6BFE?style=flat&logo=deepseek&logoColor=white" alt="DeepSeek Harness" />
   <img src="https://img.shields.io/badge/Windows_10%2F11-0078D6?style=flat&logo=windows&logoColor=white" alt="Windows 10/11" />
@@ -32,7 +32,7 @@ cc-dsh-notifier 在代理需要你介入、而你没有看着它的窗口时,弹
 |---|---|
 | 中断事件 | 权限请求、提问、等待输入均会通知 |
 | 聚焦感知 | 会话窗口聚焦时静默,失焦时才通知 |
-| 点击跳转 | `SetForegroundWindow` 聚焦会话窗口;浏览器 tab 经 UIA 激活 |
+| 点击跳转 | `SetForegroundWindow` 聚焦会话窗口;浏览器 tab 经 CDP 激活,TAB 无端口时回退 UIA |
 | 多会话 | 每个会话绑定各自窗口句柄;Toast 携带会话身份 |
 | 本地化通知 | Toast 文案跟随系统显示语言(`auto`)或 `language` 设置(`zh`/`en`) |
 | DeepSeek Harness | `dsh-notifier` 插件一次安装覆盖 web 与 tui 两个 profile |
@@ -58,10 +58,11 @@ node scripts/install.mjs
 **推荐 —— 从[最新 Release](https://github.com/baobaolaodie/cc-dsh-notifier/releases)下载 tarball 后安装**(无需 clone 仓库、无凭据):
 
 ```bash
-dsh plugin --profile web add ./cc-dsh-notifier-0.1.4.tgz
-dsh plugin --profile dsh-tui add ./cc-dsh-notifier-0.1.4.tgz
+dsh plugin --profile web add ./baobaolaodie-cc-dsh-notifier-0.1.5.tgz
+dsh plugin --profile dsh-tui add ./baobaolaodie-cc-dsh-notifier-0.1.5.tgz
 ```
 
+> **版本说明**: 顶部徽章 `0.1.2` 是 root 包版本;上方 tarball 名 `0.1.5` 是 dsh 插件包版本,两者是两个独立的发布单元(en: top badge = root package, tarball = dsh plugin; independent release units).
 **备选 —— git 安装**(会 clone 整个仓库,零配置):
 
 ```bash
@@ -132,7 +133,7 @@ flowchart LR
     DSH["dsh-notifier<br/>plugin · web/tui"] --> NA
     NA -->|"HTTP · localhost"| DM["daemon.mjs<br/>sessions · focus · lifecycle"]
     DM --> TA["toast-agent.py<br/>winrt toast"]
-    TA -->|"click"| WIN["session window<br/>SetForegroundWindow · UIA tab"]
+    TA -->|"click"| WIN["session window<br/>SetForegroundWindow · CDP/UIA tab"]
     DM --> ST[("state · logs<br/>%LOCALAPPDATA%")]
 
     classDef client fill:#3B82F6,stroke:#2563EB,color:#fff,stroke-width:2px
@@ -153,7 +154,7 @@ daemon 为单实例:按需唤醒,无会话 60 秒后退出,代码变更时自动
 │   ├── notify-agent.mjs   # hook 转发器(Claude Code)
 │   ├── daemon.mjs         # 常驻进程:会话、聚焦、去重
 │   ├── toast-agent.py     # Python winrt Toast + 点击处理
-│   └── lib/               # 共享模块、win32 桥、UIA 助手
+│   └── lib/               # 共享模块、win32 桥、CDP/UIA 助手
 ├── plugins/
 │   └── dsh-notifier/      # dsh 组合包插件(web + tui profile)
 ├── test/                  # node:test 套件(显式文件清单)
@@ -167,7 +168,7 @@ daemon 为单实例:按需唤醒,无会话 60 秒后退出,代码变更时自动
 |---|---|---|
 | 运行时 | Node.js 18+(ESM) | 转发器、daemon、插件 |
 | 通知 | Python 3 + winrt | Windows Toast 渲染与激活 |
-| 窗口桥 | PowerShell 5.1 + C# 助手 | 窗口枚举、前台查询、UIA tab 激活 |
+| 窗口桥 | PowerShell 5.1 + C# 助手 | 窗口枚举、前台查询、CDP/UIA tab 激活 |
 | 测试 | node:test | 单元 + 集成测试 |
 
 ## 部署
