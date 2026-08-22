@@ -1,0 +1,44 @@
+{
+  "$schema": "https://dsh.community/schemas/dsh-plugin-0.15.json",
+  "manifestVersion": "0.15",
+  "id": "io.github.baobaolaodie.cc-dsh-notifier",
+  "name": "cc-dsh-notifier",
+  "version": "0.1.5",
+  "facets": {
+    "host": {
+      "entry": "plugins/dsh-notifier/lib/ecosystem.mjs",
+      "apiVersion": "v1alpha1"
+    }
+  },
+  "requires": {
+    "contracts": [],
+    "services": []
+  },
+  "permissions": [],
+  "contributes": {
+    "commands": [],
+    "panels": []
+  },
+  "subscriptions": [],
+  "license": "MIT",
+  "source": {
+    "repository": "https://github.com/baobaolaodie/cc-dsh-notifier"
+  },
+  "overrides": [
+    {
+      "target": "package.json#dsh.bundle",
+      "kind": "native",
+      "description": "The existing Cordis bundle remains the sole functional runtime"
+    },
+    {
+      "target": "plugins/dsh-notifier/cordis.patch.yml",
+      "kind": "patch",
+      "description": "Bundle patch used by the packaged tarball install channel"
+    },
+    {
+      "target": "platform/win32",
+      "kind": "native",
+      "description": "Toast display and click-to-return depend on Windows 10/11 (Python winrt + window bridge); non-Windows hosts load with platform degradation logs"
+    }
+  ]
+}
