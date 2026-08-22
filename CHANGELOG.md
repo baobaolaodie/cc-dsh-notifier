@@ -10,6 +10,12 @@ All notable changes to this project are documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/). Versions are recorded in git tags and this document.
 
+## Unreleased
+
+### Added
+
+- dsh ecosystem adaptation: the repository root now declares `dsh-plugin.json` (Community v0.15 manifest) plus a declaration-only facet entry (`plugins/dsh-notifier/lib/ecosystem.mjs`), so dsh-ecosystem-spec tooling and the dshtui.com listing can discover the plugin without touching its runtime; the existing Cordis bundle stays the sole functional runtime and all three install channels are unchanged. Both READMEs link the dsh-TUI ecosystem project.
+
 ## [0.1.2] - 2026-08-18
 
 ### Fixed

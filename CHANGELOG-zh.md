@@ -10,6 +10,12 @@
 
 格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/);版本遵循 [语义化版本](https://semver.org/lang/zh-CN/)。版本记录于 git 标签与本文件。
 
+## Unreleased
+
+### 新增
+
+- dsh 生态适配:仓库根新增 `dsh-plugin.json`(Community v0.15 manifest)与声明式 facet 入口(`plugins/dsh-notifier/lib/ecosystem.mjs`),让 dsh-ecosystem-spec 工具链与 dshtui.com 收录列表可发现本插件且不触碰其运行时;既有 Cordis bundle 保持唯一功能运行时,三条安装渠道行为不变。双语 README 增加 dsh-TUI 生态项目链接。
+
 ## [0.1.2] - 2026-08-18
 
 ### 修复

@@ -74,6 +74,8 @@ dsh plugin --profile dsh-tui add github:baobaolaodie/cc-dsh-notifier
 
 Verified against dsh 0.1.0-rc.6 on Windows 11 (2026-08-16): web and tui profiles, permission/question/waiting-for-input notifications, focus-aware silence, click-to-return, and the tarball install flow.
 
+[dsh-TUI](https://github.com/ccch1mneyyy/dsh-TUI) · A Windows toast notifier plugin in the dsh-TUI ecosystem.
+
 ### Verify
 
 ```bash
