@@ -93,3 +93,7 @@ node scripts/uninstall.mjs  # 卸载
 - **发布/收录(2026-08-18 更新)**:生产 profile 用 **tarball 0.1.5**(零配置最方便);GitHub Packages 发布 `@baobaolaodie/cc-dsh-notifier`(0.1.3 为坏包——patch name 裸 @ 前缀 YAML 解析失败,0.1.4 修复并重发;`npm publish --registry=https://npm.pkg.github.com --access public`,下载需 token);根 package.json 声明 `dsh.bundle` + `main` 供 git 安装与生态雷达识别;runtime 入库(prepare/pretest 幂等同步);git 安装端到端验证(坑 1:patch 相对路径按 profile 目录解析,必须用包名;坑 2:root patch 名必须 = 根 package.json name(git 安装依赖名),scoped 名只用于子包);awesome-dsh-plugins 收录 PR #185 **已合并**(条目 cc-dsh-notifier);WSL Linux 加载级 PASS(降级日志)。
 - **生态 manifest 同步(2026-08-22)**:仓库根 `dsh-plugin.json` 是 dsh-ecosystem-spec Community v0.15 的声明层(declaration-only facet,`plugins/dsh-notifier/lib/ecosystem.mjs`,零依赖内联 FacetModule 形状),`version` 字段与插件包对齐(0.1.5);**CI 版本一致性检查不覆盖该文件,发布新插件版本时须手动同步**;上游准入校验:`npm run validate:manifest -- --manifest ./dsh-plugin.json`(在 T-Auto/dsh-ecosystem-spec 检出中运行,Node ≥22.19/24)。
 - **恢复**:daemon 被杀/异常 → 任何通知事件自动拉起;绑定丢失 → resync 自愈;改代码 → 自我重启,无需手动。
+
+## CHANGELOG/文档门禁陷阱(2026-08-23)
+
+- **CI 版本一致性检查不容忍顶部 `## [Unreleased]`**:`grep -m1 '^## \['` 取首个方括号标题并 sed 提取 semver,`[Unreleased]` 提取不出 → 五处比对失败(quality job exit 1,PR #9 首推踩中)。未发布内容一律用**无方括号** `## Unreleased` 标题;发版时再改为 `## [x.y.z] - 日期`。

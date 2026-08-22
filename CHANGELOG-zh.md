@@ -10,7 +10,7 @@
 
 格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/);版本遵循 [语义化版本](https://semver.org/lang/zh-CN/)。版本记录于 git 标签与本文件。
 
-## [Unreleased]
+## Unreleased
 
 ### 新增
 
