@@ -161,6 +161,7 @@ The daemon is single-instance: it wakes on demand, exits after 60 seconds of no 
 │   └── dsh-notifier/      # dsh bundle plugin (web + tui profiles)
 ├── test/                  # node:test suite (explicit file list)
 ├── docs/                  # Installation, usage, troubleshooting (bilingual)
+├── dsh-plugin.json        # dsh-ecosystem-spec Community v0.15 declaration manifest
 └── package.json           # Zero runtime dependencies
 ```
 

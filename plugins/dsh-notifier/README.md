@@ -19,6 +19,9 @@ daemon,复用其 Windows Toast + 点击跳转管线。web 与 tui 两个 surface
 - **聚焦静默由 daemon 判定**:在看 → 静默,切走 → 弹;无插件侧交互抑制
 - **性能红线**:session/event 热路径先纯内存过滤(Set.has)再读配置/语言;`gate()` 按 cwd
   缓存(有界 64);resync 仅在通知事件路径执行
+- **生态声明 facet(`lib/ecosystem.mjs`)**:declaration-only——activate 零副作用,snapshot
+  返回 `state:"degraded"`("Native Cordis runtime owns all notifier effects");仅供电生
+  工具/上游准入发现,勿在其中挂业务逻辑
 
 ## 安装(本地开发,仓库根目录执行)
 

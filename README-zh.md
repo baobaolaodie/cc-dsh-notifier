@@ -161,6 +161,7 @@ daemon 为单实例:按需唤醒,无会话 60 秒后退出,代码变更时自动
 │   └── dsh-notifier/      # dsh 组合包插件(web + tui profile)
 ├── test/                  # node:test 套件(显式文件清单)
 ├── docs/                  # 安装、使用、排障(双语)
+├── dsh-plugin.json        # dsh-ecosystem-spec Community v0.15 声明清单
 └── package.json           # 零运行时依赖
 ```
 

@@ -97,3 +97,4 @@ node scripts/uninstall.mjs  # 卸载
 ## CHANGELOG/文档门禁陷阱(2026-08-23)
 
 - **CI 版本一致性检查不容忍顶部 `## [Unreleased]`**:`grep -m1 '^## \['` 取首个方括号标题并 sed 提取 semver,`[Unreleased]` 提取不出 → 五处比对失败(quality job exit 1,PR #9 首推踩中)。未发布内容一律用**无方括号** `## Unreleased` 标题;发版时再改为 `## [x.y.z] - 日期`。
+- **Comet build 守卫的 run-step 死锁解法(2026-08-23)**:tasks 全勾后若 `record-check`/`state next` 报 "Classic Run step mismatch: expected tweak.build.complete, got tweak.build.execute"(run 投影滞后于 evidence),直接跑合法状态事件 `comet state transition <name> build-complete` 原子同步 run 投影并推进 phase,再 record-check 即可;guard 的 Build-passes 检查需要 record-check 证据(本仓库无 build script,用 `npm test` 充当)。另:分支名/提交类型须落 pr-policy 白名单(`feat|fix|docs|chore|...`),tweak 预设的 `tweak/`、`tweak:` 会被拒。
